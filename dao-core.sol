@@ -52,7 +52,6 @@ contract token {
 }
 
 contract DAO {
-
     address public daoFounder;
     address public daoFounderContr;
     address public daoMarketContr;
@@ -106,7 +105,7 @@ contract DAO {
     }
 
     function daoShareCost() returns (uint shareCost) {
-        shareCost = creditTurn/sharesAmount;
+        shareCost = creditTurn*100/sharesAmount;
     }
 
     function daoCreditPower() returns (uint creditPower) {
@@ -115,7 +114,7 @@ contract DAO {
 
     function daoShareSale(uint _shareAmount) returns (uint creditReward) {
         if(daoShares.tokenBalanceOf(msg.sender)>=_shareAmount) {
-            creditReward = daoShareCost()*_shareAmount;
+            creditReward = daoShareCost()*_shareAmount/100;
             daoCredits.emission(msg.sender, creditReward);
             daoShares.burn(msg.sender, _shareAmount);
         }
@@ -123,7 +122,7 @@ contract DAO {
 
     function daoShareBuy(uint _creditAmount) returns (uint shares) {
         if(daoCredits.tokenBalanceOf(msg.sender)>=_creditAmount) {
-            shares = daoCreditPower()*_creditAmount;
+            shares = daoCreditPower()*_creditAmount/100;
             daoShares.emission(msg.sender, shares);
             daoCredits.burn(msg.sender, _creditAmount);
         }
@@ -172,6 +171,14 @@ contract agent {
     address daoAddr;
     DAO public dao;
 
+    /* Agents contract list*/
+
+    AgentContract[] public agentContracts;
+    struct AgentContract {
+        address agentContractAddr;
+        string abi;
+    }
+
     modifier controlCheck { if (msg.sender == controlAddr) _ }
 
     function agent(address _daoAddr) {
@@ -186,7 +193,7 @@ contract agent {
         }
     }     
 
-    function setAgent(address _agentAddr) controlCheck returns(bool result) {
+    function setNewAgent(address _agentAddr) controlCheck returns(bool result) {
         dao.setAgent(_agentAddr);
         return true;
     } 
@@ -197,8 +204,10 @@ contract market {
     DAO public dao;
 
     struct Order {
+        uint orderID;
         address owner;
         uint amount;
+        uint price;
     }
 
 
@@ -215,6 +224,7 @@ contract market {
     mapping (address => bool) buyExistOf;
     mapping (address => uint) buyDataOf;
 
+
     function getSellList(address _assetAddr) returns(uint assetID) {
         return 0;
     }
@@ -223,25 +233,47 @@ contract market {
         return 0;
     }
 
-    function addSell(address _assetAddr, uint amount) returns(uint assetID) {
-        return 0;
+    function addSell(address _assetAddr, uint _amount, uint _price) returns(uint sellID) {
+        if (dao.agentActiveOf(msg.sender) && dao.assetExistOf(_assetAddr)) {
+            if(sellExistOf[_assetAddr]) {
+                uint assetID;
+                assetID = sellDataOf[_assetAddr];
+                OrderList[] sellOrders = sellList[assetID];
+                sellID = sellOrders.orders.length++;
+                sellOrders.orders[sellID] = Order({orderID: sellID, owner: msg.sender, amount: _amount, price: _price});
+                return assetID;
+            }
+            
+        }
     }
 
-    function addBuy(address _assetAddr, uint _amount) returns(uint buyID) {
+    function addBuy(address _assetAddr, uint _amount, uint _price) returns(uint buyID) {
         if (dao.agentActiveOf(msg.sender) && dao.assetExistOf(_assetAddr)) {
             if(buyExistOf[_assetAddr]) {
                 uint assetID;
                 assetID = buyDataOf[_assetAddr];
                 OrderList[] buyOrders = buyList[assetID];
                 buyID = buyOrders.orders.length++;
-                buyOrders.orders[buyID] = Order({owner: msg.sender, amount: _amount});
+                buyOrders.orders[buyID] = Order({orderID: buyID, owner: msg.sender, amount: _amount, price: _price});
                 return assetID;
             }
             
         }
     }
+
+    function сloseBuyDeal(address _assetAddr, buyID) returns(bool result) {
+        return true;
+    }
+
+    function сloseSellDeal(address _assetAddr, sellID) returns(bool result) {
+        return true;
+    }
+
+    
 }
 
 contract goverment {
+    address daoAddr;
+    DAO public dao;
 
 }
