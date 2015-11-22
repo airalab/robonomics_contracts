@@ -105,7 +105,7 @@ contract DAO {
     }
 
     function daoShareCost() returns (uint shareCost) {
-        shareCost = creditTurn*100/sharesAmount;
+        shareCost = creditTurn/sharesAmount;
     }
 
     function daoCreditPower() returns (uint creditPower) {
@@ -114,7 +114,7 @@ contract DAO {
 
     function daoShareSale(uint _shareAmount) returns (uint creditReward) {
         if(daoShares.tokenBalanceOf(msg.sender)>=_shareAmount) {
-            creditReward = daoShareCost()*_shareAmount/100;
+            creditReward = daoShareCost()*_shareAmount;
             daoCredits.emission(msg.sender, creditReward);
             daoShares.burn(msg.sender, _shareAmount);
         }
@@ -122,7 +122,7 @@ contract DAO {
 
     function daoShareBuy(uint _creditAmount) returns (uint shares) {
         if(daoCredits.tokenBalanceOf(msg.sender)>=_creditAmount) {
-            shares = daoCreditPower()*_creditAmount/100;
+            shares = daoCreditPower()*_creditAmount;
             daoShares.emission(msg.sender, shares);
             daoCredits.burn(msg.sender, _creditAmount);
         }
@@ -217,10 +217,12 @@ contract market {
     }
     
     OrderList[] public sellList;
+    Order[] public sellOrders;
     mapping (address => bool) sellExistOf;
     mapping (address => uint) sellDataOf;
     
     OrderList[] public buyList;
+    Order[] public buyOrders;
     mapping (address => bool) buyExistOf;
     mapping (address => uint) buyDataOf;
 
@@ -238,8 +240,8 @@ contract market {
             if(sellExistOf[_assetAddr]) {
                 uint assetID;
                 assetID = sellDataOf[_assetAddr];
-                OrderList[] sellOrders = sellList[assetID];
-                sellID = sellOrders.orders.length++;
+                OrderList[] assetOrders = sellList[assetID];
+                sellID = sellOrders.sellOrders.length++;
                 sellOrders.orders[sellID] = Order({orderID: sellID, owner: msg.sender, amount: _amount, price: _price});
                 return assetID;
             }
@@ -261,19 +263,24 @@ contract market {
         }
     }
 
-    function сloseBuyDeal(address _assetAddr, buyID) returns(bool result) {
-        return true;
-    }
-
-    function сloseSellDeal(address _assetAddr, sellID) returns(bool result) {
-        return true;
-    }
-
     
+    function BuyDeal(address _assetAddr, uint _buyID) {
+        uint profit = msg.value*dao.daoEfficiency()/100;
+        dao.daoCredits.emission(daoAddr, profit);
+        return true;
+    }
+
+    function SellDeal(address _assetAddr, uint sellID) returns(bool result) {
+        return true;
+    }
+
+
 }
 
 contract goverment {
     address daoAddr;
     DAO public dao;
+
+
 
 }
