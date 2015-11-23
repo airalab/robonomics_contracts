@@ -1,4 +1,5 @@
 contract token { 
+    string public assetName;
     address public daoAddr;
     address public owner;
     mapping (address => uint) public tokenBalanceOf;
@@ -6,7 +7,8 @@ contract token {
 
 
     /*Initial */
-    function token() {
+    function token(string _assetName) {
+        assetName = _assetName;
         owner = msg.sender;
     }
 
@@ -38,11 +40,6 @@ contract token {
     }
 
     /* Agent function */
-    
-    function getBalance() returns(uint _balance) {
-        return tokenBalanceOf[msg.sender];
-    }
-
     function sendToken(address receiver, uint amount) returns(bool result) {
         if (tokenBalanceOf[msg.sender] < amount) {return false;}
         tokenBalanceOf[msg.sender] -= amount;
@@ -173,10 +170,12 @@ contract agent {
 
     /* Agents contract list*/
 
-    AgentContract[] public agentContracts;
+    AgentContract[] public agentContractList;
     struct AgentContract {
         address agentContractAddr;
         string abi;
+        string desc;
+        bool active;
     }
 
     modifier controlCheck { if (msg.sender == controlAddr) _ }
@@ -197,6 +196,21 @@ contract agent {
         dao.setAgent(_agentAddr);
         return true;
     } 
+
+     function setAgentContract(address _agentContractAddr, string _abi, string _desc) controlCheck returns(uint contractID) {
+        contractID = agentContractList.length++;
+        AgentContract a = agentContractList[contractID];
+        a.agentContractAddr = _agentContractAddr;
+        a.abi = _abi;
+        a.desc = _desc;
+        a.active = true;
+        return contractID;
+    }
+
+    function inactiveAgentContract(address _agentContractAddr) controlCheck returns(bool result) {
+        
+    }
+
 }
 
 contract market {
@@ -211,18 +225,23 @@ contract market {
     }
 
 
-    struct OrderList {
+    struct SaleAssetList {
         address assetAddr;
-        Order[] orders;
+        Order[] sellOrderList;
     }
     
-    OrderList[] public sellList;
-    Order[] public sellOrders;
+    struct BuyAssetList {
+        address assetAddr;
+        Order[] buyOrderList;
+    }
+    
+    SaleAssetList[] public sellAssetList;
+    Order[] public sellOrderList;
     mapping (address => bool) sellExistOf;
     mapping (address => uint) sellDataOf;
     
-    OrderList[] public buyList;
-    Order[] public buyOrders;
+    BuyAssetList[] public buyAssetList;
+    Order[] public buyOrderList;
     mapping (address => bool) buyExistOf;
     mapping (address => uint) buyDataOf;
 
@@ -240,9 +259,9 @@ contract market {
             if(sellExistOf[_assetAddr]) {
                 uint assetID;
                 assetID = sellDataOf[_assetAddr];
-                OrderList[] assetOrders = sellList[assetID];
-                sellID = sellOrders.sellOrders.length++;
-                sellOrders.orders[sellID] = Order({orderID: sellID, owner: msg.sender, amount: _amount, price: _price});
+                SaleAssetList saleAssetOrders = sellAssetList[assetID];
+                sellID = saleAssetOrders.sellOrderList.length++;
+                saleAssetOrders.sellOrderList[sellID] = Order({orderID: sellID, owner: msg.sender, amount: _amount, price: _price});
                 return assetID;
             }
             
@@ -254,9 +273,9 @@ contract market {
             if(buyExistOf[_assetAddr]) {
                 uint assetID;
                 assetID = buyDataOf[_assetAddr];
-                OrderList[] buyOrders = buyList[assetID];
-                buyID = buyOrders.orders.length++;
-                buyOrders.orders[buyID] = Order({orderID: buyID, owner: msg.sender, amount: _amount, price: _price});
+                BuyAssetList buyAssetOrders = buyAssetList[assetID];
+                buyID = buyAssetOrders.buyOrderList.length++;
+                buyAssetOrders.buyOrderList[buyID] = Order({orderID: buyID, owner: msg.sender, amount: _amount, price: _price});
                 return assetID;
             }
             
@@ -264,9 +283,9 @@ contract market {
     }
 
     
-    function BuyDeal(address _assetAddr, uint _buyID) {
+    function BuyDeal(address _assetAddr, uint _buyID) returns(bool result) {
         uint profit = msg.value*dao.daoEfficiency()/100;
-        dao.daoCredits.emission(daoAddr, profit);
+        /*  TO DO */
         return true;
     }
 
