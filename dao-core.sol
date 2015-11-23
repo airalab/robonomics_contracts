@@ -13,7 +13,7 @@ contract token {
 
     /* DAO functions */
     function emission(address _agentContrAddr, uint _amount) returns(bool result) {
-        if(msg.sender==daoAddr) 
+        if(msg.sender==daoAddr || msg.sender==owner) 
         {
             tokenBalanceOf[_agentContrAddr] += _amount;
             return true;
