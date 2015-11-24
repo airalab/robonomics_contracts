@@ -1,4 +1,4 @@
-contract token { 
+contract token {
     string public assetName;
     address public daoAddr;
     address public owner;
@@ -15,16 +15,16 @@ contract token {
 
     /* DAO functions */
     function emission(address _agentContrAddr, uint _amount) returns(bool result) {
-        if(msg.sender==daoAddr || msg.sender==owner) 
+        if(msg.sender==daoAddr || msg.sender==owner)
         {
             tokenBalanceOf[_agentContrAddr] += _amount;
             return true;
         }
         return false;
     }
-    
+
     function burn(address _agentContrAddr, uint _amount) returns(bool result) {
-        if(msg.sender==daoAddr && tokenBalanceOf[_agentContrAddr]>=_amount) 
+        if(msg.sender==daoAddr && tokenBalanceOf[_agentContrAddr]>=_amount)
         {
             tokenBalanceOf[_agentContrAddr] -= _amount;
             return true;
@@ -72,26 +72,27 @@ contract DAO {
 
     /* Agents data */
     Agent[] public agentsList;
-    mapping (address => uint) public agentDataOf; 
+    mapping (address => uint) public agentDataOf;
     mapping (address => bool) public agentActiveOf;
     struct Agent {
         address agentContrAddr;
         uint joinData;
     }
 
-    function DAO(token _shares, token _credits, market _daoMarketContr, goverment _daoGovermentContr) {
-        daoFounder = msg.sender;  
+    function DAO(token _shares, token _credits, agent _daoFounderContr, market _daoMarketContr, goverment _daoGovermentContr) {
+        daoFounder = msg.sender;
         daoShares = token(_shares);
         daoCredits = token(_credits);
+        daoFounderContr = _daoFounderContr;
         daoMarketContr = _daoMarketContr;
         daoGovermentContr = _daoGovermentContr;
     }
-    
+
     function initializationDaoBalances(uint _founderSharesAmount, uint _founderCreditsAmount) returns (bool result) {
         if(!initialization) {
-        daoShares.emission(msg.sender, _founderSharesAmount);
+        daoShares.emission(daoFounderContr, _founderSharesAmount);
         sharesAmount = _founderSharesAmount;
-        daoCredits.emission(msg.sender, _founderCreditsAmount);
+        daoCredits.emission(daoFounderContr, _founderCreditsAmount);
         creditAmount = _founderCreditsAmount;
         return true;
         }
@@ -129,10 +130,9 @@ contract DAO {
         daoShares.emission(_agentContrAddr, _sharesAmount);
     }
 
-    function daoCreditEmission(uint _creditsAMount) {
-        daoCredits.emission(msg.sender, _creditsAMount);
+    function daoCreditEmission(address _agentContrAddr, uint _creditsAmount) {
+        daoCredits.emission(_agentContrAddr, _creditsAmount);
     }
-
 
     function setAgent(address _agentContAddr) returns(uint agentID) {
         if(daoShares.tokenBalanceOf(msg.sender)>0) {
@@ -143,7 +143,7 @@ contract DAO {
             uint newAgentSharesAmount;
             newAgentSharesAmount = sharesAmount/numAgents;
             daoShares.emission(_agentContAddr, newAgentSharesAmount);
-            numAgents = agentID;   
+            numAgents = agentID;
             agentDataOf[_agentContAddr] = agentID;
             agentActiveOf[_agentContAddr] = true;
             return agentID;
@@ -180,22 +180,27 @@ contract agent {
 
     modifier controlCheck { if (msg.sender == controlAddr) _ }
 
-    function agent(address _daoAddr) {
+    function agent() {
         agentAddr = msg.sender;
         controlAddr = msg.sender;
-        daoAddr = _daoAddr;
-    } 
+    }
+
+    function setDao(address _daoAddr) {
+        if(msg.sender == agentAddr) {
+        	daoAddr = _daoAddr;
+        }
+    }
 
     function setControlAddr(address _controlAddr) returns(bool result) {
         if(msg.sender == agentAddr) {
             controlAddr = _controlAddr;
         }
-    }     
+    }
 
     function setNewAgent(address _agentAddr) controlCheck returns(bool result) {
         dao.setAgent(_agentAddr);
         return true;
-    } 
+    }
 
      function setAgentContract(address _agentContractAddr, string _abi, string _desc) controlCheck returns(uint contractID) {
         contractID = agentContractList.length++;
@@ -208,7 +213,7 @@ contract agent {
     }
 
     function inactiveAgentContract(address _agentContractAddr) controlCheck returns(bool result) {
-        
+
     }
 
 }
@@ -229,17 +234,17 @@ contract market {
         address assetAddr;
         Order[] sellOrderList;
     }
-    
+
     struct BuyAssetList {
         address assetAddr;
         Order[] buyOrderList;
     }
-    
+
     SaleAssetList[] public sellAssetList;
     Order[] public sellOrderList;
     mapping (address => bool) sellExistOf;
     mapping (address => uint) sellDataOf;
-    
+
     BuyAssetList[] public buyAssetList;
     Order[] public buyOrderList;
     mapping (address => bool) buyExistOf;
@@ -264,7 +269,7 @@ contract market {
                 saleAssetOrders.sellOrderList[sellID] = Order({orderID: sellID, owner: msg.sender, amount: _amount, price: _price});
                 return assetID;
             }
-            
+
         }
     }
 
@@ -278,11 +283,11 @@ contract market {
                 buyAssetOrders.buyOrderList[buyID] = Order({orderID: buyID, owner: msg.sender, amount: _amount, price: _price});
                 return assetID;
             }
-            
+
         }
     }
 
-    
+
     function BuyDeal(address _assetAddr, uint _buyID) returns(bool result) {
         uint profit = msg.value*dao.daoEfficiency()/100;
         /*  TO DO */
