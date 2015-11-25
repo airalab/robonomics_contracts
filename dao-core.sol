@@ -141,9 +141,9 @@ contract DAO {
             a.agentContrAddr = _agentContAddr;
             a.joinData = now;
             uint newAgentSharesAmount;
-            newAgentSharesAmount = sharesAmount/numAgents;
-            daoShares.emission(_agentContAddr, newAgentSharesAmount);
             numAgents = agentID;
+            newAgentSharesAmount = sharesAmount/numAgents*daoEfficiency();
+            daoShares.emission(_agentContAddr, newAgentSharesAmount);
             agentDataOf[_agentContAddr] = agentID;
             agentActiveOf[_agentContAddr] = true;
             return agentID;
