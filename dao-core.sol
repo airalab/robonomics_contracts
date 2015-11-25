@@ -188,6 +188,7 @@ contract agent {
     function setDao(address _daoAddr) {
         if(msg.sender == agentAddr) {
         	daoAddr = _daoAddr;
+        	dao(daoAddr);
         }
     }
 
@@ -250,6 +251,12 @@ contract market {
     mapping (address => bool) buyExistOf;
     mapping (address => uint) buyDataOf;
 
+    function setDao(address _daoAddr) {
+        if(msg.sender == agentAddr) {
+        	daoAddr = _daoAddr;
+        	dao(daoAddr);
+        }
+    }
 
     function getSellList(address _assetAddr) returns(uint assetID) {
         return 0;
