@@ -257,13 +257,13 @@ contract market {
 
     SaleAssetList[] public sellAssetList;
     Order[] public sellOrderList;
-    mapping (address => bool) sellExistOf;
-    mapping (address => uint) sellDataOf;
+    mapping (address => bool) public sellExistOf;
+    mapping (address => uint) public sellDataOf;
 
     BuyAssetList[] public buyAssetList;
     Order[] public buyOrderList;
-    mapping (address => bool) buyExistOf;
-    mapping (address => uint) buyDataOf;
+    mapping (address => bool) public buyExistOf;
+    mapping (address => uint) public buyDataOf;
 
     function setDao(address _daoAddr) {
 		daoAddr = _daoAddr;
