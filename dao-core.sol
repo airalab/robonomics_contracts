@@ -282,19 +282,18 @@ contract market {
     	address agentContrAddr = dao.agentContractOf(msg.sender);
         if (dao.agentActiveOf(agentContrAddr) && dao.assetExistOf(_assetAddr)) {
         	uint assetID;
-            SaleAssetList sellAssetOrders = sellAssetList[0];
             if (sellExistOf[_assetAddr]) {
                 assetID = sellDataOf[_assetAddr];
-                sellAssetOrders = sellAssetList[assetID];
+                SaleAssetList sellAssetOrders = sellAssetList[assetID];
                 sellID = sellAssetOrders.sellOrderList.length++;
                 sellAssetOrders.sellOrderList[sellID] = Order({orderID: sellID, owner: agentContrAddr, amount: _amount, price: _price, active: true});
                 return sellID;
             } else {
             	assetID = sellAssetList.length++;
-				sellID = 0;
 				sellExistOf[_assetAddr] = true;
                 sellAssetOrders = sellAssetList[assetID];
                 sellAssetOrders.assetAddr = _assetAddr;
+				sellID = sellAssetOrders.sellOrderList.length++;
                 sellAssetOrders.sellOrderList[sellID] = Order({orderID: sellID, owner: agentContrAddr, amount: _amount, price: _price, active: true});
 				return sellID;
             }
@@ -302,53 +301,50 @@ contract market {
     }
 
     function getSellId(address _assetAddr, uint _amount) returns(uint sellID) {
-		sellID = 0;
 		if (sellExistOf[_assetAddr]) {
-            uint assetID = sellDataOf[_assetAddr];
+			uint assetID = sellDataOf[_assetAddr];
 			uint i;
 			uint min = 0;
 			for (i = 0; i <= sellAssetList[assetID].sellOrderList.length - 1; i++) {
-            	if (sellAssetList[assetID].sellOrderList[i].active == true && sellAssetList[assetID].sellOrderList[i].amount == _amount && (sellAssetList[assetID].sellOrderList[i].amount < min || min == 0)) {
-            		min = sellAssetList[assetID].sellOrderList[i].amount;
-            		sellID = i;
-            	}
-            }
+				if (sellAssetList[assetID].sellOrderList[i].active == true && sellAssetList[assetID].sellOrderList[i].amount == _amount && (sellAssetList[assetID].sellOrderList[i].price < min || min == 0)) {
+					min = sellAssetList[assetID].sellOrderList[i].price;
+					sellID = i;
+				}
+			}
 		}
-        return sellID;
+		return sellID;
     }
 
     function addBuy(address _assetAddr, uint _amount, uint _price) returns(uint buyID) {
     	address agentContrAddr = dao.agentContractOf(msg.sender);
-        if (dao.agentActiveOf(agentContrAddr) && dao.assetExistOf(_assetAddr)) {
-        	uint assetID;
-            BuyAssetList buyAssetOrders = buyAssetList[0];
-            if (buyExistOf[_assetAddr]) {
-                assetID = buyDataOf[_assetAddr];
-                buyAssetOrders = buyAssetList[assetID];
-                buyID = buyAssetOrders.buyOrderList.length++;
-                buyAssetOrders.buyOrderList[buyID] = Order({orderID: buyID, owner: agentContrAddr, amount: _amount, price: _price, active: true});
-                return buyID;
-            } else {
-            	assetID = buyAssetList.length++;
-				buyID = 0;
-				buyExistOf[_assetAddr] = true;
-                buyAssetOrders = buyAssetList[assetID];
-                buyAssetOrders.assetAddr = _assetAddr;
-                buyAssetOrders.buyOrderList[buyID] = Order({orderID: buyID, owner: agentContrAddr, amount: _amount, price: _price, active: true});
+		if (dao.agentActiveOf(agentContrAddr) && dao.assetExistOf(_assetAddr)) {
+			uint assetID;
+			if (buyExistOf[_assetAddr]) {
+				assetID = buyDataOf[_assetAddr];
+				BuyAssetList buyAssetOrders = buyAssetList[assetID];
+				buyID = buyAssetOrders.buyOrderList.length++;
+				buyAssetOrders.buyOrderList[buyID] = Order({orderID: buyID, owner: agentContrAddr, amount: _amount, price: _price, active: true});
 				return buyID;
-            }
-        }
+			} else {
+				assetID = buyAssetList.length++;
+				buyExistOf[_assetAddr] = true;
+				buyAssetOrders = buyAssetList[assetID];
+				buyAssetOrders.assetAddr = _assetAddr;
+				buyID = buyAssetOrders.buyOrderList.length++;
+				buyAssetOrders.buyOrderList[buyID] = Order({orderID: buyID, owner: agentContrAddr, amount: _amount, price: _price, active: true});
+				return buyID;
+			}
+		}
     }
 
-    function getById(address _assetAddr, uint _amount) returns(uint buyID) {
-		buyID = 0;
+    function getBuyId(address _assetAddr, uint _amount) returns(uint buyID) {
 		if (buyExistOf[_assetAddr]) {
             uint assetID = buyDataOf[_assetAddr];
 			uint i;
-			uint min = 0;
+			uint max = 0;
 			for (i = 0; i <= buyAssetList[assetID].buyOrderList.length - 1; i++) {
-            	if (buyAssetList[assetID].buyOrderList[i].active == true && buyAssetList[assetID].buyOrderList[i].amount == _amount && (buyAssetList[assetID].buyOrderList[i].amount < min || min == 0)) {
-            		min = buyAssetList[assetID].buyOrderList[i].amount;
+            	if (buyAssetList[assetID].buyOrderList[i].active == true && buyAssetList[assetID].buyOrderList[i].amount == _amount && (buyAssetList[assetID].buyOrderList[i].price > max || max == 0)) {
+            		max = buyAssetList[assetID].buyOrderList[i].price;
             		buyID = i;
             	}
             }
