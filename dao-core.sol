@@ -384,9 +384,18 @@ contract market {
 			if (order.total > 0 && order.active == true && _amount >= order.min && _amount <= order.total && ((_amount / order.step) * order.step) == _amount) {
 				address agent_buy_addr = dao.agentContractOf(msg.sender);
 				agent agent_buy = agent(agent_buy_addr);
-				agent_buy.sendToken(dao.daoCredits(), order.owner, (order.unitPrice * _amount));
-
 				agent agent_sell = agent(order.owner);
+
+				token credit = token(dao.daoCredits());
+				if (credit.tokenBalanceOf(agent_buy_addr) < (order.unitPrice * _amount)) {
+					return false;
+				}
+				token asset = token(sellAssetList[assetID].assetAddr);
+				if (asset.tokenBalanceOf(order.owner) < _amount) {
+					return false;
+				}
+
+				agent_buy.sendToken(dao.daoCredits(), order.owner, (order.unitPrice * _amount));
 				agent_sell.sendToken(sellAssetList[assetID].assetAddr, agent_buy_addr, _amount);
 
 				order.total = order.total - _amount;
@@ -406,9 +415,18 @@ contract market {
 			if (order.total > 0 && order.active == true && _amount >= order.min && _amount <= order.total && ((_amount / order.step) * order.step) == _amount) {
 				address agent_sell_addr = dao.agentContractOf(msg.sender);
 				agent agent_sell = agent(agent_sell_addr);
-				agent_sell.sendToken(buyAssetList[assetID].assetAddr, order.owner, _amount);
-
 				agent agent_buy = agent(order.owner);
+
+				token credit = token(dao.daoCredits());
+				if (credit.tokenBalanceOf(order.owner) < (order.unitPrice * _amount)) {
+					return false;
+				}
+				token asset = token(buyAssetList[assetID].assetAddr);
+				if (asset.tokenBalanceOf(agent_sell_addr) < _amount) {
+					return false;
+				}
+
+				agent_sell.sendToken(buyAssetList[assetID].assetAddr, order.owner, _amount);
 				agent_buy.sendToken(dao.daoCredits(), agent_sell_addr, (order.unitPrice * _amount));
 
 				order.total = order.total - _amount;
