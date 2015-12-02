@@ -33,7 +33,7 @@ contract token {
     function setDaoAddr(address _daoAddr) {
         DAO dao = DAO(_daoAddr);
         address agentContrAddr = dao.agentContractOf(msg.sender);
-        if(dao.agentActiveOf(agentContrAddr)) {
+        if(dao.agentActiveOf(agentContrAddr) || dao.daoFounder() == msg.sender) {
             daoAddr = _daoAddr;
         }
     }
