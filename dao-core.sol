@@ -440,7 +440,64 @@ contract market {
     }
 }
 
+contract rule {
+    address seller;
+    address buyer; 
+    address asset;  
+    uint qty;
+    uint fullCost;
+    uint dealTimestamp;
+    
+    function execute(address _seller , address _buyer, address  _asset,  uint _qty, uint _fullCost) returns(address seller, address buyer, address asset, address qty, uint fullCost) {
+    }
+}
+
 contract goverment {
     address daoAddr;
-    DAO public dao;
+
+    function goverment(address _daoAddr) {
+        daoAddr = _daoAddr;
+    }
+
+    /* market data */
+    
+    struct MarketDeal {
+        address seller;
+        address buyer; 
+        address asset;  
+        uint qty;
+        uint fullCost;
+        uint dealTimestamp;
+    }
+
+    MarketDeal[] public marketDeals;
+    
+    /* proposal data */
+    
+    mapping (address => uint) public sellerRulesFilterExistOf;
+    mapping (address => uint) public buyerRulesFilterExistOf;
+    mapping (address => uint) public assetRulesFilterExistOf;
+    mapping (address => uint) public sellerRulesFilterOf;
+    mapping (address => uint) public buyerRulesFilterOf;
+    mapping (address => uint) public assetRulesFilterOf;
+    
+    
+    /* proposal data */
+    function setMarketDeal(address _seller , address _buyer, address  _asset,  uint _qty, uint _fullCost) returns(bool result) {
+        marketDeals[marketDeals.length++] = MarketDeal({seller: _seller, buyer: _buyer, asset: _asset, qty: _qty, fullCost: _fullCost, dealTimestamp: now});
+    }
+    
+    function executeRule(address _ruleAddr, uint _marketDealID) {
+        rule executingRule;
+        executingRule = rule(_ruleAddr);
+        address seller = marketDeals[_marketDealID].seller;
+        address buyer = marketDeals[_marketDealID].buyer;
+        address asset = marketDeals[_marketDealID].asset;
+        uint qty = marketDeals[_marketDealID].qty;
+        uint fullCost = marketDeals[_marketDealID].fullCost;
+        
+        executingRule.execute(seller,buyer,asset,qty,fullCost);
+        
+    }
+    
 }
