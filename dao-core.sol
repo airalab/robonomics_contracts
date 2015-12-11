@@ -1,41 +1,53 @@
 contract token { 
-    address public daoAddr;
-    address public owner;
-    mapping (address => uint) public tokenBalanceOf;
-    DAO daoToken;
+    address public creator;
+    string public symbol;
+    string public name;
+    uint public baseUnit;
+    uint totalSupply;
+    mapping (address => uint) balanceOf;
 
+    modifier creatorCheck { if (msg.sender == creator) _ }
 
     /*Initial */
     function token() {
-        owner = msg.sender;
+        creator = msg.sender;
     }
 
 
-    /* DAO functions */
-    function emission(address _agentContrAddr, uint _amount) returns(bool result) {
-        if(msg.sender==daoAddr) 
-        {
-            tokenBalanceOf[_agentContrAddr] += _amount;
-            return true;
-        }
-        return false;
+    /* Basic functions */
+    function setSymbol(string _s) creatorCheck returns(bool result) {
+        symbol = _s;
+        return true;
     }
-    
-    function burn(address _agentContrAddr, uint _amount) returns(bool result) {
-        if(msg.sender==daoAddr && tokenBalanceOf[_agentContrAddr]>=_amount) 
-        {
-            tokenBalanceOf[_agentContrAddr] -= _amount;
-            return true;
-        }
-        return false;
+    function setName(string _n) creatorCheck returns(bool result) {
+        name = _n;
+        return true;
     }
 
-    function setDaoAddr(address _daoAddr) {
-        daoToken = DAO(_daoAddr);
-        if(daoToken.daoFounder() == msg.sender && owner == msg.sender) {
-            daoAddr = _daoAddr;
-        }
+    function setBaseUnit(uint _unit) creatorCheck returns(bool result) {
+        baseUnit = _unit;
+        return true;
     }
+
+
+    function totalSupply() constant returns (uint256 supply)
+    function balanceOf(address _address) constant returns (uint256 balance)
+    function transfer(address _to, uint256 _value) returns (bool _success)
+    function transferFrom(address _from, address _to, uint256 _value) returns (bool success)
+    function approve(address _address) returns (bool success)
+    function unapprove(address _address) returns (bool success)
+    function isApprovedFor(address _target, address _proxy) constant returns (bool success)
+    function approveOnce(address _address, uint256 _maxValue) returns (bool success)
+    function isApprovedOnceFor(address _target, address _proxy) returns (uint256 maxValue)
+
+
+
+
+
+    /* Events */
+    event Transfer(address indexed _from, address indexed _to, uint256 _value)
+    event AddressApproval(address indexed _address, address indexed _proxy, bool _result)
+    event AddressApprovalOnce(address indexed _address, address indexed _proxy, uint256 _value)
 
     /* Agent function */
     
