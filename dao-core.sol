@@ -5,16 +5,25 @@ contract token {
     uint public baseUnit;
     uint totalSupply;
     mapping (address => uint) balanceOf;
+    mapping (address => mapping(address => bool)) approveOf;
+    mapping (address => mapping(address => bool)) approveOnceOf;
+    mapping (address => mapping(address => uint)) approveOnceValueOf;
 
     modifier creatorCheck { if (msg.sender == creator) _ }
+
+    /* Events */
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
+    event AddressApproval(address indexed _address, address indexed _proxy, bool _result);
+    event AddressApprovalOnce(address indexed _address, address indexed _proxy, uint256 _value);
+
+
 
     /*Initial */
     function token() {
         creator = msg.sender;
     }
 
-
-    /* Basic functions */
+    /* Creator functions */
     function setSymbol(string _s) creatorCheck returns(bool result) {
         symbol = _s;
         return true;
@@ -29,37 +38,79 @@ contract token {
         return true;
     }
 
-
-    function totalSupply() constant returns (uint256 supply)
-    function balanceOf(address _address) constant returns (uint256 balance)
-    function transfer(address _to, uint256 _value) returns (bool _success)
-    function transferFrom(address _from, address _to, uint256 _value) returns (bool success)
-    function approve(address _address) returns (bool success)
-    function unapprove(address _address) returns (bool success)
-    function isApprovedFor(address _target, address _proxy) constant returns (bool success)
-    function approveOnce(address _address, uint256 _maxValue) returns (bool success)
-    function isApprovedOnceFor(address _target, address _proxy) returns (uint256 maxValue)
-
-
-
-
-
-    /* Events */
-    event Transfer(address indexed _from, address indexed _to, uint256 _value)
-    event AddressApproval(address indexed _address, address indexed _proxy, bool _result)
-    event AddressApprovalOnce(address indexed _address, address indexed _proxy, uint256 _value)
-
-    /* Agent function */
-    
-    function getBalance() returns(uint _balance) {
-        return tokenBalanceOf[msg.sender];
+    function getTotalSupply()  creatorCheck returns (uint supply) {
+        return totalSupply;
     }
 
-    function sendToken(address receiver, uint amount) returns(bool result) {
-        if (tokenBalanceOf[msg.sender] < amount) {return false;}
-        tokenBalanceOf[msg.sender] -= amount;
-        tokenBalanceOf[receiver] += amount;
+    /* Agent function */
+
+    function myBalance() returns (uint256 balance) {
+        balance = balanceOf[msg.sender];
+        return balance;
+    }
+
+    function transfer(address _to, uint256 _value) returns (bool result) {
+        if (balanceOf[msg.sender] < _value) {return false;}
+        if (balanceOf[msg.sender] + _value < balanceOf[msg.sender]) {return false;}
+        balanceOf[msg.sender] -= _value;
+        balanceOf[_to] += _value;
+        Transfer(msg.sender, _to, _value);
         return true;
+    }
+
+    function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
+        if(approveOf[_from][msg.sender])
+        {
+            if (balanceOf[_from] < _value) {return false;}
+            if (balanceOf[_from] + _value < balanceOf[_from]) {return false;}
+            balanceOf[_from] -= _value;
+            balanceOf[_to] += _value;  
+            Transfer(_from, _to, _value);          
+            return true;
+        } else if(approveOnceOf[_from][msg.sender] && approveOnceValueOf[_from][msg.sender]<=_value) {
+            if (balanceOf[_from] < _value) {return false;}
+            if (balanceOf[_from] + _value < balanceOf[_from]) {return false;}
+            balanceOf[_from] -= _value;
+            balanceOf[_to] += _value;  
+            Transfer(_from, _to, _value);          
+            return true;  
+        }
+
+
+    }
+
+    function approve(address _address) returns (bool result) {
+        approveOf[msg.sender][_address] = true;
+        AddressApproval(_address, msg.sender, true);
+        return true;
+    }
+
+    function unapprove(address _address) returns (bool success) {
+        approveOf[msg.sender][_address] = false;
+        return true;        
+    }
+
+    function approveOnce(address _address, uint256 _maxValue) returns (bool success) {
+        approveOnceOf[msg.sender][_address] = true;
+        approveOnceValueOf[msg.sender][_address] = _maxValue;
+        AddressApprovalOnce(_address, msg.sender, _maxValue);
+        return true;       
+    }
+
+    function unapproveOnce(address _address) returns (bool success) {
+        approveOnceOf[msg.sender][_address] = false;
+        approveOnceValueOf[msg.sender][_address] = 0;
+        return true;       
+    }
+
+    function isApprovedOnceFor(address _target, address _proxy) returns (uint256 maxValue) {
+        maxValue = approveOnceValueOf[_target][_proxy];
+        return maxValue;
+    }
+
+    function isApprovedFor(address _target, address _proxy) constant returns (bool success) {
+        success = approveOnceOf[_target][_proxy];
+        return success;
     }
 }
 
