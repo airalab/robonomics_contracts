@@ -128,11 +128,9 @@ contract token {
     }
 }
 
-
-
 contract agent {
     address creator;
-
+    
     modifier creatorCheck { if (msg.sender == creator) _ }
 
     /* Struct */
@@ -141,43 +139,23 @@ contract agent {
     struct AgentContract {
         address agentContractAddr;
         string abi;
+        string helper;
     }
 
-    Token[] public tokens;
-    Token[] public approveTokens;
-    Token[] public approveOnceTokens;
-
-    struct Token {
-        address tokenAddr;
-        address agentAddr;
-    }
 
     /* Functions */
     function agent() {
         creator = msg.sender;
     }
 
-    function setAgentToken(address _token) creatorCheck returns(uint tokenID) {
-        tokenID = tokens.length++;
-        Token t = tokens[tokenID];
-        t.tokenAddr = _token;
-        t.agentAddr = this;
-        return (tokenID);
+    function setAgentToken(address _agentContractAddr, address _abi, address _helper) creatorCheck returns(uint agentContractID) {
+        agentContractID = agentContracts.length++;
+        AgentContract a = agentContracts[agentContractID];
+        a.agentContractAddr = _agentContractAddr;
+        a.abi = _abi;
+        a.helper = _helper;
+        return (agentContractID);
     }    
-
-    function approveTokenForAgent(address _address, address _token) creatorCheck returns(bool result, uint tokenID) {
-        token approveToken;
-        approveToken = token(_token);
-        result = approveToken.approve(_address); 
-        if(!result) {break;}
-            else {
-                tokenID = approveTokens.length++;
-                Token t = approveTokens[tokenID];
-                t.tokenAddr = _token;
-                t.agentAddr = _address;
-                return (result, tokenID);
-            }
-    }
 }
 
 contract DAO {
