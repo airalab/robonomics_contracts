@@ -28,6 +28,7 @@ contract token {
         symbol = _s;
         return true;
     }
+
     function setName(string _n) creatorCheck returns(bool result) {
         name = _n;
         return true;
@@ -40,6 +41,21 @@ contract token {
 
     function getTotalSupply()  creatorCheck returns (uint supply) {
         return totalSupply;
+    }
+
+    function emmision(uint _amount) creatorCheck returns(bool result) {
+        if (balanceOf[creator] + _amount < balanceOf[creator]) {return false;}
+        balanceOf[creator] += _amount;
+        totalSupply += _amount;
+        return true;
+    }
+
+    function burn(uint _amount) creatorCheck returns(bool result) {
+        if (balanceOf[creator] < _amount) {return false;}
+        if (balanceOf[msg.sender] + _amount < balanceOf[msg.sender]) {return false;}
+        balanceOf[creator] -= _amount;
+        totalSupply += _amount;
+        return true;
     }
 
     /* Agent function */
@@ -75,8 +91,6 @@ contract token {
             Transfer(_from, _to, _value);          
             return true;  
         }
-
-
     }
 
     function approve(address _address) returns (bool result) {
@@ -111,6 +125,58 @@ contract token {
     function isApprovedFor(address _target, address _proxy) constant returns (bool success) {
         success = approveOnceOf[_target][_proxy];
         return success;
+    }
+}
+
+
+
+contract agent {
+    address creator;
+
+    modifier creatorCheck { if (msg.sender == creator) _ }
+
+    /* Struct */
+    AgentContract[] public agentContracts;
+
+    struct AgentContract {
+        address agentContractAddr;
+        string abi;
+    }
+
+    Token[] public tokens;
+    Token[] public approveTokens;
+    Token[] public approveOnceTokens;
+
+    struct Token {
+        address tokenAddr;
+        address agentAddr;
+    }
+
+    /* Functions */
+    function agent() {
+        creator = msg.sender;
+    }
+
+    function setAgentToken(address _token) creatorCheck returns(uint tokenID) {
+        tokenID = tokens.length++;
+        Token t = tokens[tokenID];
+        t.tokenAddr = _token;
+        t.agentAddr = this;
+        return (tokenID);
+    }    
+
+    function approveTokenForAgent(address _address, address _token) creatorCheck returns(bool result, uint tokenID) {
+        token approveToken;
+        approveToken = token(_token);
+        result = approveToken.approve(_address); 
+        if(!result) {break;}
+            else {
+                tokenID = approveTokens.length++;
+                Token t = approveTokens[tokenID];
+                t.tokenAddr = _token;
+                t.agentAddr = _address;
+                return (result, tokenID);
+            }
     }
 }
 
@@ -228,39 +294,6 @@ contract DAO {
     }
 }
 
-contract agent {
-    address agentAddr;
-    address controlAddr;
-    address daoAddr;
-    DAO public dao;
-
-    /* Agents contract list*/
-
-    AgentContract[] public agentContracts;
-    struct AgentContract {
-        address agentContractAddr;
-        string abi;
-    }
-
-    modifier controlCheck { if (msg.sender == controlAddr) _ }
-
-    function agent(address _daoAddr) {
-        agentAddr = msg.sender;
-        controlAddr = msg.sender;
-        daoAddr = _daoAddr;
-    } 
-
-    function setControlAddr(address _controlAddr) returns(bool result) {
-        if(msg.sender == agentAddr) {
-            controlAddr = _controlAddr;
-        }
-    }     
-
-    function setNewAgent(address _agentAddr) controlCheck returns(bool result) {
-        dao.setAgent(_agentAddr);
-        return true;
-    } 
-}
 
 contract market {
     address daoAddr;
