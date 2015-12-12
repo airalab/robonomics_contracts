@@ -148,7 +148,7 @@ contract agent {
         creator = msg.sender;
     }
 
-    function setAgentToken(address _agentContractAddr, address _abi, address _helper) creatorCheck returns(uint agentContractID) {
+    function setAgentContract(address _agentContractAddr, address _abi, address _helper) creatorCheck returns(uint agentContractID) {
         agentContractID = agentContracts.length++;
         AgentContract a = agentContracts[agentContractID];
         a.agentContractAddr = _agentContractAddr;
