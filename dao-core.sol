@@ -17,26 +17,14 @@ contract token {
     event AddressApprovalOnce(address indexed _address, address indexed _proxy, uint256 _value);
 
     /*Initial */
-    function token() {
+    function token(string _s, string _n, uint _unit) {
         creator = msg.sender;
+        symbol = _s;
+        name = _n;
+        baseUnit = _unit;
     }
 
     /* Creator functions */
-    function setSymbol(string _s) creatorCheck returns(bool result) {
-        symbol = _s;
-        return true;
-    }
-
-    function setName(string _n) creatorCheck returns(bool result) {
-        name = _n;
-        return true;
-    }
-
-    function setBaseUnit(uint _unit) creatorCheck returns(bool result) {
-        baseUnit = _unit;
-        return true;
-    }
-
     function getTotalSupply()  creatorCheck returns (uint supply) {
         return totalSupply;
     }
@@ -52,7 +40,7 @@ contract token {
         if (balanceOf[creator] < _amount) {return false;}
         if (balanceOf[msg.sender] + _amount < balanceOf[msg.sender]) {return false;}
         balanceOf[creator] -= _amount;
-        totalSupply += _amount;
+        totalSupply -= _amount;
         return true;
     }
 
@@ -125,7 +113,6 @@ contract token {
         return result;
     }
 }
-
 
 contract agent {
     address creator;
@@ -235,4 +222,64 @@ contract market {
             return (order.owner, order.total, order.unitPrice, order.min, order.step, order.active);
         }
     }
+}
+
+contract goverment {
+    address creator;
+    token share;
+
+    mapping (address => bool) public banAssetOf;
+    mapping (address => bool) public banAgentOf;
+
+
+
+    function goverment(string _s, string _n, uint _unit) {
+        creator = msg.sender;
+        share = new token(_s, _n, _unit);
+    }
+
+    struct marketDeal {
+        address asset;
+        address seller;
+        address buyer;
+        uint amount;
+        uint pricel
+    }
+
+    struct Rule {
+        address creator;
+        uint emmision;
+        uint burn;
+        uint positive;
+        uint negative;
+
+    }
+
+    function setProposal();
+    function setRule();
+    function executeRule(address _rule) {
+        executingRule = rule(_rule)
+    }
+}
+
+contract institute {
+    
+}
+
+contract DAO {
+    address public creator;
+    token public share;
+    token public credit;
+    market public daoMarket;
+    goverment public daoGoverment;
+
+    function DAO() {
+        creator = msg.sender;
+        share = new token();
+        credit = new token();
+        daoMarket = new market(credit);
+        daoGoverment = new goverment();
+    }
+
+
 }
