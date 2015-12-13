@@ -108,11 +108,12 @@ contract token {
         return maxValue;
     }
 
-    function isApprovedFor(address _target, address _proxy) constant returns (bool result) {
+    function isApprovedFor(address _target, address _proxy)  returns (bool result) {
         result = approveOnceOf[_target][_proxy];
         return result;
     }
 }
+
 
 contract agent {
     address creator;
@@ -226,59 +227,114 @@ contract market {
 
 contract goverment {
     address creator;
-    token share;
+    token shares;
+    token credits;
 
+    /* info for market */
     mapping (address => bool) public banAssetOf;
     mapping (address => bool) public banAgentOf;
 
 
 
-    function goverment(string _s, string _n, uint _unit) {
-        creator = msg.sender;
-        share = new token(_s, _n, _unit);
-    }
-
-    struct marketDeal {
+    struct MarketDeal {
         address asset;
         address seller;
         address buyer;
         uint amount;
-        uint pricel
+        uint price;
     }
 
     struct Rule {
         address creator;
-        uint emmision;
-        uint burn;
+        address asset;
+        uint percentEmmision;
+        uint percentBurn;
         uint positive;
         uint negative;
+    }
+
+    Rule[] proposals;
+
+    function goverment(string _s, string _n, uint _unit) {
+        creator = msg.sender;
+        shares = new token(_s, _n, _unit);
+        credits = new token(_s, _n, _unit);
+    }
+
+    function getDaoEfficiently() returns(uint daoEfficiently) {
 
     }
 
-    function setProposal();
-    function setRule();
-    function executeRule(address _rule) {
-        executingRule = rule(_rule)
+    function setProposal(address _asset, uint _percentEmmision, uint _percentBurn) {
+        if(shares.isApprovedFor(msg.sender, this)) {
+            uint proposalID = proposals.length++;
+            Rule r = proposals[proposalID];
+
+        }
+    }
+
+    
+}
+
+contract creditControl is goverment {
+
+    /* info for goverment */
+    mapping (address => bool) public existRuleAssetOf;
+    mapping (address => bool) public existRuleBuyerOf;
+    mapping (address => bool) public existRuleSellerOf;
+    mapping (address => uint) public ruleIdAssetOf;
+    mapping (address => uint) public ruleIdBuyerOf;
+    mapping (address => uint) public ruleIdSellerOf;
+
+    function creditControl()   {}
+    
+    function newMarketDeal(address _asset, address _seller, address _buyer, uint _amount, uint _price) {
+        if(existRuleAssetOf[_asset]) {
+            uint ruleID;
+            ruleID = ruleIdAssetOf[_asset];
+            Rule assetRule = proposals[ruleID];
+            credits.emmision(assetRule.percentEmmision*_price);
+            credits.burn(assetRule.percentBurn*_price);
+        }
     }
 }
 
+
 contract institute {
-    
+
 }
 
 contract DAO {
     address public creator;
-    token public share;
-    token public credit;
+    token public shares;
+    token public credits;
     market public daoMarket;
-    goverment public daoGoverment;
+    address public daoGoverment;
+
+    modifier govermentCheck { if (msg.sender == daoGoverment) _ }
 
     function DAO() {
-        creator = msg.sender;
-        share = new token();
-        credit = new token();
-        daoMarket = new market(credit);
-        daoGoverment = new goverment();
+
+    }
+
+    function creditEmmision(uint _amount) govermentCheck returns(bool result) {
+            result = credits.emmision(_amount);
+            return result;
+    }
+
+    function creditBurn(uint _amount) govermentCheck returns(bool result) {
+            result = credits.burn(_amount);
+            return result;
+    }
+
+    function shareEmmision(uint _amount) govermentCheck returns(bool result) {
+            result = shares.emmision(_amount);
+            return result;
+    }
+
+    function shareBurn(uint _amount) govermentCheck returns(bool result) {
+            result = shares.burn(_amount);
+            return result;
     }
 
 
