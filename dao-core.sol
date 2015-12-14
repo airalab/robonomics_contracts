@@ -4,7 +4,7 @@ contract token {
     string public name;
     uint public baseUnit;
     uint totalSupply;
-    mapping (address => uint) balanceOf;
+    mapping (address => uint) public balanceOf;
     mapping (address => mapping(address => bool)) approveOf;
     mapping (address => mapping(address => bool)) approveOnceOf;
     mapping (address => mapping(address => uint)) approveOnceValueOf;
@@ -108,7 +108,7 @@ contract token {
         return maxValue;
     }
 
-    function isApprovedFor(address _target, address _proxy)  returns (bool result) {
+    function isApprovedFor(address _target, address _proxy) returns (bool result) {
         result = approveOnceOf[_target][_proxy];
         return result;
     }
@@ -144,34 +144,60 @@ contract agent {
     }    
 }
 
-contract marketAgent is agent {
-    market agentMarket;
-    token credit;
-    
+contract marketAgent {
+    address creator;
+    market Market;
+
     modifier creatorCheck { if (msg.sender == creator) _ }
 
     function marketAgent(address _marketAddr, string _marketAbi, string _marketHelper) {
         creator = msg.sender;
-        agentMarket = market(_marketAddr);
-        credit.approve(agentMarket);
-
-        uint agentContractID = agentContracts.length++;
-        AgentContract a = agentContracts[agentContractID];
-        a.agentContractAddr = _marketAddr;
-        a.abi = _marketAbi;
-        a.helper = _marketHelper;
+        Market = market(_marketAddr);
+        Market.credit().approve(_marketAddr);
     }
     
     function approveSupply(token _asset, uint _maxValue) creatorCheck returns(bool result) {
         token asset = token(_asset);
-        result = asset.approveOnce(agentMarket, _maxValue);
+        result = asset.approveOnce(Market, _maxValue);
         return result;
+    }
+
+    function addSell(token _assetAddr, uint _total, uint _unitPrice, uint _min, uint _step) returns(uint) {
+        if (token(_assetAddr).myBalance() >= _total) {
+            approveSupply(_assetAddr, _total);
+            return Market.addSell(_assetAddr, _total, _unitPrice, _min, _step);
+        }
+    }
+
+    function addBuy(address _assetAddr, uint _total, uint _unitPrice, uint _min, uint _step) returns(uint) {
+        if (Market.credit().myBalance() >= (_total * _unitPrice)) {
+            return Market.addBuy(_assetAddr, _total, _unitPrice, _min, _step);
+        }
+    }
+
+    function removeSell(address _assetAddr, uint _orderID) returns(bool) {
+        return Market.removeSell(_assetAddr, _orderID);
+    }
+
+    function removeBuy(address _assetAddr, uint _orderID) returns(bool) {
+        return Market.removeBuy(_assetAddr, _orderID);
+    }
+
+    function buyDeal(address _assetAddr, uint _amount, uint _orderID) returns(bool) {
+        return Market.buyDeal(_assetAddr, _amount, _orderID);
+    }
+
+    function sellDeal(token _assetAddr, uint _amount, uint _orderID) returns(bool) {
+        if (token(_assetAddr).myBalance() >= _amount) {
+            approveSupply(_assetAddr, _amount);
+            return Market.sellDeal(_assetAddr, _amount, _orderID);
+        }
     }
 }
 
 contract market {
     address creator;
-    token credit;
+    token public credit;
 
     struct Order {
         uint orderID;
@@ -194,18 +220,90 @@ contract market {
     }
 
     SaleAssetList[] public sellAssetList;
-    Order[] public sellOrderList;
     mapping (address => bool) public sellExistOf;
     mapping (address => uint) public sellDataOf;
 
     BuyAssetList[] public buyAssetList;
-    Order[] public buyOrderList;
     mapping (address => bool) public buyExistOf;
     mapping (address => uint) public buyDataOf;
 
     function market(address _credit) {
         creator = msg.sender;
         credit = token(_credit);
+    }
+
+    function addSell(address _assetAddr, uint _total, uint _unitPrice, uint _min, uint _step) returns(uint sellID) {
+        uint assetID;
+        if (sellExistOf[_assetAddr]) {
+            assetID = sellDataOf[_assetAddr];
+            SaleAssetList sellAssetOrders = sellAssetList[assetID];
+        } else {
+            assetID = sellAssetList.length++;
+            sellExistOf[_assetAddr] = true;
+            sellAssetOrders = sellAssetList[assetID];
+            sellAssetOrders.assetAddr = _assetAddr;
+        }
+        sellID = sellAssetOrders.sellOrderList.length++;
+
+        Order order = sellAssetOrders.sellOrderList[sellID];
+        order.orderID = sellID;
+        order.owner = msg.sender;
+        order.total = _total;
+        order.unitPrice = _unitPrice;
+        order.min = _min;
+        order.step = _step;
+        order.active = true;
+
+        return sellID;
+    }
+
+    function addBuy(address _assetAddr, uint _total, uint _unitPrice, uint _min, uint _step) returns(uint buyID) {
+        uint assetID;
+        if (buyExistOf[_assetAddr]) {
+            assetID = buyDataOf[_assetAddr];
+            BuyAssetList buyAssetOrders = buyAssetList[assetID];
+        } else {
+            assetID = buyAssetList.length++;
+            buyExistOf[_assetAddr] = true;
+            buyAssetOrders = buyAssetList[assetID];
+            buyAssetOrders.assetAddr = _assetAddr;
+        }
+        buyID = buyAssetOrders.buyOrderList.length++;
+
+        Order order = buyAssetOrders.buyOrderList[buyID];
+        order.orderID = buyID;
+        order.owner = msg.sender;
+        order.total = _total;
+        order.unitPrice = _unitPrice;
+        order.min = _min;
+        order.step = _step;
+        order.active = true;
+
+        return buyID;
+    }
+
+    function removeSell(address _assetAddr, uint _orderID) returns(bool) {
+        if (sellExistOf[_assetAddr]) {
+            uint assetID = sellDataOf[_assetAddr];
+            Order order = sellAssetList[assetID].sellOrderList[_orderID];
+            if (order.owner == msg.sender) {
+                order.active = false;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function removeBuy(address _assetAddr, uint _orderID) returns(bool) {
+        if (buyExistOf[_assetAddr]) {
+            uint assetID = buyDataOf[_assetAddr];
+            Order order = buyAssetList[assetID].buyOrderList[_orderID];
+            if (order.owner == msg.sender) {
+                order.active = false;
+                return true;
+            }
+        }
+        return false;
     }
 
     function getSell(address _assetAddr, uint _orderID) returns(address owner, uint total, uint unitPrice, uint min, uint step, bool active) {
@@ -222,6 +320,64 @@ contract market {
             Order order = buyAssetList[assetID].buyOrderList[_orderID];
             return (order.owner, order.total, order.unitPrice, order.min, order.step, order.active);
         }
+    }
+
+    function buyDeal(address _assetAddr, uint _amount, uint _orderID) returns(bool) {
+        if (sellExistOf[_assetAddr]) {
+            uint assetID = sellDataOf[_assetAddr];
+            Order order = sellAssetList[assetID].sellOrderList[_orderID];
+            if (order.total > 0 && order.active == true && _amount >= order.min && _amount <= order.total && ((_amount / order.step) * order.step) == _amount) {
+                marketAgent agentBuy = marketAgent(msg.sender);
+                marketAgent agentSell = marketAgent(order.owner);
+                token asset = token(sellAssetList[assetID].assetAddr);
+                uint totalCredit = order.unitPrice * _amount;
+                if (credit.isApprovedFor(agentBuy, this) &&
+                    credit.isApprovedOnceFor(agentBuy, this) >= totalCredit &&
+                    credit.balanceOf(agentBuy) >= totalCredit &&
+                    asset.isApprovedFor(agentSell, this) &&
+                    asset.isApprovedOnceFor(agentSell, this) >= _amount &&
+                    asset.balanceOf(agentSell) >= _amount)
+                {
+                    credit.transferFrom(agentBuy, agentSell, totalCredit);
+                    asset.transferFrom(agentSell, agentBuy, _amount);
+                    order.total = order.total - _amount;
+                    if (order.total == 0) {
+                        order.active = false;
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    function sellDeal(address _assetAddr, uint _amount, uint _orderID) returns(bool) {
+        if (buyExistOf[_assetAddr]) {
+            uint assetID = buyDataOf[_assetAddr];
+            Order order = buyAssetList[assetID].buyOrderList[_orderID];
+            if (order.total > 0 && order.active == true && _amount >= order.min && _amount <= order.total && ((_amount / order.step) * order.step) == _amount) {
+                marketAgent agentSell = marketAgent(msg.sender);
+                marketAgent agentBuy = marketAgent(order.owner);
+                token asset = token(buyAssetList[assetID].assetAddr);
+                uint totalCredit = order.unitPrice * _amount;
+                if (credit.isApprovedFor(agentBuy, this) &&
+                    credit.isApprovedOnceFor(agentBuy, this) >= totalCredit &&
+                    credit.balanceOf(agentBuy) >= totalCredit &&
+                    asset.isApprovedFor(agentSell, this) &&
+                    asset.isApprovedOnceFor(agentSell, this) >= _amount &&
+                    asset.balanceOf(agentSell) >= _amount)
+                {
+                    credit.transferFrom(agentBuy, agentSell, totalCredit);
+                    asset.transferFrom(agentSell, agentBuy, _amount);
+                    order.total = order.total - _amount;
+                    if (order.total == 0) {
+                        order.active = false;
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
 
