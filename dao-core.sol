@@ -38,7 +38,7 @@ contract token {
 
     function burn(uint _amount) creatorCheck returns(bool result) {
         if (balanceOf[creator] < _amount) {return false;}
-        if (balanceOf[msg.sender] + _amount < balanceOf[msg.sender]) {return false;}
+        if (balanceOf[creator] + _amount < balanceOf[creator]) {return false;}
         balanceOf[creator] -= _amount;
         totalSupply -= _amount;
         return true;
