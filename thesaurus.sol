@@ -62,7 +62,7 @@ contract thesaurus {
 	}
 }
 
-contract thesaurusAdmin is thesaurus{
+contract thesaurusAdmin is thesaurus {
 
 	function setProp(string _itemprop, string _itemtype, string _desc, string _dataType) ownerCheck returns(uint propID) {
 		propID = propList.length++;
