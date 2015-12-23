@@ -1,0 +1,6 @@
+contract thesaurus {
+	
+	struct metadata {
+		
+	}
+}
