@@ -37,6 +37,33 @@ contract thesaurus {
 		owner = msg.sender;
 	}
 
+	function getPropID(string _itemprop) returns(bool result, uint propID){
+		if(!itempropExistOf[sha3(_itemprop)]) break;
+		result = true; 
+		propID = itempropOf[sha3(_itemprop)];
+		return(result, propID);
+	}
+
+	function getProp(uint _propID) returns(string itemprop, string itemtype, string desc, string dataType){
+		Prop p = propList[_propID];
+		return(p.itemprop, p.itemtype, p.desc, p.dataType);
+	}
+
+	function getMetadataID(string _itemscope) returns(bool result, uint metadataID){
+		if(!itemscopeExistOf[sha3(_itemscope)]) break;
+		result = true; 
+		metadataID = itemscopeOf[sha3(_itemscope)];
+		return(result, metadataID);
+	}
+
+	function getMetadataNumProp(uint _itemscopeID) returns(string itemscope, uint numProp){
+		Metadata m = schemaorgList[_itemscopeID];
+		return(m.itemscope, m.numProp);
+	}
+}
+
+contract thesaurusAdmin is thesaurus{
+
 	function setProp(string _itemprop, string _itemtype, string _desc, string _dataType) ownerCheck returns(uint propID) {
 		propID = propList.length++;
         Prop p = propList[propID];
@@ -49,18 +76,6 @@ contract thesaurus {
         return propID;
 	}
 
-	function getPropID(string _itemprop) returns(bool result, uint propID){
-		if(!itempropExistOf[sha3(_itemprop)]) break;
-		result = true; 
-		propID = itempropOf[sha3(_itemprop)];
-		return(result, propID);
-	}
-
-	function getProp(uint _propID) returns(string itemprop, string itemtype, string desc, string dataType){
-		Prop p = propList[_propID];
-		return(p.itemprop, p.itemtype, p.desc, p.dataType);
-	}
-	
 	function setMetadata(string _itemscope, uint _propID) ownerCheck returns(uint enumPropListID) {
 		uint metadataID;
 		if(!itemscopeExistOf[sha3(_itemscope)]) {
@@ -80,18 +95,4 @@ contract thesaurus {
         m.numProp +=1;
     	return enumPropListID;
 	}
-
-	function getMetadataID(string _itemscope) returns(bool result, uint metadataID){
-		if(!itemscopeExistOf[sha3(_itemscope)]) break;
-		result = true; 
-		metadataID = itemscopeOf[sha3(_itemscope)];
-		return(result, metadataID);
-	}
-
-	function getMetadataNumProp(uint _itemscopeID) returns(string itemscope, uint numProp){
-		Metadata m = schemaorgList[_itemscopeID];
-		return(m.itemscope, m.numProp);
-	}
-
-
 }
