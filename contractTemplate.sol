@@ -6,6 +6,17 @@ contract contractTemplate {
 	bool promisorAgree;
 	bool promiseeAgree;
 
+	struct Transfer {
+		address token;
+		string tokenItemscope;
+		uint amount;
+		bool transferSend;
+		bool transferReceive;
+	}
+
+	Transfer promisorTransfer;
+	Transfer promiseeTransfer;
+
 	function contractTemplate(address _promisee, address _beneficiary) {
 		promisor = msg.sender;
 		promisee = _promisee;
