@@ -1,0 +1,3 @@
+"Schema.org","Second test"
+"openingHours", "LocalBusiness", "The opening hours for a business. Opening hours can be specified as a weekly time range, starting with days, then times per day."
+"address", "Place", "Physical address of the item."
