@@ -9,11 +9,13 @@ contract core {
 		string code;
 		string abi;
 		string actions;
-		string thesaurus;
+		string itemscope;
 		bool inactive;
 	}
 
 	Template[] templates;
+	mapping (bytes32 => uint) public itemscopeTemplateOf;
+	mapping (bytes32 => bool) public itemscopeTemplateExistOf;
 
 	function core(string _daoName, string _desc) {
 		daoName = _daoName;
@@ -24,13 +26,13 @@ contract core {
 	function setTemplate(string _code,
 						 string _abi,
 						 string _actions,
-						 string _thesaurus) ownerCheck returns(bool result, uint templateID) {
+						 string _itemscope) ownerCheck returns(bool result, uint templateID) {
 		templateID = templates.length++;
 		Template t = templates[templateID];
         t.code = _code;
         t.abi = _abi;
         t.actions = _actions;
-        t.thesaurus = _thesaurus;
+        t.itemscope = _itemscope;
         result = true;
         return(result, templateID);
 	}
