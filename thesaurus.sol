@@ -22,6 +22,7 @@ contract thesaurus {
 	
 	struct Metadata {
 		string itemscope;
+		string desc;
 		Enum[]  enumPropList;
 		uint numProp;
 	}
@@ -76,7 +77,7 @@ contract thesaurusAdmin is thesaurus {
         return propID;
 	}
 
-	function setMetadata(string _itemscope, uint _propID) ownerCheck returns(uint enumPropListID) {
+	function setMetadata(string _itemscope, uint _desc, uint _propID) ownerCheck returns(uint enumPropListID) {
 		uint metadataID;
 		if(!itemscopeExistOf[sha3(_itemscope)]) {
 			metadataID = schemaorgList.length++;    	
@@ -88,6 +89,7 @@ contract thesaurusAdmin is thesaurus {
 
     	Metadata m = schemaorgList[metadataID];
         m.itemscope = _itemscope;
+        m.desc = _desc;
 
         enumPropListID = m.enumPropList.length++;
        	Enum e = m.enumPropList[enumPropListID];
