@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 contract token { 
     address public creator;
     string public symbol;
@@ -49,6 +50,54 @@ contract token {
     function myBalance() returns (uint256 balance) {
         balance = balanceOf[msg.sender];
         return balance;
+=======
+contract token {
+    string public assetName;
+    address public daoAddr;
+    address public owner;
+    mapping (address => uint) public tokenBalanceOf;
+    DAO daoToken;
+
+    /*Initial */
+    function token(string _assetName) {
+        assetName = _assetName;
+        owner = msg.sender;
+    }
+
+    /* DAO functions */
+    function emission(address _agentContrAddr, uint _amount) returns(bool result) {
+        if(msg.sender==daoAddr || msg.sender==owner)
+        {
+            tokenBalanceOf[_agentContrAddr] += _amount;
+            return true;
+        }
+        return false;
+    }
+
+    function burn(address _agentContrAddr, uint _amount) returns(bool result) {
+        if(msg.sender==daoAddr && tokenBalanceOf[_agentContrAddr]>=_amount)
+        {
+            tokenBalanceOf[_agentContrAddr] -= _amount;
+            return true;
+        }
+        return false;
+    }
+
+    function setDaoAddr(address _daoAddr) {
+        DAO dao = DAO(_daoAddr);
+        address agentContrAddr = dao.agentContractOf(msg.sender);
+        if(dao.agentActiveOf(agentContrAddr) || dao.daoFounder() == msg.sender) {
+            daoAddr = _daoAddr;
+        }
+    }
+
+    /* Agent function */
+    function sendToken(address receiver, uint amount) returns(bool result) {
+        if (tokenBalanceOf[msg.sender] < amount) {return false;}
+        tokenBalanceOf[msg.sender] -= amount;
+        tokenBalanceOf[receiver] += amount;
+        return true;
+>>>>>>> refs/remotes/origin/master
     }
 
     function transfer(address _to, uint256 _value) returns (bool result) {
@@ -60,6 +109,7 @@ contract token {
         return true;
     }
 
+<<<<<<< HEAD
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if(approveOf[_from][msg.sender])
         {
@@ -83,6 +133,42 @@ contract token {
         approveOf[msg.sender][_address] = true;
         AddressApproval(_address, msg.sender, true);
         return true;
+=======
+    /* Agents data */
+    Agent[] public agentsList;
+    mapping (address => uint) public agentDataOf;
+    mapping (address => bool) public agentActiveOf;
+    mapping (address => address) public agentContractOf;
+    struct Agent {
+        address agentContrAddr;
+        uint joinData;
+    }
+
+    function DAO(token _shares, token _credits, agent _daoFounderContr, market _daoMarketContr, goverment _daoGovermentContr) {
+        daoFounder = msg.sender;
+        daoShares = token(_shares);
+        daoCredits = token(_credits);
+        daoFounderContr = _daoFounderContr;
+        daoMarketContr = _daoMarketContr;
+        daoGovermentContr = _daoGovermentContr;
+    }
+
+    function setMarket(address _daoMarketContr) {
+        if(msg.sender == daoFounder) {
+        	daoMarketContr = _daoMarketContr;
+        }
+    }
+
+    function initializationDaoBalances(uint _founderSharesAmount, uint _founderCreditsAmount) returns (bool result) {
+        if(!initialization) {
+			daoShares.emission(daoFounderContr, _founderSharesAmount);
+			sharesAmount = _founderSharesAmount;
+			daoCredits.emission(daoFounderContr, _founderCreditsAmount);
+			creditAmount = _founderCreditsAmount;
+			initialization = true;
+			return true;
+        }
+>>>>>>> refs/remotes/origin/master
     }
 
     function unapprove(address _address) returns (bool result) {
@@ -129,6 +215,7 @@ contract agent {
         string helper;
     }
 
+<<<<<<< HEAD
     /* Functions */
     function agent() {
         creator = msg.sender;
@@ -168,6 +255,47 @@ contract marketAgent {
             return Market.addSell(_assetAddr, _total, _unitPrice, _min, _step);
         }
     }
+=======
+    function daoCreditEmission(address _agentContrAddr, uint _creditsAmount) {
+        daoCredits.emission(_agentContrAddr, _creditsAmount);
+    }
+
+    function setAgent(address _agentContAddr) returns(uint agentID) {
+        if(daoShares.tokenBalanceOf(msg.sender)>0) {
+            agentID = agentsList.length++;
+            Agent a = agentsList[agentID];
+            a.agentContrAddr = _agentContAddr;
+            a.joinData = now;
+            uint newAgentSharesAmount;
+            numAgents = agentID + 1;
+            newAgentSharesAmount = sharesAmount/numAgents*daoEfficiency();
+            daoShares.emission(_agentContAddr, newAgentSharesAmount);
+            agentDataOf[_agentContAddr] = agentID;
+            agentActiveOf[_agentContAddr] = true;
+            agent Agn = agent(_agentContAddr);
+            agentContractOf[Agn.agentAddr()] = _agentContAddr;
+            return agentID;
+        }
+    }
+
+    function setAssets(address _assetAddr) returns(uint assetID) {
+        if (agentActiveOf[msg.sender] == true) {
+            assetID = assetsList.length++;
+            Asset a = assetsList[assetID];
+            a.assetAddr = _assetAddr;
+            assetDataOf[_assetAddr] = assetID;
+            assetExistOf[_assetAddr] = true;
+            return assetID;
+        }
+    }
+}
+
+contract agent {
+    address public agentAddr;
+    address controlAddr;
+    address daoAddr;
+    DAO public dao;
+>>>>>>> refs/remotes/origin/master
 
     function addBuy(address _assetAddr, uint _total, uint _unitPrice, uint _min, uint _step) returns(uint) {
         if (Market.credit().myBalance() >= (_total * _unitPrice)) {
@@ -175,16 +303,51 @@ contract marketAgent {
         }
     }
 
+<<<<<<< HEAD
     function removeSell(address _assetAddr, uint _orderID) returns(bool) {
         return Market.removeSell(_assetAddr, _orderID);
+=======
+    AgentContract[] public agentContractList;
+    struct AgentContract {
+        address agentContractAddr;
+        string abi;
+        string desc;
+        bool active;
+>>>>>>> refs/remotes/origin/master
     }
 
     function removeBuy(address _assetAddr, uint _orderID) returns(bool) {
         return Market.removeBuy(_assetAddr, _orderID);
     }
 
+<<<<<<< HEAD
     function buyDeal(address _assetAddr, uint _amount, uint _orderID) returns(bool) {
         return Market.buyDeal(_assetAddr, _amount, _orderID);
+=======
+    function agent() {
+        agentAddr = msg.sender;
+        controlAddr = msg.sender;
+    }
+
+    function addAsset(address _tokenAddr) {
+        if (msg.sender == agentAddr) {
+			dao.setAssets(_tokenAddr);
+		}
+    }
+
+    function sendToken(address assetAddr, address receiver, uint amount) {
+        if (msg.sender == agentAddr || msg.sender == dao.daoMarketContr()) {
+			token asset = token(assetAddr);
+			asset.sendToken(receiver, amount);
+		}
+    }
+
+    function setDao(address _daoAddr) {
+        if(msg.sender == agentAddr) {
+        	daoAddr = _daoAddr;
+			dao = DAO(daoAddr);
+        }
+>>>>>>> refs/remotes/origin/master
     }
 
     function sellDeal(token _assetAddr, uint _amount, uint _orderID) returns(bool) {
@@ -193,6 +356,28 @@ contract marketAgent {
             return Market.sellDeal(_assetAddr, _amount, _orderID);
         }
     }
+<<<<<<< HEAD
+=======
+
+    function setNewAgent(address _agentAddr) controlCheck returns(bool result) {
+        dao.setAgent(_agentAddr);
+        return true;
+    }
+
+    function setAgentContract(address _agentContractAddr, string _abi, string _desc) controlCheck returns(uint contractID) {
+        contractID = agentContractList.length++;
+        AgentContract a = agentContractList[contractID];
+        a.agentContractAddr = _agentContractAddr;
+        a.abi = _abi;
+        a.desc = _desc;
+        a.active = true;
+        return contractID;
+    }
+
+    function inactiveAgentContract(address _agentContractAddr) controlCheck returns(bool result) {
+
+    }
+>>>>>>> refs/remotes/origin/master
 }
 
 contract market {
@@ -220,10 +405,15 @@ contract market {
     }
 
     SaleAssetList[] public sellAssetList;
+<<<<<<< HEAD
+=======
+    Order[] public sellOrderList;
+>>>>>>> refs/remotes/origin/master
     mapping (address => bool) public sellExistOf;
     mapping (address => uint) public sellDataOf;
 
     BuyAssetList[] public buyAssetList;
+<<<<<<< HEAD
     mapping (address => bool) public buyExistOf;
     mapping (address => uint) public buyDataOf;
 
@@ -290,10 +480,47 @@ contract market {
                 order.active = false;
                 return true;
             }
+=======
+    Order[] public buyOrderList;
+    mapping (address => bool) public buyExistOf;
+    mapping (address => uint) public buyDataOf;
+
+    function setDao(address _daoAddr) {
+		daoAddr = _daoAddr;
+		dao = DAO(daoAddr);
+    }
+
+    function addSell(address _assetAddr, uint _total, uint _unitPrice, uint _min, uint _step) returns(uint sellID) {
+    	address agentContrAddr = dao.agentContractOf(msg.sender);
+        if (dao.agentActiveOf(agentContrAddr) && dao.assetExistOf(_assetAddr)) {
+        	uint assetID;
+            if (sellExistOf[_assetAddr]) {
+                assetID = sellDataOf[_assetAddr];
+                SaleAssetList sellAssetOrders = sellAssetList[assetID];
+            } else {
+            	assetID = sellAssetList.length++;
+				sellExistOf[_assetAddr] = true;
+                sellAssetOrders = sellAssetList[assetID];
+                sellAssetOrders.assetAddr = _assetAddr;
+            }
+			sellID = sellAssetOrders.sellOrderList.length++;
+
+			Order order = sellAssetOrders.sellOrderList[sellID];
+			order.orderID = sellID;
+			order.owner = agentContrAddr;
+			order.total = _total;
+			order.unitPrice = _unitPrice;
+			order.min = _min;
+			order.step = _step;
+			order.active = true;
+
+			return sellID;
+>>>>>>> refs/remotes/origin/master
         }
         return false;
     }
 
+<<<<<<< HEAD
     function removeBuy(address _assetAddr, uint _orderID) returns(bool) {
         if (buyExistOf[_assetAddr]) {
             uint assetID = buyDataOf[_assetAddr];
@@ -302,10 +529,38 @@ contract market {
                 order.active = false;
                 return true;
             }
+=======
+    function addBuy(address _assetAddr, uint _total, uint _unitPrice, uint _min, uint _step) returns(uint buyID) {
+    	address agentContrAddr = dao.agentContractOf(msg.sender);
+        if (dao.agentActiveOf(agentContrAddr) && dao.assetExistOf(_assetAddr)) {
+        	uint assetID;
+            if (buyExistOf[_assetAddr]) {
+                assetID = buyDataOf[_assetAddr];
+                BuyAssetList buyAssetOrders = buyAssetList[assetID];
+            } else {
+            	assetID = buyAssetList.length++;
+				buyExistOf[_assetAddr] = true;
+                buyAssetOrders = buyAssetList[assetID];
+                buyAssetOrders.assetAddr = _assetAddr;
+            }
+			buyID = buyAssetOrders.buyOrderList.length++;
+
+			Order order = buyAssetOrders.buyOrderList[buyID];
+			order.orderID = buyID;
+			order.owner = agentContrAddr;
+			order.total = _total;
+			order.unitPrice = _unitPrice;
+			order.min = _min;
+			order.step = _step;
+			order.active = true;
+
+			return buyID;
+>>>>>>> refs/remotes/origin/master
         }
         return false;
     }
 
+<<<<<<< HEAD
     function getSell(address _assetAddr, uint _orderID) returns(address owner, uint total, uint unitPrice, uint min, uint step, bool active) {
         if (sellExistOf[_assetAddr]) {
             uint assetID = sellDataOf[_assetAddr];
@@ -378,10 +633,127 @@ contract market {
             }
         }
         return false;
+=======
+    function removeSell(address _assetAddr, uint _orderID) returns(bool result) {
+    	if (sellExistOf[_assetAddr]) {
+    		address agentContrAddr = dao.agentContractOf(msg.sender);
+			uint assetID = sellDataOf[_assetAddr];
+			Order order = sellAssetList[assetID].sellOrderList[_orderID];
+			if (order.owner == agentContrAddr) {
+				order.active = false;
+				return true;
+			}
+		}
+		return false;
+    }
+
+    function removeBuy(address _assetAddr, uint _orderID) returns(bool result) {
+    	if (buyExistOf[_assetAddr]) {
+    		address agentContrAddr = dao.agentContractOf(msg.sender);
+			uint assetID = buyDataOf[_assetAddr];
+			Order order = buyAssetList[assetID].buyOrderList[_orderID];
+			if (order.owner == agentContrAddr) {
+				order.active = false;
+				return true;
+			}
+		}
+		return false;
+    }
+
+    function getSell(address _assetAddr, uint _orderID) returns(address owner, uint total, uint unitPrice, uint min, uint step, bool active) {
+		if (sellExistOf[_assetAddr]) {
+			uint assetID = sellDataOf[_assetAddr];
+			Order order = sellAssetList[assetID].sellOrderList[_orderID];
+			return (order.owner, order.total, order.unitPrice, order.min, order.step, order.active);
+		}
+    }
+
+    function getBuy(address _assetAddr, uint _orderID) returns(address owner, uint total, uint unitPrice, uint min, uint step, bool active) {
+		if (buyExistOf[_assetAddr]) {
+			uint assetID = buyDataOf[_assetAddr];
+			Order order = buyAssetList[assetID].buyOrderList[_orderID];
+			return (order.owner, order.total, order.unitPrice, order.min, order.step, order.active);
+		}
+    }
+
+    function BuyDeal(address _assetAddr, uint _amount, uint _orderID) returns(bool result) {
+		if (sellExistOf[_assetAddr]) {
+            uint assetID = sellDataOf[_assetAddr];
+			Order order = sellAssetList[assetID].sellOrderList[_orderID];
+			if (order.total > 0 && order.active == true && _amount >= order.min && _amount <= order.total && ((_amount / order.step) * order.step) == _amount) {
+				address agent_buy_addr = dao.agentContractOf(msg.sender);
+				agent agent_buy = agent(agent_buy_addr);
+				agent agent_sell = agent(order.owner);
+
+				token credit = token(dao.daoCredits());
+				if (credit.tokenBalanceOf(agent_buy_addr) < (order.unitPrice * _amount)) {
+					return false;
+				}
+				token asset = token(sellAssetList[assetID].assetAddr);
+				if (asset.tokenBalanceOf(order.owner) < _amount) {
+					return false;
+				}
+
+				agent_buy.sendToken(dao.daoCredits(), order.owner, (order.unitPrice * _amount));
+				agent_sell.sendToken(sellAssetList[assetID].assetAddr, agent_buy_addr, _amount);
+
+				order.total = order.total - _amount;
+				if (order.total == 0) {
+					order.active = false;
+				}
+				return true;
+			}
+		}
+        return false;
+    }
+
+    function SellDeal(address _assetAddr, uint _amount, uint _orderID) returns(bool result) {
+        if (buyExistOf[_assetAddr]) {
+			uint assetID = buyDataOf[_assetAddr];
+			Order order = buyAssetList[assetID].buyOrderList[_orderID];
+			if (order.total > 0 && order.active == true && _amount >= order.min && _amount <= order.total && ((_amount / order.step) * order.step) == _amount) {
+				address agent_sell_addr = dao.agentContractOf(msg.sender);
+				agent agent_sell = agent(agent_sell_addr);
+				agent agent_buy = agent(order.owner);
+
+				token credit = token(dao.daoCredits());
+				if (credit.tokenBalanceOf(order.owner) < (order.unitPrice * _amount)) {
+					return false;
+				}
+				token asset = token(buyAssetList[assetID].assetAddr);
+				if (asset.tokenBalanceOf(agent_sell_addr) < _amount) {
+					return false;
+				}
+
+				agent_sell.sendToken(buyAssetList[assetID].assetAddr, order.owner, _amount);
+				agent_buy.sendToken(dao.daoCredits(), agent_sell_addr, (order.unitPrice * _amount));
+
+				order.total = order.total - _amount;
+				if (order.total == 0) {
+					order.active = false;
+				}
+				return true;
+			}
+		}
+		return false;
+    }
+}
+
+contract rule {
+    address seller;
+    address buyer; 
+    address asset;  
+    uint qty;
+    uint fullCost;
+    uint dealTimestamp;
+    
+    function execute(address _seller , address _buyer, address  _asset,  uint _qty, uint _fullCost) returns(address seller, address buyer, address asset, address qty, uint fullCost) {
+>>>>>>> refs/remotes/origin/master
     }
 }
 
 contract goverment {
+<<<<<<< HEAD
     address creator;
     token shares;
     token credits;
@@ -457,7 +829,55 @@ contract creditControl is goverment {
 
 
 contract institute {
+=======
+    address daoAddr;
 
+    function goverment(address _daoAddr) {
+        daoAddr = _daoAddr;
+    }
+
+    /* market data */
+    
+    struct MarketDeal {
+        address seller;
+        address buyer; 
+        address asset;  
+        uint qty;
+        uint fullCost;
+        uint dealTimestamp;
+    }
+>>>>>>> refs/remotes/origin/master
+
+    MarketDeal[] public marketDeals;
+    
+    /* proposal data */
+    
+    mapping (address => uint) public sellerRulesFilterExistOf;
+    mapping (address => uint) public buyerRulesFilterExistOf;
+    mapping (address => uint) public assetRulesFilterExistOf;
+    mapping (address => uint) public sellerRulesFilterOf;
+    mapping (address => uint) public buyerRulesFilterOf;
+    mapping (address => uint) public assetRulesFilterOf;
+    
+    
+    /* proposal data */
+    function setMarketDeal(address _seller , address _buyer, address  _asset,  uint _qty, uint _fullCost) returns(bool result) {
+        marketDeals[marketDeals.length++] = MarketDeal({seller: _seller, buyer: _buyer, asset: _asset, qty: _qty, fullCost: _fullCost, dealTimestamp: now});
+    }
+    
+    function executeRule(address _ruleAddr, uint _marketDealID) {
+        rule executingRule;
+        executingRule = rule(_ruleAddr);
+        address seller = marketDeals[_marketDealID].seller;
+        address buyer = marketDeals[_marketDealID].buyer;
+        address asset = marketDeals[_marketDealID].asset;
+        uint qty = marketDeals[_marketDealID].qty;
+        uint fullCost = marketDeals[_marketDealID].fullCost;
+        
+        executingRule.execute(seller,buyer,asset,qty,fullCost);
+        
+    }
+    
 }
 
 contract DAO {
