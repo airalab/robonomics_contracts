@@ -10,6 +10,7 @@ contract core {
 		string abi;
 		string actions;
 		string itemscope;
+		address thesaurus;
 		bool inactive;
 	}
 
@@ -26,13 +27,15 @@ contract core {
 	function setTemplate(string _code,
 						 string _abi,
 						 string _actions,
-						 string _itemscope) ownerCheck returns(bool result, uint templateID) {
+						 string _itemscope,
+						 address _thesaurus) ownerCheck returns(bool result, uint templateID) {
 		templateID = templates.length++;
 		Template t = templates[templateID];
         t.code = _code;
         t.abi = _abi;
         t.actions = _actions;
         t.itemscope = _itemscope;
+        t.thesaurus = _thesaurus;
         result = true;
         return(result, templateID);
 	}
