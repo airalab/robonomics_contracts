@@ -9,7 +9,7 @@ contract thesaurus {
 		string itemprop;
 		string itemtype;
 		string desc;
-		string dataType;
+		string helper;
 	}
 
 	Prop[] public propList;
@@ -45,9 +45,9 @@ contract thesaurus {
 		return(result, propID);
 	}
 
-	function getProp(uint _propID) returns(string itemprop, string itemtype, string desc, string dataType){
+	function getProp(uint _propID) returns(string itemprop, string itemtype, string desc, string helper){
 		Prop p = propList[_propID];
-		return(p.itemprop, p.itemtype, p.desc, p.dataType);
+		return(p.itemprop, p.itemtype, p.desc, p.helper);
 	}
 
 	function getMetadataID(string _itemscope) returns(bool result, uint metadataID){
@@ -65,13 +65,13 @@ contract thesaurus {
 
 contract thesaurusAdmin is thesaurus {
 
-	function setProp(string _itemprop, string _itemtype, string _desc, string _dataType) ownerCheck returns(uint propID) {
+	function setProp(string _itemprop, string _itemtype, string _desc, string _helper) ownerCheck returns(uint propID) {
 		propID = propList.length++;
         Prop p = propList[propID];
         p.itemprop = _itemprop;
         p.itemtype = _itemtype;
         p.desc = _desc;
-        p.dataType = _dataType;
+        p.helper = _helper;
         itempropExistOf[sha3(p.itemprop)] = true;
         itempropOf[sha3(p.itemprop)] = propID;
         return propID;
