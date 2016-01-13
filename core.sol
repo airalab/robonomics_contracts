@@ -2,15 +2,20 @@ contract core {
 	string public daoName;
 	string public desc;
 	address public admin;
+	uint public nodesAmount;
+	uint public templatesAmount;
 
 	modifier adminCheck { if (msg.sender == admin) _ }
 	
 	struct DaoNode {
+	    string itemscope;
 		string interface;
 		string code;
 	} 
 
 	DaoNode[] daoNodes;
+	mapping (string => uint) public daoNodeOf;
+	mapping (string => bool) public daoNodeExistOf;
 
 	struct Template {
 		string code;
@@ -31,13 +36,18 @@ contract core {
 		admin = msg.sender;
 	}
 
-	function setDaoNode(string _interface,
+	function setDaoNode(string _itemscope,
+	                    string _interface,
 						string _code) adminCheck returns(bool result, uint daoNodeID) {
 		daoNodeID = daoNodes.length++;
 		DaoNode d = daoNodes[daoNodeID];
+		d.itemscope = _itemscope;
 		d.interface = _interface;
 		d.code = _code;
 		result = true;
+		nodesAmount +=1;
+		daoNodeOf[d.itemscope] = daoNodeID;
+		daoNodeExistOf[d.itemscope] = true;
         return(result, daoNodeID);
 	}
 
@@ -57,6 +67,7 @@ contract core {
         t.thesaurus = _thesaurus;
         itemscopeTemplateExistOf[t.itemscope] = true;
         itemscopeTemplateOf[t.itemscope] = templateID;
+        templatesAmount +=1;
         result = true;
         return(result, templateID);
 	}
