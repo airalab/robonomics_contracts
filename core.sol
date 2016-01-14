@@ -18,6 +18,7 @@ contract core {
 	mapping (string => bool) public daoNodeExistOf;
 
 	struct Template {
+		string itemscope;
 		string code;
 		string interface;
 		bool inactive;
