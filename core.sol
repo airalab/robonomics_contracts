@@ -20,9 +20,6 @@ contract core {
 	struct Template {
 		string code;
 		string interface;
-		string actions;
-		string itemscope;
-		address thesaurus;
 		bool inactive;
 	}
 
