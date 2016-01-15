@@ -61,9 +61,21 @@ contract thesaurus {
 		Metadata m = schemaorgList[_itemscopeID];
 		return(m.itemscope, m.numProp);
 	}
+
+	function getPropFromMetadata(uint _itemscopeID, uint _enumPropID) returns(uint) {
+		Metadata m = schemaorgList[_itemscopeID];
+		Enum prop = m.enumPropList[_enumPropID];
+		return prop.propListID;
+	}
 }
 
 contract thesaurusAdmin is thesaurus {
+
+	function thesaurusAdmin(string _name, string _desc) thesaurus(_name, _desc) {
+		name = _name;
+		desc = _desc;
+		owner = msg.sender;
+	}
 
 	function setProp(string _itemprop, string _itemtype, string _desc, string _helper) ownerCheck returns(uint propID) {
 		propID = propList.length++;
@@ -77,12 +89,12 @@ contract thesaurusAdmin is thesaurus {
         return propID;
 	}
 
-	function setMetadata(string _itemscope, uint _desc, uint _propID) ownerCheck returns(uint enumPropListID) {
+	function setMetadata(string _itemscope, string _desc, uint _propID) ownerCheck returns(uint enumPropListID) {
 		uint metadataID;
 		if(!itemscopeExistOf[sha3(_itemscope)]) {
 			metadataID = schemaorgList.length++;    	
-        	itemscopeExistOf[sha3(m.itemscope)] = true;
-        	itemscopeOf[sha3(m.itemscope)] = metadataID;
+        	itemscopeExistOf[sha3(_itemscope)] = true;
+        	itemscopeOf[sha3(_itemscope)] = metadataID;
     	} else {
     		metadataID = itemscopeOf[sha3(_itemscope)];
     	}
