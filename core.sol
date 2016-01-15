@@ -8,9 +8,10 @@ contract core {
 	modifier adminCheck { if (msg.sender == admin) _ }
 	
 	struct DaoNode {
-	    string itemscope;
+	    	string itemscope;
 		string interface;
 		string code;
+		address nodeAddr;
 	} 
 
 	DaoNode[] daoNodes;
