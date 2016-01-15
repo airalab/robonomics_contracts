@@ -8,15 +8,15 @@ contract core {
 	modifier adminCheck { if (msg.sender == admin) _ }
 	
 	struct DaoNode {
-	    	string itemscope;
+	    string itemscope;
 		string interface;
 		string code;
 		address nodeAddr;
 	} 
 
 	DaoNode[] daoNodes;
-	mapping (string => uint) public daoNodeOf;
-	mapping (string => bool) public daoNodeExistOf;
+	mapping (bytes32 => uint) public daoNodeOf;
+	mapping (bytes32 => bool) public daoNodeExistOf;
 
 	struct Template {
 		string itemscope;
@@ -26,8 +26,8 @@ contract core {
 	}
 
 	Template[] templates;
-	mapping (string => uint) public itemscopeTemplateOf;
-	mapping (string => bool) public itemscopeTemplateExistOf;
+	mapping (bytes32 => uint) public itemscopeTemplateOf;
+	mapping (bytes32 => bool) public itemscopeTemplateExistOf;
 
 	function core(string _daoName, string _desc) {
 		daoName = _daoName;
@@ -37,39 +37,45 @@ contract core {
 
 	function setDaoNode(string _itemscope,
 	                    string _interface,
-						string _code) adminCheck returns(bool result, uint daoNodeID) {
+						string _code,
+						address _nodeAddr) adminCheck returns(bool result, uint daoNodeID) {
 		daoNodeID = daoNodes.length++;
 		DaoNode d = daoNodes[daoNodeID];
 		d.itemscope = _itemscope;
 		d.interface = _interface;
 		d.code = _code;
+		d.nodeAddr = _nodeAddr;
 		result = true;
 		nodesAmount +=1;
-		daoNodeOf[d.itemscope] = daoNodeID;
-		daoNodeExistOf[d.itemscope] = true;
+		daoNodeOf[sha3(d.itemscope)] = daoNodeID;
+		daoNodeExistOf[sha3(d.itemscope)] = true;
         return(result, daoNodeID);
 	}
 
-	function getDaoNode() {}
+	function getDaoNode(uint _daoNodeID) returns(string itemscope, string interface, string code)
+	{
+		DaoNode d = daoNodes[_daoNodeID];
+		return(d.itemscope, d.interface, d.code, d.nodeAddr);
+	}
 
 	function setTemplate(string _code,
 						 string _interface,
-						 string _actions,
-						 string _itemscope,
-						 address _thesaurus) adminCheck returns(bool result, uint templateID) {
+						 string _itemscope) adminCheck returns(bool result, uint templateID) {
 		templateID = templates.length++;
 		Template t = templates[templateID];
         t.code = _code;
         t.interface = _interface;
-        t.actions = _actions;
         t.itemscope = _itemscope;
-        t.thesaurus = _thesaurus;
-        itemscopeTemplateExistOf[t.itemscope] = true;
-        itemscopeTemplateOf[t.itemscope] = templateID;
+        itemscopeTemplateExistOf[sha3(t.itemscope)] = true;
+        itemscopeTemplateOf[sha3(t.itemscope)] = templateID;
         templatesAmount +=1;
         result = true;
         return(result, templateID);
 	}
 
-	function getTemplate() {}
+	function getTemplate(uint _templateID) returns(string itemscope, string interface, string code)
+	{
+		Template t = templates[_templateID];
+		return(t.itemscope, t.interface, t.code);
+	}
 }
