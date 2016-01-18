@@ -30,5 +30,8 @@ contract agentStorage {
 		return contractID;
 	}
 
-	function getContractAddr()
+	function getContractAddr(uint _contractID) returns(address) {
+		Contract c = contractList[_contractID];
+		return c.contractAddr;
+	}
 }
