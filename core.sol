@@ -10,7 +10,6 @@ contract core {
 	struct DaoNode {
 	    string itemscope;
 		string interface;
-		string code;
 		address nodeAddr;
 	} 
 
@@ -20,7 +19,6 @@ contract core {
 
 	struct Template {
 		string itemscope;
-		string code;
 		string interface;
 		bool inactive;
 	}
@@ -37,13 +35,11 @@ contract core {
 
 	function setDaoNode(string _itemscope,
 	                    string _interface,
-						string _code,
 						address _nodeAddr) adminCheck returns(bool result, uint daoNodeID) {
 		daoNodeID = daoNodes.length++;
 		DaoNode d = daoNodes[daoNodeID];
 		d.itemscope = _itemscope;
 		d.interface = _interface;
-		d.code = _code;
 		d.nodeAddr = _nodeAddr;
 		result = true;
 		nodesAmount +=1;
@@ -52,18 +48,16 @@ contract core {
         return(result, daoNodeID);
 	}
 
-	function getDaoNode(uint _daoNodeID) returns(string itemscope, string interface, string code)
+	function getDaoNode(uint _daoNodeID) returns(string itemscope, string interface, address nodeAddr)
 	{
 		DaoNode d = daoNodes[_daoNodeID];
-		return(d.itemscope, d.interface, d.code, d.nodeAddr);
+		return(d.itemscope, d.interface, d.nodeAddr);
 	}
 
-	function setTemplate(string _code,
-						 string _interface,
+	function setTemplate(string _interface,
 						 string _itemscope) adminCheck returns(bool result, uint templateID) {
 		templateID = templates.length++;
 		Template t = templates[templateID];
-        t.code = _code;
         t.interface = _interface;
         t.itemscope = _itemscope;
         itemscopeTemplateExistOf[sha3(t.itemscope)] = true;
@@ -73,9 +67,9 @@ contract core {
         return(result, templateID);
 	}
 
-	function getTemplate(uint _templateID) returns(string itemscope, string interface, string code)
+	function getTemplate(uint _templateID) returns(string itemscope, string interface)
 	{
 		Template t = templates[_templateID];
-		return(t.itemscope, t.interface, t.code);
+		return(t.itemscope, t.interface);
 	}
 }
