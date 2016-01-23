@@ -12,9 +12,9 @@ contract token {
     modifier creatorCheck { if (msg.sender == creator) _ }
 
     /* Events */
-    event Transfer(address indexed _from, address indexed _to, uint256 _value);
+    event Transfer(address indexed _from, address indexed _to, uint _value);
     event AddressApproval(address indexed _address, address indexed _proxy, bool _result);
-    event AddressApprovalOnce(address indexed _address, address indexed _proxy, uint256 _value);
+    event AddressApprovalOnce(address indexed _address, address indexed _proxy, uint _value);
 
     /*Initial */
     function token(string _s, string _n, uint _unit) {
@@ -69,7 +69,7 @@ contract token {
             balanceOf[_to] += _value;  
             Transfer(_from, _to, _value);          
             return true;
-        } else if(approveOnceOf[_from][msg.sender] && approveOnceValueOf[_from][msg.sender]<=_value) {
+        } else if(approveOnceOf[_from][msg.sender] && approveOnceValueOf[_from][msg.sender]=>_value) {
             if (balanceOf[_from] < _value) {return false;}
             if (balanceOf[_from] + _value < balanceOf[_from]) {return false;}
             balanceOf[_from] -= _value;
