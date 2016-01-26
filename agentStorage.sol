@@ -8,9 +8,9 @@ contract agentStorage {
 		address contractAddr;
 	}
 	
-	Contract[] public contractList;
-	mapping(bytes32 => uint) public contractOf;
-	mapping(bytes32 => bool) public contractExistOf;
+	Contract[]  contractList;
+	mapping(bytes32 => uint)  contractOf;
+	mapping(bytes32 => bool)  contractExistOf;
 
 	function agentStorage() {
 		owner = msg.sender;
@@ -35,7 +35,14 @@ contract agentStorage {
 		}
 	}
 
-	function updContractAddr(uint _contractID, string _itemscope, address _contractAddr) ownerCheck returns(bool result) {
+	function getContractAddr(uint _contractID) ownerCheck returns(address contractAddr) {
+		Contract c = contractList[_contractID];
+		return(c.contractAddr);
+
+	}
+
+
+	function updContract(uint _contractID, string _itemscope, address _contractAddr) ownerCheck returns(bool result) {
 		Contract c = contractList[_contractID];
 		
 		contractExistOf[sha3(c.itemscope)] = false;

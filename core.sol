@@ -57,9 +57,14 @@ contract core {
 
 	function updDaoNode(uint _daoNodeID, string _itemscope, string _interface, address _nodeAddr) adminCheck returns(bool result) {
 		DaoNode d = daoNodes[_daoNodeID];
+
+		daoNodeExistOf[sha3(d.itemscope)] = false;
+
 		d.itemscope = _itemscope;
 		d.interface = _interface;
 		d.nodeAddr = _nodeAddr;
+		daoNodeExistOf[sha3(d.itemscope)] = true;
+		daoNodeOf[sha3(d.itemscope)] = _daoNodeID;
 		return true;
 	}
 
@@ -84,12 +89,18 @@ contract core {
 		return(t.itemscope, t.interface, t.templateAddr);
 	}
 	
-	function updTemplate(uint _templateID, string _itemscope, string _interface, address _templateAddr) adminCheck returns(bool result)
-	{
+	function updTemplate(uint _templateID, string _itemscope, string _interface, address _templateAddr) adminCheck returns(bool result) {	
 		Template t = templates[_templateID];
+
+		itemscopeTemplateExistOf[sha3(t.itemscope)] = false;
+
 		t.itemscope = _itemscope;
 		t.interface = _interface;
 		t.templateAddr = _templateAddr;
+
+		itemscopeTemplateExistOf[sha3(t.itemscope)] = true;
+		itemscopeTemplateOf[sha3(t.itemscope)] = _templateID;
+
 		return true;
 	}
 	
