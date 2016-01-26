@@ -19,6 +19,7 @@ contract core {
 
 	struct Template {
 		string itemscope;
+		address templateAddr;
 		string interface;
 		bool inactive;
 	}
@@ -54,12 +55,22 @@ contract core {
 		return(d.itemscope, d.interface, d.nodeAddr);
 	}
 
+	function updDaoNode(uint _daoNodeID, string _itemscope, string _interface, address _nodeAddr) adminCheck returns(bool result) {
+		DaoNode d = daoNodes[_daoNodeID];
+		d.itemscope = _itemscope;
+		d.interface = _interface;
+		d.nodeAddr = _nodeAddr;
+		return true;
+	}
+
 	function setTemplate(string _interface,
-						 string _itemscope) adminCheck returns(bool result, uint templateID) {
+						 string _itemscope,
+						 address _templateAddr) adminCheck returns(bool result, uint templateID) {
 		templateID = templates.length++;
 		Template t = templates[templateID];
         t.interface = _interface;
         t.itemscope = _itemscope;
+        t.templateAddr = _templateAddr;
         itemscopeTemplateExistOf[sha3(t.itemscope)] = true;
         itemscopeTemplateOf[sha3(t.itemscope)] = templateID;
         templatesAmount +=1;
@@ -67,9 +78,19 @@ contract core {
         return(result, templateID);
 	}
 
-	function getTemplate(uint _templateID) returns(string itemscope, string interface)
+	function getTemplate(uint _templateID) returns(string itemscope, string interface, address templateAddr)
 	{
 		Template t = templates[_templateID];
-		return(t.itemscope, t.interface);
+		return(t.itemscope, t.interface, t.templateAddr);
 	}
+	
+	function updTemplate(uint _templateID, string _itemscope, string _interface, address _templateAddr) adminCheck returns(bool result)
+	{
+		Template t = templates[_templateID];
+		t.itemscope = _itemscope;
+		t.interface = _interface;
+		t.templateAddr = _templateAddr;
+		return true;
+	}
+	
 }
