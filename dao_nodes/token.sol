@@ -1,5 +1,6 @@
 contract token {
     address public creator;
+    address public em;
     string public symbol;
     string public name;
     uint public baseUnit;
@@ -9,23 +10,24 @@ contract token {
     mapping (address => mapping(address => bool)) approveOnceOf;
     mapping (address => mapping(address => uint)) approveOnceValueOf;
 
-    modifier creatorCheck { if (msg.sender == creator) _ }
+    modifier creatorCheck { if (msg.sender == em) _ }
 
     /* Events */
-    event Transfer(address indexed _from, address indexed _to, uint _value);
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event AddressApproval(address indexed _address, address indexed _proxy, bool _result);
-    event AddressApprovalOnce(address indexed _address, address indexed _proxy, uint _value);
+    event AddressApprovalOnce(address indexed _address, address indexed _proxy, uint256 _value);
 
     /*Initial */
-    function token(string _s, string _n, uint _unit) {
+    function token(string _s, string _n, uint _unit, address _em) {
         creator = msg.sender;
+        em = _em;
         symbol = _s;
         name = _n;
         baseUnit = _unit;
-    }
+    }  
 
     /* Creator functions */
-    function getTotalSupply()  creatorCheck returns (uint supply) {
+    function getTotalSupply() creatorCheck returns (uint supply) {
         return totalSupply;
     }
 
@@ -46,12 +48,20 @@ contract token {
 
     /* Agent function */
 
-    function myBalance() returns (uint256 balance) {
-        balance = balanceOf[msg.sender];
+    function getBalance(address _account) returns (uint256 balance) {
+		balance = 0;
+        if (approveOf[_account][msg.sender]) {
+			balance = balanceOf[_account];
+		}
         return balance;
     }
 
-    function transfer(address _to, uint _value) returns (bool result) {
+    function myBalance() returns (uint256 balance) {
+		balance = balanceOf[msg.sender];
+        return balance;
+    }
+
+    function transfer(address _to, uint256 _value) returns (bool result) {
         if (balanceOf[msg.sender] < _value) {return false;}
         if (balanceOf[msg.sender] + _value < balanceOf[msg.sender]) {return false;}
         balanceOf[msg.sender] -= _value;
@@ -60,7 +70,7 @@ contract token {
         return true;
     }
 
-    function transferFrom(address _from, address _to, uint _value) returns (bool success) {
+    function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if(approveOf[_from][msg.sender])
         {
             if (balanceOf[_from] < _value) {return false;}
@@ -69,7 +79,7 @@ contract token {
             balanceOf[_to] += _value;  
             Transfer(_from, _to, _value);          
             return true;
-        } else if(approveOnceOf[_from][msg.sender] && approveOnceValueOf[_from][msg.sender]=>_value) {
+        } else if(approveOnceOf[_from][msg.sender] && approveOnceValueOf[_from][msg.sender]<=_value) {
             if (balanceOf[_from] < _value) {return false;}
             if (balanceOf[_from] + _value < balanceOf[_from]) {return false;}
             balanceOf[_from] -= _value;
