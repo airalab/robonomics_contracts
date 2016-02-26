@@ -1,15 +1,21 @@
 contract core {
 	string public daoName;
 	string public desc;
+	
 	address public admin;
+	address public founder;
+	address public thesaurus;
+	address public agentStorageTemplate;
+
 	uint public nodesAmount;
 	uint public templatesAmount;
+
 
 	modifier adminCheck { if (msg.sender == admin) _ }
 	
 	struct DaoNode {
-	    string itemscope;
-		string interface;
+		string itemscope;
+		string interface; // update Feb 2016 - link to GitHub raw source
 		address nodeAddr;
 	} 
 
@@ -20,7 +26,7 @@ contract core {
 	struct Template {
 		string itemscope;
 		address templateAddr;
-		string interface;
+		string interface; // update Feb 2016 - link to GitHub raw source
 		bool inactive;
 	}
 
@@ -32,6 +38,7 @@ contract core {
 		daoName = _daoName;
 		desc = _desc;
 		admin = msg.sender;
+		founder = msg.sender;
 	}
 
 	function setDaoNode(string _itemscope,
@@ -49,10 +56,25 @@ contract core {
         return(result, daoNodeID);
 	}
 
+	function setThesaurus(address _thesaurus) adminCheck returns(bool result) {
+		thesaurus = _thesaurus;
+		return true;
+	}
+
+	function setAgentStorageTemplate(address _agentStorageTemplate) adminCheck returns(bool result) {
+		agentStorageTemplate = _agentStorageTemplate;
+		return true;
+	}
+
 	function getDaoNode(uint _daoNodeID) returns(string itemscope, string interface, address nodeAddr)
 	{
 		DaoNode d = daoNodes[_daoNodeID];
 		return(d.itemscope, d.interface, d.nodeAddr);
+	}
+
+	function setAdmin(address _admin) adminCheck returns(bool result) {
+		admin = _admin;
+		return true;
 	}
 
 	function updDaoNode(uint _daoNodeID, string _itemscope, string _interface, address _nodeAddr) adminCheck returns(bool result) {
