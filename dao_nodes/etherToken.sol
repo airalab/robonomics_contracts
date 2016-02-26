@@ -2,15 +2,13 @@ contract etherToken {
     address public creator;
     string public symbol;
     string public name;
-    uint totalSupply;
+    uint public totalSupply;
     mapping (address => uint) public balanceOf;
     mapping (address => mapping(address => bool)) approveOf;
     mapping (address => mapping(address => bool)) approveOnceOf;
     mapping (address => mapping(address => uint)) approveOnceValueOf;
 
-    modifier creatorCheck { if (msg.sender == creator) _ }
-
-    /* Events */
+      /* Events */
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event AddressApproval(address indexed _address, address indexed _proxy, bool _result);
     event AddressApprovalOnce(address indexed _address, address indexed _proxy, uint256 _value);
@@ -18,8 +16,8 @@ contract etherToken {
     /*Initial */
     function etherToken() {
         creator = msg.sender;
-        symbol = "Eth";
-        name = "Eth";
+        symbol = "Wei";
+        name = "EthContractWallet";
     }  
 
     function getTotalSupply() returns (uint supply) {
