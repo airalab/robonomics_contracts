@@ -1,5 +1,7 @@
 contract market {
     address creator;
+    token Token;
+    etherToken EtherToken;
 
     struct Order {
         uint orderID;
@@ -31,8 +33,9 @@ contract market {
     mapping (address => uint) public buyDataOf;
     mapping (address => uint) public buyCountAsset;
 
-    function market() {
+    function market(address _etherTokenAddr) {
         creator = msg.sender;
+        EtherToken = etherToken(_etherTokenAddr);
     }
 
     function addSell(address _assetAddr, uint _total, uint _unitPrice, uint _min, uint _step) returns(uint sellID) {
@@ -184,4 +187,36 @@ contract market {
             return order.unitPrice;
         }
     }
+    
+    function dealSell(address _assetAddr, uint _orderID) returns(bool) {
+        if (sellExistOf[_assetAddr]) {
+            uint assetID = sellDataOf[_assetAddr];
+            Order order = sellAssetList[assetID].sellOrderList[_orderID];
+            Token = token(_assetAddr);
+            if (Token.balanceOf(order.owner) >= order.total && EtherToken.balanceOf(msg.sender) >= order.total * order.unitPrice) {
+                order.active = false;
+                Token.transferFrom(order.owner,msg.sender,order.total);
+                EtherToken.transferFrom(msg.sender,order.owner,order.total * order.unitPrice);
+                return true;
+            }
+        }
+        return false;
+        
+    }
+    
+    function dealBuy(address _assetAddr, uint _orderID) returns(bool) {
+        if (buyExistOf[_assetAddr]) {
+            uint assetID = buyDataOf[_assetAddr];
+            Order order = buyAssetList[assetID].buyOrderList[_orderID];
+            Token = token(_assetAddr);
+            if (EtherToken.balanceOf(order.owner) >= order.total * order.unitPrice && Token.balanceOf(msg.sender) >= order.total) {
+                order.active = false;
+                Token.transferFrom(msg.sender,order.owner,order.total);
+                EtherToken.transferFrom(order.owner,msg.sender,order.total * order.unitPrice);
+                return true;
+            }
+        }
+        return false;
+    }
+    
 }
