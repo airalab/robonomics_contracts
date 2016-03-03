@@ -15,7 +15,6 @@ contract ethertoken is token {
     
     function withdraw(uint256 _value) returns (bool result){
         if (balanceOf[msg.sender] < _value) {return false;}
-        if (balanceOf[msg.sender] + _value < balanceOf[msg.sender]) {return false;}
         msg.sender.send(_value);
         return true;
         
