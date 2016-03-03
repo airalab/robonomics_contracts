@@ -1,7 +1,7 @@
 contract ethertoken is token {
     
     /*Initial */
-    function etherToken() {
+    function ethertoken() {
         creator = msg.sender;
         symbol = "Wei";
         name = "EthContractWallet";
