@@ -18,11 +18,11 @@ contract token {
     event AddressApprovalOnce(address indexed _address, address indexed _proxy, uint256 _value);
 
     /*Initial */
-    function token(string _s, string _n, uint _unit, address _em) {
+    function token(string _symbol, string _name, uint _unit, address _em) {
         creator = msg.sender;
         em = _em;
-        symbol = _s;
-        name = _n;
+        symbol = _symbol;
+        name = _name;
         baseUnit = _unit;
     }  
 
@@ -32,7 +32,6 @@ contract token {
     }
 
     function emission(uint _amount) creatorCheck returns(bool result) {
-        if (balanceOf[creator] + _amount < balanceOf[creator]) {return false;}
         balanceOf[creator] += _amount;
         totalSupply += _amount;
         return true;
@@ -40,7 +39,6 @@ contract token {
 
     function burn(uint _amount) creatorCheck returns(bool result) {
         if (balanceOf[creator] < _amount) {return false;}
-        if (balanceOf[creator] + _amount < balanceOf[creator]) {return false;}
         balanceOf[creator] -= _amount;
         totalSupply -= _amount;
         return true;
@@ -63,7 +61,6 @@ contract token {
 
     function transfer(address _to, uint256 _value) returns (bool result) {
         if (balanceOf[msg.sender] < _value) {return false;}
-        if (balanceOf[msg.sender] + _value < balanceOf[msg.sender]) {return false;}
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
         Transfer(msg.sender, _to, _value);
@@ -74,14 +71,12 @@ contract token {
         if(approveOf[_from][msg.sender])
         {
             if (balanceOf[_from] < _value) {return false;}
-            if (balanceOf[_from] + _value < balanceOf[_from]) {return false;}
             balanceOf[_from] -= _value;
             balanceOf[_to] += _value;  
             Transfer(_from, _to, _value);          
             return true;
         } else if(approveOnceOf[_from][msg.sender] && approveOnceValueOf[_from][msg.sender]<=_value) {
             if (balanceOf[_from] < _value) {return false;}
-            if (balanceOf[_from] + _value < balanceOf[_from]) {return false;}
             balanceOf[_from] -= _value;
             balanceOf[_to] += _value;  
             Transfer(_from, _to, _value);          
