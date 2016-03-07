@@ -188,21 +188,25 @@ contract market {
         }
     }
     
-    function dealSell(address _assetAddr, uint _orderID) returns(bool) {
-        if (sellExistOf[_assetAddr]) {
-            uint assetID = sellDataOf[_assetAddr];
-            Order order = sellAssetList[assetID].sellOrderList[_orderID];
-            Token = token(_assetAddr);
-            if (Token.balanceOf(order.owner) >= order.total && EtherToken.balanceOf(msg.sender) >= order.total * order.unitPrice) {
-                order.active = false;
-                Token.transferFrom(order.owner,msg.sender,order.total);
-                EtherToken.transferFrom(msg.sender,order.owner,order.total * order.unitPrice);
-                return true;
-            }
-        }
-        return false;
-        
-    }
+    function dealSell(address _assetAddr, uint _orderID, uint count) returns(bool) {
+       if (sellExistOf[_assetAddr]) {
+           uint assetID = sellDataOf[_assetAddr];
+           Order order = sellAssetList[assetID].sellOrderList[_orderID];
+           Token = token(_assetAddr);
+           
+           if (count <= order.total
+               && Token.balanceOf(order.owner) >= count 
+               && EtherToken.balanceOf(msg.sender) >= count * order.unitPrice) {
+               Token.transferFrom(order.owner,msg.sender, count);
+               EtherToken.transferFrom(msg.sender,order.owner,count * order.unitPrice);
+               order.total -= count;
+               order.active = order.total > 0;
+               return true;
+           }
+       }
+       return false;
+       
+   }
     
     function dealBuy(address _assetAddr, uint _orderID) returns(bool) {
         if (buyExistOf[_assetAddr]) {
