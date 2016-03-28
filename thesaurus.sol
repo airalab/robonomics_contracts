@@ -1,100 +1,167 @@
-contract thesaurus {
-	string public name;
-	string public desc;
-	address public owner;
-
-	modifier ownerCheck { if (msg.sender == owner) _ }
-
-	struct Prop {
-		string itemprop;
-		string itemtype;
-		string desc;
-		string dataType;
-	}
-
-	Prop[] public propList;
-	mapping (bytes32 => uint) public itempropOf;
-	mapping (bytes32 => bool) public itempropExistOf;
-
-	struct Enum {
-		uint propListID;
-	}
-	
-	struct Metadata {
-		string itemscope;
-		string desc;
-		Enum[]  enumPropList;
-		uint numProp;
-	}
-
-	Metadata[] schemaorgList;
-	/* Help you find itemscope proplist*/
-	mapping (bytes32 => uint) public itemscopeOf;
-	mapping (bytes32 => bool) public itemscopeExistOf;
-
-	function thesaurus(string _name, string _desc) {
-		name = _name;
-		desc = _desc;
-		owner = msg.sender;
-	}
-
-	function getPropID(string _itemprop) returns(bool result, uint propID){
-		if(!itempropExistOf[sha3(_itemprop)]) break;
-		result = true; 
-		propID = itempropOf[sha3(_itemprop)];
-		return(result, propID);
-	}
-
-	function getProp(uint _propID) returns(string itemprop, string itemtype, string desc, string dataType){
-		Prop p = propList[_propID];
-		return(p.itemprop, p.itemtype, p.desc, p.dataType);
-	}
-
-	function getMetadataID(string _itemscope) returns(bool result, uint metadataID){
-		if(!itemscopeExistOf[sha3(_itemscope)]) break;
-		result = true; 
-		metadataID = itemscopeOf[sha3(_itemscope)];
-		return(result, metadataID);
-	}
-
-	function getMetadataNumProp(uint _itemscopeID) returns(string itemscope, uint numProp){
-		Metadata m = schemaorgList[_itemscopeID];
-		return(m.itemscope, m.numProp);
-	}
+/*
+ * Interface for object comparation 
+ */
+contract Comparable {
+   function isEqual(Comparable _to) returns (bool);
 }
 
-contract thesaurusAdmin is thesaurus {
+/*
+ * Contract for objects that can be morder
+ */
+contract Mortal {
+    /* Contract owner address */
+    address public owner;
 
-	function setProp(string _itemprop, string _itemtype, string _desc, string _dataType) ownerCheck returns(uint propID) {
-		propID = propList.length++;
-        Prop p = propList[propID];
-        p.itemprop = _itemprop;
-        p.itemtype = _itemtype;
-        p.desc = _desc;
-        p.dataType = _dataType;
-        itempropExistOf[sha3(p.itemprop)] = true;
-        itempropOf[sha3(p.itemprop)] = propID;
-        return propID;
-	}
+    /* Store owner on creation */
+    function Mortal() { owner = msg.sender; }
 
-	function setMetadata(string _itemscope, uint _desc, uint _propID) ownerCheck returns(uint enumPropListID) {
-		uint metadataID;
-		if(!itemscopeExistOf[sha3(_itemscope)]) {
-			metadataID = schemaorgList.length++;    	
-        	itemscopeExistOf[sha3(m.itemscope)] = true;
-        	itemscopeOf[sha3(m.itemscope)] = metadataID;
-    	} else {
-    		metadataID = itemscopeOf[sha3(_itemscope)];
-    	}
+    /* Only owner can kill me */
+    function kill() {
+        if (msg.sender == owner) suicide(this);
+    }
+}
 
-    	Metadata m = schemaorgList[metadataID];
-        m.itemscope = _itemscope;
-        m.desc = _desc;
+/*
+ * Knowledge is a generic declaration of object or process 
+ */
+contract Knowledge is Comparable, Mortal {
+    /* Knowledge can have a type described below */
+    int public OBJECT  = 1;
+    int public PROCESS = 2;
+    /* Knowledge type is a int value */
+    int public knowledgeType;
+    
+    /* Constructor gets the type as argument */
+    function Knowledge(int _type) { knowledgeType = _type; }
 
-        enumPropListID = m.enumPropList.length++;
-       	Enum e = m.enumPropList[enumPropListID];
-        e.propListID = _propID;
-        m.numProp +=1;
-    	return enumPropListID;
-	}
+    /* Generic Knowledge comparation procedure */
+    function isEqual(Knowledge _to) returns (bool) {
+        // Knowledge with different types can't be equal
+        if (_to.knowledgeType() != knowledgeType)
+            return false;
+        /*
+         * Knowledge with the same type can be compared,
+         * comparation procedure implemented in the inherit types
+         */
+        if (knowledgeType == OBJECT) {
+            return KObject(this).isEqual(KObject(_to));
+        } else {
+            return KProcess(this).isEqual(KProcess(_to));
+        }
+    }
+}
+
+contract KObject is Knowledge(Knowledge.OBJECT) {
+
+    /* Property describe attribute of presented object */
+    struct Property {
+        string name;
+        string value;
+    }
+    /* List of object properties */
+    Property[] public properties;
+    /* Name to value mapping */
+    mapping (string => string) propertyValueOf;
+
+    /* Described object can be consist of some another objects */
+    KObject[] public components;
+
+    /*
+     * The equal objects has:
+     *  - equal properties
+     *  - equal components
+     */
+    function isEqual(KObject _to) returns (bool) {
+        return isEqualProperties(_to) && isEqualComponents(_to);
+    }
+
+    function isEqualProperties(KObject _to) returns (bool) {
+        // Count of properties in equal objects should be same
+        if (properties.length != _to.properties.length)
+            return false;
+        
+        // Compare every property of objects
+        for (var i = 0; i < properties.length; ++i) {
+            // Take a name of current property
+            var name = properties[i].name;
+
+            // Compare value of the same properties
+            if (propertyValueOf[name] != _to.propertyValueOf[name])
+                return false;
+        }
+        return true;
+    }
+
+    function isEqualComponents(KObject _to) returns (bool) {
+        // Count of components in equal objects should be same
+        if (components.length != _to.components.length)
+            return false;
+
+        // Compare every components of objects
+        for (var i = 0; i < components.length; ++i) {
+            var equalFound = false;
+
+            for (var j = 0; j < _to.components.length; ++j)
+                equalFound |= components[i].isEqual(_to.components[j]);
+
+            // Return false if no equal component found
+            if (!equalFound)
+                return false;
+        }
+        return true;
+    }
+}
+
+contract KProcess is Knowledge(Knowledge.PROCESS) {
+    /*
+     * Morphism describe knowledge manipulation line
+     * e.g. apple production have a morphism with 
+     * three objects: Ground -> AppleTree -> Apple
+     * this knowledges can be stored in morphism list
+     * as [ Ground, AppleTree, Apple ]
+     */
+    Knowledge[] morphism;
+
+    function append(Knowledge _knowledge) {
+        morphism[morphism.length++] = _knowledge;
+    }
+
+    function isEqual(KProcess _to) {
+        // Count of knowledges in equal processes should be same
+        if (morphism.length != _to.morphism.length)
+            return false;
+
+        for (var i = 0; i < morphism.length; ++i)
+            // All knowledge in morphism line should be equal
+            if (!morphism[i].isEqual(_to.morphism[i]))
+                return false;
+        return true;
+    }
+}
+
+contract KnowledgeIndex {
+    /* Available knowledge names */ 
+    string[] public thesaurus;
+    
+    /* Mapping to knowledge from name */
+    mapping (string => Knowledge) knowledgeOf;
+
+    /*
+     * Insert knowledge by name
+     *   knowledge instance with the same name will be replaced
+     */
+    function insert(string _name, Knowledge _knowledge) {
+        knowledgeOf[_name] = _knowledge;
+
+        // Check when thesaurus already contains name
+        if (!thesaurusCheck(_name))
+            thesaurus[thesaurus.length++] = _name;
+    }
+
+    function thesaurusCheck(string _name) {
+        for (var i = 0; i < thesaurus.length; ++i)
+            if (thesaurus[i] == _name)
+                return true;
+        return false;
+    }
 }
