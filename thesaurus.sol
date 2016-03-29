@@ -1,18 +1,4 @@
-/*
- * Contract for objects that can be morder
- */
-contract Mortal {
-    /* Contract owner address */
-    address public owner;
-
-    /* Store owner on creation */
-    function Mortal() { owner = msg.sender; }
-
-    /* Only owner can kill me */
-    function kill() {
-        if (msg.sender == owner) suicide(this);
-    }
-}
+import 'common.sol';
 
 /*
  * Knowledge is a generic declaration of object or process
@@ -69,7 +55,7 @@ contract KObject is Knowledge {
     /* Insert new property value by name
      *   If the same name exist value will be replaced
      */
-    function insertProperty(string _name, string _value) {
+    function insertProperty(string _name, string _value) onlyOwner {
         var nameHash = sha3(_name);
         // Check for inserting new property
         if (propertyHashOf[nameHash] == 0)
@@ -86,7 +72,7 @@ contract KObject is Knowledge {
     function componentsLength() returns (uint)
     { return components.length; }
 
-    function appendComponent(KObject _component) {
+    function appendComponent(KObject _component) onlyOwner {
         components[components.length++] = _component;
     }
 
@@ -159,7 +145,7 @@ contract KProcess is Knowledge {
     function morphismLength() returns (uint)
     { return morphism.length; }
 
-    function append(Knowledge _knowledge) {
+    function append(Knowledge _knowledge) onlyOwner {
         morphism[morphism.length++] = _knowledge;
     }
 
