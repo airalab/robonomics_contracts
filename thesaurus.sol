@@ -67,13 +67,17 @@ contract KObject is Knowledge {
     }
 
     /* Described object can be consist of some another objects */
-    KObject[] public components;
+    Array.Data components;
 
     function componentsLength() returns (uint)
-    { return components.length; }
+    { return Array.size(components); }
 
     function appendComponent(KObject _component) onlyOwner {
-        components[components.length++] = _component;
+        Array.append(components, _component);
+    }
+    
+    function getComponent(uint _index) returns (KObject) {
+        return KObject(Array.get(components, _index));
     }
 
     /*
@@ -105,15 +109,15 @@ contract KObject is Knowledge {
 
     function isEqualComponents(KObject _to) returns (bool) {
         // Count of components in equal objects should be same
-        if (components.length != _to.componentsLength())
+        if (componentsLength() != _to.componentsLength())
             return false;
 
         // Compare every components of objects
-        for (uint i = 0; i < components.length; ++i) {
+        for (uint i = 0; i < componentsLength(); ++i) {
             var equalFound = false;
 
-            for (uint j = 0; j < components.length; ++j)
-                if (components[i].isEqual(_to.components(j))) {
+            for (uint j = 0; j < componentsLength(); ++j)
+                if (getComponent(i).isEqual(_to.getComponent(j))) {
                     equalFound = true;
                     break;
                 }
@@ -140,23 +144,34 @@ contract KProcess is Knowledge {
      * this knowledges can be stored in morphism list
      * as [ Ground, AppleTree, Apple ]
      */
-    Knowledge[] public morphism;
+    Array.Data morphism;
 
     function morphismLength() returns (uint)
-    { return morphism.length; }
+    { return Array.size(morphism); }
 
+    /* Append knowledge into line */
     function append(Knowledge _knowledge) onlyOwner {
-        morphism[morphism.length++] = _knowledge;
+        Array.append(morphism, _knowledge);
+    }
+    
+    /* Insert knowledge into position */
+    function insert(Knowledge _knowledge, uint _position) {
+        Array.insert(morphism, _position, _knowledge);
+    }
+    
+    /* Get knowledge by index in line */
+    function get(uint _index) returns (Knowledge) {
+        return Knowledge(Array.get(morphism, _index));
     }
 
     function isEqualProcess(KProcess _to) returns (bool) {
         // Count of knowledges in equal processes should be same
-        if (morphism.length != _to.morphismLength())
+        if (morphismLength() != _to.morphismLength())
             return false;
 
-        for (uint i = 0; i < morphism.length; ++i)
+        for (uint i = 0; i < morphismLength(); i += 1)
             // All knowledge in morphism line should be equal
-            if (!morphism[i].isEqual(_to.morphism(i)))
+            if (!get(i).isEqual(_to.get(i)))
                 return false;
         return true;
     }
@@ -165,24 +180,25 @@ contract KProcess is Knowledge {
 library Thesaurus {
     struct Index {
         /* Available knowledge names */
-        string[] thesaurus;
+        string [] thesaurus;
 
-        /* Mapping to knowledge from name hash */
-        mapping (bytes32 => Knowledge) knowledgeOf;
+        /* Mapping to knowledge from name */
+        mapping (bytes32 => address) knowledgeOf;
     }
 
     /*
      * Insert knowledge by name
      *   knowledge instance with the same name will be replaced
      */
-    function insert(Index storage _ix, string _name, Knowledge _knowledge) {
+    function set(Index storage _ix, string _name, Knowledge _knowledge) {
+        // Check for term is exist
         var nameHash = sha3(_name);
-
-        // Check when thesaurus already contains name
-        if (_ix.knowledgeOf[nameHash] == Knowledge(0x0))
+        if (_ix.knowledgeOf[nameHash] == 0x0)
             _ix.thesaurus[_ix.thesaurus.length++] = _name;
-
-        // Insert new knowledge into mapping
         _ix.knowledgeOf[nameHash] = _knowledge;
+    }
+    
+    function get(Index storage _ix, string _name)  returns (Knowledge) {
+        return Knowledge(_ix.knowledgeOf[sha3(_name)]);
     }
 }
