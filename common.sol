@@ -8,6 +8,10 @@ contract Owned {
     /* Store owner on creation */
     function Owned() { owner = msg.sender; }
 
+    /* Delegate contract to another person */
+    function delegate(address _owner) onlyOwner
+    { owner = _owner; }
+
     /* Owner check modifier */
     modifier onlyOwner { if (msg.sender == owner) _ }
 }

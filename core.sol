@@ -78,10 +78,6 @@ contract Core is Mortal {
         dao.agentStorage = new AgentStorage();
     }
 
-    /* Change DAO owner */
-    function setAdmin(address _admin) onlyOwner
-    { owner = _admin; }
-
     /* 
      * DAO nodes setter
      *   set new node for given name, replaced address will returned
