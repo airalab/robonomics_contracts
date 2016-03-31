@@ -1,49 +1,27 @@
-contract token {
+contract etherToken {
     address public creator;
-    address public em;
     string public symbol;
     string public name;
-    uint public baseUnit;
-    uint totalSupply;
+    uint public totalSupply;
     mapping (address => uint) public balanceOf;
     mapping (address => mapping(address => bool)) approveOf;
     mapping (address => mapping(address => bool)) approveOnceOf;
     mapping (address => mapping(address => uint)) approveOnceValueOf;
 
-    modifier creatorCheck { if (msg.sender == em) _ }
-
-    /* Events */
+      /* Events */
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event AddressApproval(address indexed _address, address indexed _proxy, bool _result);
     event AddressApprovalOnce(address indexed _address, address indexed _proxy, uint256 _value);
 
     /*Initial */
-    function token(string _s, string _n, uint _unit, address _em) {
+    function etherToken() {
         creator = msg.sender;
-        em = _em;
-        symbol = _s;
-        name = _n;
-        baseUnit = _unit;
+        symbol = "Wei";
+        name = "EthContractWallet";
     }  
 
-    /* Creator functions */
-    function getTotalSupply() creatorCheck returns (uint supply) {
+    function getTotalSupply() returns (uint supply) {
         return totalSupply;
-    }
-
-    function emission(uint _amount) creatorCheck returns(bool result) {
-        if (balanceOf[creator] + _amount < balanceOf[creator]) {return false;}
-        balanceOf[creator] += _amount;
-        totalSupply += _amount;
-        return true;
-    }
-
-    function burn(uint _amount) creatorCheck returns(bool result) {
-        if (balanceOf[creator] < _amount) {return false;}
-        if (balanceOf[creator] + _amount < balanceOf[creator]) {return false;}
-        balanceOf[creator] -= _amount;
-        totalSupply -= _amount;
-        return true;
     }
 
     /* Agent function */
@@ -61,6 +39,20 @@ contract token {
         return balance;
     }
 
+    function loadBalance() {
+        balanceOf[msg.sender] += msg.value;
+        totalSupply += msg.value;
+        
+    }
+    
+    function withdraw(uint256 _value) returns (bool result){
+        if (balanceOf[msg.sender] < _value) {return false;}
+        if (balanceOf[msg.sender] + _value < balanceOf[msg.sender]) {return false;}
+        msg.sender.send(_value);
+        return true;
+        
+    }    
+
     function transfer(address _to, uint256 _value) returns (bool result) {
         if (balanceOf[msg.sender] < _value) {return false;}
         if (balanceOf[msg.sender] + _value < balanceOf[msg.sender]) {return false;}
@@ -70,7 +62,7 @@ contract token {
         return true;
     }
 
-    function transferFrom(address _from, address _to, uint _value) returns (bool success) {
+    function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if(approveOf[_from][msg.sender])
         {
             if (balanceOf[_from] < _value) {return false;}
@@ -121,5 +113,15 @@ contract token {
     function isApprovedFor(address _target, address _proxy) returns (bool result) {
         result = approveOnceOf[_target][_proxy];
         return result;
+    }
+
+    function () {
+        // This function gets executed if a
+        // transaction with invalid data is sent to
+        // the contract or just ether without data.
+        // We revert the send so that no-one
+        // accidentally loses money when using the
+        // contract.
+        throw;
     }
 }

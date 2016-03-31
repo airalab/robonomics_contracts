@@ -183,22 +183,25 @@ library Thesaurus {
         string [] thesaurus;
 
         /* Mapping to knowledge from name */
-        mapping (bytes32 => address) knowledgeOf;
+        mapping (bytes32 => Knowledge) knowledgeOf;
     }
 
     /*
      * Insert knowledge by name
      *   knowledge instance with the same name will be replaced
      */
-    function set(Index storage _ix, string _name, Knowledge _knowledge) {
+    function set(Index storage _ix, string _name, Knowledge _knowledge)
+            returns (Knowledge) {
         // Check for term is exist
         var nameHash = sha3(_name);
-        if (_ix.knowledgeOf[nameHash] == 0x0)
+        var replaced = _ix.knowledgeOf[nameHash];
+        if (replaced == Knowledge(0x0))
             _ix.thesaurus[_ix.thesaurus.length++] = _name;
         _ix.knowledgeOf[nameHash] = _knowledge;
+        return replaced;
     }
     
     function get(Index storage _ix, string _name)  returns (Knowledge) {
-        return Knowledge(_ix.knowledgeOf[sha3(_name)]);
+        return _ix.knowledgeOf[sha3(_name)];
     }
 }
