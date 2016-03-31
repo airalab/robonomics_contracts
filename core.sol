@@ -15,7 +15,7 @@ contract Core is Mortal {
         Array.Data nodes;
         mapping (bytes32 => address) getNodeBy;
         mapping (address => string)  getNodeNameBy;
- 
+        
         /* DAO templates */
         Array.Data templates;
         mapping (bytes32 => address) getTemplateBy;
@@ -66,7 +66,7 @@ contract Core is Mortal {
      *   the contract interface contains GitHub source URI
      */
     mapping (address => string) public interfaceOf;
- 
+    
     /* Common used array data iterator */
     Array.Iterator it;
 
@@ -92,7 +92,7 @@ contract Core is Mortal {
         var replaced = getNode(_name);
         if (replaced != 0) {
             Array.setBegin(dao.nodes, it);
-            Array.find(it, getNode(_name));
+            Array.find(it, replaced);
             Array.remove(it);
         }
         // Append new node
@@ -104,7 +104,19 @@ contract Core is Mortal {
         // Return replaced address
         return replaced;
     }
- 
+    
+    function removeNode(string _name) onlyOwner returns (address) {
+        var removed = getNode(_name);
+        removeNode(removed);
+        return removed;
+    }
+    
+    function removeNode(address _node) onlyOwner {
+        Array.setBegin(dao.nodes, it);
+        Array.find(it, _node);
+        Array.remove(it);
+    }
+    
     /*
      * DAO templates setter
      *   set new template for given name, replaced address will returned
@@ -115,16 +127,28 @@ contract Core is Mortal {
         var replaced = getTemplate(_name);
         if (replaced != 0) {
             Array.setBegin(dao.templates, it);
-            Array.find(it, getNode(_name));
+            Array.find(it, replaced);
             Array.remove(it);
         }
-        // Append new template
+        // Append new node
         Array.append(dao.templates, _template);
         dao.getNodeBy[sha3(_name)]   = _template;
         dao.getNodeNameBy[_template] = _name;
-        // Register template interface
+        // Register node interface
         interfaceOf[_template] = _interface;
         // Return replaced address
         return replaced;
+    }
+    
+    function removeTemplate(string _name) onlyOwner returns (address) {
+        var removed = getTemplate(_name);
+        removeTemplate(removed);
+        return removed;
+    }
+    
+    function removeTemplate(address _node) onlyOwner {
+        Array.setBegin(dao.templates, it);
+        Array.find(it, _node);
+        Array.remove(it);
     }
 }
