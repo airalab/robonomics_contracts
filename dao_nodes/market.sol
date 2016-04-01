@@ -88,7 +88,7 @@ contract Market is Mortal {
     /*
      * The lot on market manipulations
      */
-    function placeLot(Lot _lot)
+    function appendLot(Lot _lot)
     { Array.append(market.lots, _lot); }
  
     function removeLot(Lot _lot) {
