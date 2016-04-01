@@ -102,7 +102,7 @@ contract Market is Mortal {
     /*
      * Client public methods
      */
-    function bestDeal(Token _buy, uint _value) returns (Lot) {
+    function bestDeal(Token _buy, Token _sell, uint _value) returns (Lot) {
         Lot best = Lot(0);
         
         Array.setBegin(market.lots, it);
@@ -114,7 +114,7 @@ contract Market is Mortal {
                 continue;
             }
             /* So the lot is candidate to best if token and value suit */
-            if (lot.sale() == _buy && lot.value() >= _value)
+            if (lot.sale() == _buy && lot.buy() == _sell && lot.value() >= _value)
                 /* Best price - low price */
                 if (best == Lot(0) || best.price() > lot.price())
                     best = lot;
