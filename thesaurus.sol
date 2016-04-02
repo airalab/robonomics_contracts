@@ -1,100 +1,207 @@
-contract thesaurus {
-	string public name;
-	string public desc;
-	address public owner;
+import 'common.sol';
 
-	modifier ownerCheck { if (msg.sender == owner) _ }
+/*
+ * Knowledge is a generic declaration of object or process
+ */
+contract Knowledge is Mortal {
+    /* Knowledge can have a type described below */
+    int8 constant OBJECT  = 1;
+    int8 constant PROCESS = 2;
 
-	struct Prop {
-		string itemprop;
-		string itemtype;
-		string desc;
-		string dataType;
-	}
+    /* Knowledge type is a int value */
+    int public knowledgeType;
 
-	Prop[] public propList;
-	mapping (bytes32 => uint) public itempropOf;
-	mapping (bytes32 => bool) public itempropExistOf;
+    function Knowledge(int8 _type) {
+        knowledgeType = _type;
+    }
 
-	struct Enum {
-		uint propListID;
-	}
-	
-	struct Metadata {
-		string itemscope;
-		string desc;
-		Enum[]  enumPropList;
-		uint numProp;
-	}
-
-	Metadata[] schemaorgList;
-	/* Help you find itemscope proplist*/
-	mapping (bytes32 => uint) public itemscopeOf;
-	mapping (bytes32 => bool) public itemscopeExistOf;
-
-	function thesaurus(string _name, string _desc) {
-		name = _name;
-		desc = _desc;
-		owner = msg.sender;
-	}
-
-	function getPropID(string _itemprop) returns(bool result, uint propID){
-		if(!itempropExistOf[sha3(_itemprop)]) break;
-		result = true; 
-		propID = itempropOf[sha3(_itemprop)];
-		return(result, propID);
-	}
-
-	function getProp(uint _propID) returns(string itemprop, string itemtype, string desc, string dataType){
-		Prop p = propList[_propID];
-		return(p.itemprop, p.itemtype, p.desc, p.dataType);
-	}
-
-	function getMetadataID(string _itemscope) returns(bool result, uint metadataID){
-		if(!itemscopeExistOf[sha3(_itemscope)]) break;
-		result = true; 
-		metadataID = itemscopeOf[sha3(_itemscope)];
-		return(result, metadataID);
-	}
-
-	function getMetadataNumProp(uint _itemscopeID) returns(string itemscope, uint numProp){
-		Metadata m = schemaorgList[_itemscopeID];
-		return(m.itemscope, m.numProp);
-	}
+    /* Generic Knowledge comparation procedure */
+    function isEqual(Knowledge _to) returns (bool) {
+        // Knowledge with different types can't be equal
+        if (_to.knowledgeType() != knowledgeType)
+            return false;
+        /*
+         * Knowledge with the same type can be compared,
+         * comparation procedure implemented in the inherit types
+         */
+        if (knowledgeType == OBJECT) {
+            return KObject(this).isEqualObject(KObject(_to));
+        } else {
+            return KProcess(this).isEqualProcess(KProcess(_to));
+        }
+    }
 }
 
-contract thesaurusAdmin is thesaurus {
+/*
+ * The knowledge object represents the real world object
+ * that can be consist of some another objects and have
+ * a count of attributes
+ */
+contract KObject is Knowledge {
+    /* Object constructor */
+    function KObject() Knowledge(OBJECT) {}
 
-	function setProp(string _itemprop, string _itemtype, string _desc, string _dataType) ownerCheck returns(uint propID) {
-		propID = propList.length++;
-        Prop p = propList[propID];
-        p.itemprop = _itemprop;
-        p.itemtype = _itemtype;
-        p.desc = _desc;
-        p.dataType = _dataType;
-        itempropExistOf[sha3(p.itemprop)] = true;
-        itempropOf[sha3(p.itemprop)] = propID;
-        return propID;
-	}
+    /* List of object property names */
+    string[] public properties;
 
-	function setMetadata(string _itemscope, uint _desc, uint _propID) ownerCheck returns(uint enumPropListID) {
-		uint metadataID;
-		if(!itemscopeExistOf[sha3(_itemscope)]) {
-			metadataID = schemaorgList.length++;    	
-        	itemscopeExistOf[sha3(m.itemscope)] = true;
-        	itemscopeOf[sha3(m.itemscope)] = metadataID;
-    	} else {
-    		metadataID = itemscopeOf[sha3(_itemscope)];
-    	}
+    function propertiesLength() returns (uint)
+    { return properties.length; }
 
-    	Metadata m = schemaorgList[metadataID];
-        m.itemscope = _itemscope;
-        m.desc = _desc;
+    /* Hash name to value mapping */
+    mapping (bytes32 => string)  public propertyValueOf;
+    /* Hash name to value hash mapping */
+    mapping (bytes32 => bytes32) public propertyHashOf;
 
-        enumPropListID = m.enumPropList.length++;
-       	Enum e = m.enumPropList[enumPropListID];
-        e.propListID = _propID;
-        m.numProp +=1;
-    	return enumPropListID;
-	}
+    /* Insert new property value by name
+     *   If the same name exist value will be replaced
+     */
+    function insertProperty(string _name, string _value) onlyOwner {
+        var nameHash = sha3(_name);
+        // Check for inserting new property
+        if (propertyHashOf[nameHash] == 0)
+            properties[properties.length++] = _name;
+
+        // Store property value and value hash for future comparation
+        propertyValueOf[nameHash] = _value;
+        propertyHashOf[nameHash]  = sha3(_value);
+    }
+
+    /* Described object can be consist of some another objects */
+    Array.Data components;
+
+    function componentsLength() returns (uint)
+    { return Array.size(components); }
+
+    function appendComponent(KObject _component) onlyOwner {
+        Array.append(components, _component);
+    }
+    
+    function getComponent(uint _index) returns (KObject) {
+        return KObject(Array.get(components, _index));
+    }
+
+    /*
+     * Comparation function over knowledge objects describe equal object,
+     * the equal objects has:
+     *  - equal properties
+     *  - equal components
+     */
+    function isEqualObject(KObject _to) returns (bool) {
+        return isEqualProperties(_to) && isEqualComponents(_to);
+    }
+
+    function isEqualProperties(KObject _to) returns (bool) {
+        // Count of properties in equal objects should be same
+        if (properties.length != _to.propertiesLength())
+            return false;
+
+        // Compare every property of objects
+        for (uint i = 0; i < properties.length; ++i) {
+            // Take a name of current property
+            var nameHash = sha3(properties[i]);
+
+            // Compare value of the same properties
+            if (propertyHashOf[nameHash] != _to.propertyHashOf(nameHash))
+                return false;
+        }
+        return true;
+    }
+
+    function isEqualComponents(KObject _to) returns (bool) {
+        // Count of components in equal objects should be same
+        if (componentsLength() != _to.componentsLength())
+            return false;
+
+        // Compare every components of objects
+        for (uint i = 0; i < componentsLength(); ++i) {
+            var equalFound = false;
+
+            for (uint j = 0; j < componentsLength(); ++j)
+                if (getComponent(i).isEqual(_to.getComponent(j))) {
+                    equalFound = true;
+                    break;
+                }
+
+            // Return false if no equal component found
+            if (!equalFound)
+                return false;
+        }
+        return true;
+    }
+}
+
+/*
+ * The knowledge process describe knowledge manipulation
+ */
+contract KProcess is Knowledge {
+    /* Process constructor */
+    function KProcess() Knowledge(PROCESS) {}
+
+    /*
+     * Morphism describe knowledge manipulation line
+     * e.g. apple production have a morphism with 
+     * three objects: Ground -> AppleTree -> Apple
+     * this knowledges can be stored in morphism list
+     * as [ Ground, AppleTree, Apple ]
+     */
+    Array.Data morphism;
+
+    function morphismLength() returns (uint)
+    { return Array.size(morphism); }
+
+    /* Append knowledge into line */
+    function append(Knowledge _knowledge) onlyOwner {
+        Array.append(morphism, _knowledge);
+    }
+    
+    /* Insert knowledge into position */
+    function insert(Knowledge _knowledge, uint _position) {
+        Array.insert(morphism, _position, _knowledge);
+    }
+    
+    /* Get knowledge by index in line */
+    function get(uint _index) returns (Knowledge) {
+        return Knowledge(Array.get(morphism, _index));
+    }
+
+    function isEqualProcess(KProcess _to) returns (bool) {
+        // Count of knowledges in equal processes should be same
+        if (morphismLength() != _to.morphismLength())
+            return false;
+
+        for (uint i = 0; i < morphismLength(); i += 1)
+            // All knowledge in morphism line should be equal
+            if (!get(i).isEqual(_to.get(i)))
+                return false;
+        return true;
+    }
+}
+
+library Thesaurus {
+    struct Index {
+        /* Available knowledge names */
+        string [] thesaurus;
+
+        /* Mapping to knowledge from name */
+        mapping (bytes32 => Knowledge) knowledgeOf;
+    }
+
+    /*
+     * Insert knowledge by name
+     *   knowledge instance with the same name will be replaced
+     */
+    function set(Index storage _ix, string _name, Knowledge _knowledge)
+            returns (Knowledge) {
+        // Check for term is exist
+        var nameHash = sha3(_name);
+        var replaced = _ix.knowledgeOf[nameHash];
+        if (replaced == Knowledge(0x0))
+            _ix.thesaurus[_ix.thesaurus.length++] = _name;
+        _ix.knowledgeOf[nameHash] = _knowledge;
+        return replaced;
+    }
+    
+    function get(Index storage _ix, string _name)  returns (Knowledge) {
+        return _ix.knowledgeOf[sha3(_name)];
+    }
 }

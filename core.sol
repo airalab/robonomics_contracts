@@ -1,46 +1,150 @@
-contract core {
-	string daoName;
-	string desc;
-	string owner;
+import 'agent_storage.sol';
 
-	modifier ownerCheck { if (msg.sender == owner) _ }
-	
-	struct Template {
-		string code;
-		string abi;
-		string actions;
-		string itemscope;
-		address thesaurus;
-		bool inactive;
-	}
+contract Core is Mortal {
+    /* DAO configuration */
+    struct Config {
+        /* Short description */
+        string  name;
+        string  description;
+        address founder;
 
-	Template[] templates;
-	mapping (bytes32 => uint) public itemscopeTemplateOf;
-	mapping (bytes32 => bool) public itemscopeTemplateExistOf;
+        /* DAO knowledge and active contracts storage */
+        AgentStorage agentStorage;
 
-	function core(string _daoName, string _desc) {
-		daoName = _daoName;
-		desc = _desc;
-		owner = msg.sender;
-	}
+        /* DAO nodes */
+        Array.Data nodes;
+        mapping (bytes32 => address) getNodeBy;
+        mapping (address => string)  getNodeNameBy;
+        
+        /* DAO templates */
+        Array.Data templates;
+        mapping (bytes32 => address) getTemplateBy;
+        mapping (address => string)  getTemplateNameBy;
+    }
 
-	function setTemplate(string _code,
-						 string _abi,
-						 string _actions,
-						 string _itemscope,
-						 address _thesaurus) ownerCheck returns(bool result, uint templateID) {
-		templateID = templates.length++;
-		Template t = templates[templateID];
-        t.code = _code;
-        t.abi = _abi;
-        t.actions = _actions;
-        t.itemscope = _itemscope;
-        t.thesaurus = _thesaurus;
-        result = true;
-        return(result, templateID);
-	}
+    Config dao;
 
-	function getTemplate() {
-		
-	}
+    /* Public getters */
+    function getName() returns (string)
+    { return dao.name; }
+
+    function getDescription() returns (string)
+    { return dao.description; }
+
+    function getFounder() returns (address)
+    { return dao.founder; }
+
+    function getStorage() returns (AgentStorage)
+    { return dao.agentStorage; }
+
+    function getNodeLength() returns (uint)
+    { return Array.size(dao.nodes); }
+
+    function getNode(uint _index) returns (address)
+    { return Array.get(dao.nodes, _index); }
+
+    function getNode(string _name) returns (address)
+    { return dao.getNodeBy[sha3(_name)]; }
+
+    function getNodeName(address _node) returns (string)
+    { return dao.getNodeNameBy[_node]; }
+
+    function getTemplateLength() returns (uint)
+    { return Array.size(dao.templates); }
+
+    function getTemplate(uint _index) returns (address)
+    { return Array.get(dao.templates, _index); }
+
+    function getTemplate(string _name) returns (address)
+    { return dao.getTemplateBy[sha3(_name)]; }
+
+    function getTemplateName(address _node) returns (string)
+    { return dao.getTemplateNameBy[_node]; }
+
+    /*
+     * Interface storage
+     *   the contract interface contains GitHub source URI
+     */
+    mapping (address => string) public interfaceOf;
+    
+    /* Common used array data iterator */
+    Array.Iterator it;
+
+    /* DAO constructor */
+    function Core(string _name, string _description) {
+        dao.name         = _name;
+        dao.description  = _description;
+        dao.founder      = msg.sender;
+        dao.agentStorage = new AgentStorage();
+    }
+
+    /* 
+     * DAO nodes setter
+     *   set new node for given name, replaced address will returned
+     */
+    function setNode(string _name, address _node, string _interface) onlyOwner
+            returns (address) {
+        // Remove node if replaced
+        var replaced = getNode(_name);
+        if (replaced != 0) {
+            Array.setBegin(dao.nodes, it);
+            Array.find(it, replaced);
+            Array.remove(it);
+        }
+        // Append new node
+        Array.append(dao.nodes, _node);
+        dao.getNodeBy[sha3(_name)] = _node;
+        dao.getNodeNameBy[_node]   = _name;
+        // Register node interface
+        interfaceOf[_node] = _interface;
+        // Return replaced address
+        return replaced;
+    }
+    
+    function removeNode(string _name) onlyOwner returns (address) {
+        var removed = getNode(_name);
+        removeNode(removed);
+        return removed;
+    }
+    
+    function removeNode(address _node) onlyOwner {
+        Array.setBegin(dao.nodes, it);
+        Array.find(it, _node);
+        Array.remove(it);
+    }
+    
+    /*
+     * DAO templates setter
+     *   set new template for given name, replaced address will returned
+     */
+    function setTemplate(string _name, address _template, string _interface) onlyOwner
+            returns (address) {
+        // Remove template if replaced
+        var replaced = getTemplate(_name);
+        if (replaced != 0) {
+            Array.setBegin(dao.templates, it);
+            Array.find(it, replaced);
+            Array.remove(it);
+        }
+        // Append new node
+        Array.append(dao.templates, _template);
+        dao.getNodeBy[sha3(_name)]   = _template;
+        dao.getNodeNameBy[_template] = _name;
+        // Register node interface
+        interfaceOf[_template] = _interface;
+        // Return replaced address
+        return replaced;
+    }
+    
+    function removeTemplate(string _name) onlyOwner returns (address) {
+        var removed = getTemplate(_name);
+        removeTemplate(removed);
+        return removed;
+    }
+    
+    function removeTemplate(address _node) onlyOwner {
+        Array.setBegin(dao.templates, it);
+        Array.find(it, _node);
+        Array.remove(it);
+    }
 }
