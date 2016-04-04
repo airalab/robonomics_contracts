@@ -1,226 +1,126 @@
-contract market {
-    address creator;
-    token Token;
-    etherToken EtherToken;
+import 'token.sol';
 
-    struct Order {
-        uint orderID;
-        address owner;
-        uint total;
-        uint unitPrice;
-        uint min;
-        uint step;
-        bool active;
+/*
+ * Token lot for market
+ *   presents available deal based on token transfers
+ */
+contract Lot is Mortal {
+    /* Operational tokens */
+    Token public sale;
+    Token public buy;
+
+    /* Operational addreses */
+    address public seller;
+    address public buyer;
+
+    /* Operation description */
+    uint public value = 0; // Value of sale tokens
+    uint public price = 0; // Price one sale token in buy tokens
+
+    /* Lot is deal and closed */
+    bool public closed = false;
+
+    function Lot(Token _sale, Token _buy, uint _value, uint _price) {
+        sale   = _sale;
+        buy    = _buy;
+        value  = _value;
+        price  = _price;
+        seller = msg.sender;
+    }
+    
+    /* Lot deal with buyer is a sender */
+    function deal() returns (bool) {
+        return deal(msg.sender);
     }
 
-    struct SaleAssetList {
-        address assetAddr;
-        Order[] sellOrderList;
-    }
+    /* Lot deal method with buyer in argument */
+    function deal(address _buyer) returns (bool) {
+        /* So if lot is closed no deal available */
+        if (closed) return false;
 
-    struct BuyAssetList {
-        address assetAddr;
-        Order[] buyOrderList;
-    }
-
-    SaleAssetList[] public sellAssetList;
-    mapping (address => bool) public sellExistOf;
-    mapping (address => uint) public sellDataOf;
-    mapping (address => uint) public sellCountAsset;
-
-    BuyAssetList[] public buyAssetList;
-    mapping (address => bool) public buyExistOf;
-    mapping (address => uint) public buyDataOf;
-    mapping (address => uint) public buyCountAsset;
-
-    function market(address _etherTokenAddr) {
-        creator = msg.sender;
-        EtherToken = etherToken(_etherTokenAddr);
-    }
-
-    function addSell(address _assetAddr, uint _total, uint _unitPrice, uint _min, uint _step) returns(uint sellID) {
-        uint assetID;
-        if (sellExistOf[_assetAddr]) {
-            assetID = sellDataOf[_assetAddr];
-            SaleAssetList sellAssetOrders = sellAssetList[assetID];
-        } else {
-            assetID = sellAssetList.length++;
-			sellDataOf[_assetAddr] = assetID;
-            sellExistOf[_assetAddr] = true;
-            sellAssetOrders = sellAssetList[assetID];
-            sellAssetOrders.assetAddr = _assetAddr;
-        }
-        sellID = sellAssetOrders.sellOrderList.length++;
-
-        Order order = sellAssetOrders.sellOrderList[sellID];
-        order.orderID = sellID;
-        order.owner = msg.sender;
-        order.total = _total;
-        order.unitPrice = _unitPrice;
-        order.min = _min;
-        order.step = _step;
-        order.active = true;
-		
-        sellCountAsset[_assetAddr] = sellID;
-
-        return sellID;
-    }
-
-    function addBuy(address _assetAddr, uint _total, uint _unitPrice, uint _min, uint _step) returns(uint buyID) {
-        uint assetID;
-        if (buyExistOf[_assetAddr]) {
-            assetID = buyDataOf[_assetAddr];
-            BuyAssetList buyAssetOrders = buyAssetList[assetID];
-        } else {
-            assetID = buyAssetList.length++;
-			buyDataOf[_assetAddr] = assetID;
-            buyExistOf[_assetAddr] = true;
-            buyAssetOrders = buyAssetList[assetID];
-            buyAssetOrders.assetAddr = _assetAddr;
-        }
-        buyID = buyAssetOrders.buyOrderList.length++;
-
-        Order order = buyAssetOrders.buyOrderList[buyID];
-        order.orderID = buyID;
-        order.owner = msg.sender;
-        order.total = _total;
-        order.unitPrice = _unitPrice;
-        order.min = _min;
-        order.step = _step;
-        order.active = true;
-		
-        buyCountAsset[_assetAddr] = buyID;
-
-        return buyID;
-    }
-
-    function removeSell(address _assetAddr, uint _orderID) returns(bool) {
-        if (sellExistOf[_assetAddr]) {
-            uint assetID = sellDataOf[_assetAddr];
-            Order order = sellAssetList[assetID].sellOrderList[_orderID];
-            if (order.owner == msg.sender) {
-                order.active = false;
-                return true;
-            }
+        /* Check it to deal this lot */
+        if (sale.getBalance(seller) >= value
+          && buy.getBalance(_buyer) >= value * price) {
+            // Do transfer tokens
+            sale.transferFrom(seller, _buyer, value);
+            buy.transferFrom(_buyer, seller, value * price);
+            // Store buyer and close lot
+            buyer = _buyer;
+            closed = true;
+            return true;
         }
         return false;
     }
+}
 
-    function removeBuy(address _assetAddr, uint _orderID) returns(bool) {
-        if (buyExistOf[_assetAddr]) {
-            uint assetID = buyDataOf[_assetAddr];
-            Order order = buyAssetList[assetID].buyOrderList[_orderID];
-            if (order.owner == msg.sender) {
-                order.active = false;
-                return true;
-            }
-        }
-        return false;
+/*
+ * Token based market contract
+ */
+contract Market is Mortal {
+    /* Market configuration */
+    struct Config {
+        /* Market name */
+        string name;
+        /* Available market lots */
+        Array.Data lots;
     }
 
-    function downSell(address _assetAddr, uint _orderID, uint _total) {
-        if (sellExistOf[_assetAddr]) {
-            uint assetID = sellDataOf[_assetAddr];
-            Order order = sellAssetList[assetID].sellOrderList[_orderID];
-            order.total = order.total - _total;
-            if (order.total == 0) {
-                order.active = false;
-            }
-        }
+    Config market;
+
+    /* Common used array iterator */
+    Array.Iterator it;
+
+    /* Public getters */
+    function getName() returns (string)
+    { return market.name; }
+
+    function getLotLength() returns (uint)
+    { return Array.size(market.lots); }
+
+    function getLot(uint _index) returns (Lot)
+    { return Lot(Array.get(market.lots, _index)); }
+
+    /* Market constructor */
+    function Market(string _name) {
+        market.name = _name;
     }
 
-    function downBuy(address _assetAddr, uint _orderID, uint _total) {
-        if (sellExistOf[_assetAddr]) {
-            uint assetID = buyDataOf[_assetAddr];
-            Order order = buyAssetList[assetID].buyOrderList[_orderID];
-            order.total = order.total - _total;
-            if (order.total == 0) {
-                order.active = false;
-            }
-        }
-    }
-
-    function getSell(address _assetAddr, uint _orderID) returns(address owner, uint total, uint unitPrice, uint min, uint step, bool active) {
-        if (sellExistOf[_assetAddr]) {
-            uint assetID = sellDataOf[_assetAddr];
-            Order order = sellAssetList[assetID].sellOrderList[_orderID];
-            return (order.owner, order.total, order.unitPrice, order.min, order.step, order.active);
-        }
-    }
-
-    function getBuy(address _assetAddr, uint _orderID) returns(address owner, uint total, uint unitPrice, uint min, uint step, bool active) {
-        if (buyExistOf[_assetAddr]) {
-            uint assetID = buyDataOf[_assetAddr];
-            Order order = buyAssetList[assetID].buyOrderList[_orderID];
-            return (order.owner, order.total, order.unitPrice, order.min, order.step, order.active);
-        }
-    }
-
-    function getSellOwner(address _assetAddr, uint _orderID) returns(address) {
-        if (sellExistOf[_assetAddr]) {
-            uint assetID = sellDataOf[_assetAddr];
-            Order order = sellAssetList[assetID].sellOrderList[_orderID];
-            return order.owner;
-        }
-    }
-
-    function getBuyOwner(address _assetAddr, uint _orderID) returns(address) {
-        if (buyExistOf[_assetAddr]) {
-            uint assetID = buyDataOf[_assetAddr];
-            Order order = buyAssetList[assetID].buyOrderList[_orderID];
-            return order.owner;
-        }
-    }
-
-    function getSellPrice(address _assetAddr, uint _orderID) returns(uint) {
-        if (sellExistOf[_assetAddr]) {
-            uint assetID = sellDataOf[_assetAddr];
-            Order order = sellAssetList[assetID].sellOrderList[_orderID];
-            return order.unitPrice;
-        }
-    }
-
-    function getBuyPrice(address _assetAddr, uint _orderID) returns(uint) {
-        if (buyExistOf[_assetAddr]) {
-            uint assetID = buyDataOf[_assetAddr];
-            Order order = buyAssetList[assetID].buyOrderList[_orderID];
-            return order.unitPrice;
+    /*
+     * The lot on market manipulations
+     */
+    function appendLot(Lot _lot)
+    { Array.append(market.lots, _lot); }
+ 
+    function removeLot(Lot _lot) {
+        if (_lot.seller() == msg.sender) {
+            Array.setBegin(market.lots, it);
+            Array.find(it, _lot);
+            Array.remove(it);
         }
     }
     
-    function dealSell(address _assetAddr, uint _orderID, uint count) returns(bool) {
-       if (sellExistOf[_assetAddr]) {
-           uint assetID = sellDataOf[_assetAddr];
-           Order order = sellAssetList[assetID].sellOrderList[_orderID];
-           Token = token(_assetAddr);
-           
-           if (count <= order.total
-               && Token.balanceOf(order.owner) >= count 
-               && EtherToken.balanceOf(msg.sender) >= count * order.unitPrice) {
-               Token.transferFrom(order.owner,msg.sender, count);
-               EtherToken.transferFrom(msg.sender,order.owner,count * order.unitPrice);
-               order.total -= count;
-               order.active = order.total > 0;
-               return true;
-           }
-       }
-       return false;
-       
-   }
-    
-    function dealBuy(address _assetAddr, uint _orderID) returns(bool) {
-        if (buyExistOf[_assetAddr]) {
-            uint assetID = buyDataOf[_assetAddr];
-            Order order = buyAssetList[assetID].buyOrderList[_orderID];
-            Token = token(_assetAddr);
-            if (EtherToken.balanceOf(order.owner) >= order.total * order.unitPrice && Token.balanceOf(msg.sender) >= order.total) {
-                order.active = false;
-                Token.transferFrom(msg.sender,order.owner,order.total);
-                EtherToken.transferFrom(order.owner,msg.sender,order.total * order.unitPrice);
-                return true;
+    /*
+     * Client public methods
+     */
+    function bestDeal(Token _buy, Token _sell, uint _value) returns (Lot) {
+        Lot best = Lot(0);
+        
+        Array.setBegin(market.lots, it);
+        while (!Array.end(it)) {
+            var lot = Lot(Array.get(it));
+            /* Drop closed lots from array */
+            if (lot.closed()) {
+                Array.remove(it);
+                continue;
             }
+            /* So the lot is candidate to best if token and value suit */
+            if (lot.sale() == _buy && lot.buy() == _sell && lot.value() >= _value)
+                /* Best price - low price */
+                if (best == Lot(0) || best.price() > lot.price())
+                    best = lot;
+            /* Step next */
+            Array.next(it);
         }
-        return false;
+        return best;
     }
-    
 }
