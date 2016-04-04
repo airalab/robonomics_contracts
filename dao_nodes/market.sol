@@ -124,3 +124,33 @@ contract Market is Mortal {
         return best;
     }
 }
+
+/* Very usefull abstract contract
+ * presents autonomous agent that use the market and self created token */
+contract MarketAgent {
+    /* The current agent token */
+    Token  public getToken;
+    /* The public token used by agent */
+    Token  public getPublicToken;
+    /* The market that used by agent */
+    Market public getMarket;
+
+    function MarketAgent(Token _publicToken, Market _market) {
+        getPublicToken = _publicToken;
+        getMarket      = _market;
+        /* Making the internal token */
+        makeToken();
+    }
+
+    function makeToken() internal;
+
+    /* Place a Lot on market with price in public tokens */
+    function placeLot(uint _value, uint _price) internal {
+        /* Make lot with given value and price */
+        var lot = new Lot(getToken, getPublicToken, _value, _price);
+        /* Approve lot to sell */
+        getToken.approve(lot, _value);
+        /* Register lot on the market */
+        getMarket.appendLot(lot);
+    }
+}
