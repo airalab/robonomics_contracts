@@ -16,7 +16,7 @@ contract Knowledge is Mortal {
     }
 
     /* Generic Knowledge comparation procedure */
-    function isEqual(Knowledge _to) returns (bool) {
+    function isEqual(Knowledge _to) constant returns (bool) {
         // Knowledge with different types can't be equal
         if (_to.knowledgeType() != knowledgeType)
             return false;
@@ -44,7 +44,7 @@ contract KObject is Knowledge {
     /* List of object property names */
     string[] public properties;
 
-    function propertiesLength() returns (uint)
+    function propertiesLength() constant returns (uint)
     { return properties.length; }
 
     /* Hash name to value mapping */
@@ -69,14 +69,14 @@ contract KObject is Knowledge {
     /* Described object can be consist of some another objects */
     Array.Data components;
 
-    function componentsLength() returns (uint)
+    function componentsLength() constant returns (uint)
     { return Array.size(components); }
 
     function appendComponent(KObject _component) onlyOwner {
         Array.append(components, _component);
     }
     
-    function getComponent(uint _index) returns (KObject) {
+    function getComponent(uint _index) constant returns (KObject) {
         return KObject(Array.get(components, _index));
     }
 
@@ -86,11 +86,11 @@ contract KObject is Knowledge {
      *  - equal properties
      *  - equal components
      */
-    function isEqualObject(KObject _to) returns (bool) {
+    function isEqualObject(KObject _to) constant returns (bool) {
         return isEqualProperties(_to) && isEqualComponents(_to);
     }
 
-    function isEqualProperties(KObject _to) returns (bool) {
+    function isEqualProperties(KObject _to) constant returns (bool) {
         // Count of properties in equal objects should be same
         if (properties.length != _to.propertiesLength())
             return false;
@@ -107,7 +107,7 @@ contract KObject is Knowledge {
         return true;
     }
 
-    function isEqualComponents(KObject _to) returns (bool) {
+    function isEqualComponents(KObject _to) constant returns (bool) {
         // Count of components in equal objects should be same
         if (componentsLength() != _to.componentsLength())
             return false;
@@ -146,7 +146,7 @@ contract KProcess is Knowledge {
      */
     Array.Data morphism;
 
-    function morphismLength() returns (uint)
+    function morphismLength() constant returns (uint)
     { return Array.size(morphism); }
 
     /* Append knowledge into line */
@@ -160,11 +160,11 @@ contract KProcess is Knowledge {
     }
     
     /* Get knowledge by index in line */
-    function get(uint _index) returns (Knowledge) {
+    function get(uint _index) constant returns (Knowledge) {
         return Knowledge(Array.get(morphism, _index));
     }
 
-    function isEqualProcess(KProcess _to) returns (bool) {
+    function isEqualProcess(KProcess _to) constant returns (bool) {
         // Count of knowledges in equal processes should be same
         if (morphismLength() != _to.morphismLength())
             return false;
@@ -201,7 +201,7 @@ library Thesaurus {
         return replaced;
     }
     
-    function get(Index storage _ix, string _name)  returns (Knowledge) {
+    function get(Index storage _ix, string _name) constant returns (Knowledge) {
         return _ix.knowledgeOf[sha3(_name)];
     }
 }

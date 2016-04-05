@@ -71,13 +71,13 @@ contract Market is Mortal {
     Array.Iterator it;
 
     /* Public getters */
-    function getName() returns (string)
+    function getName() constant returns (string)
     { return market.name; }
 
-    function getLotLength() returns (uint)
+    function getLotLength() constant returns (uint)
     { return Array.size(market.lots); }
 
-    function getLot(uint _index) returns (Lot)
+    function getLot(uint _index) constant returns (Lot)
     { return Lot(Array.get(market.lots, _index)); }
 
     /* Market constructor */
@@ -122,5 +122,35 @@ contract Market is Mortal {
             Array.next(it);
         }
         return best;
+    }
+}
+
+/* Very usefull abstract contract
+ * presents autonomous agent that use the market and self created token */
+contract MarketAgent {
+    /* The current agent token */
+    Token  public getToken;
+    /* The public token used by agent */
+    Token  public getPublicToken;
+    /* The market that used by agent */
+    Market public getMarket;
+
+    function MarketAgent(Token _publicToken, Market _market) {
+        getPublicToken = _publicToken;
+        getMarket      = _market;
+        /* Making the internal token */
+        makeToken();
+    }
+
+    function makeToken() internal;
+
+    /* Place a Lot on market with price in public tokens */
+    function placeLot(uint _value, uint _price) internal {
+        /* Make lot with given value and price */
+        var lot = new Lot(getToken, getPublicToken, _value, _price);
+        /* Approve lot to sell */
+        getToken.approve(lot, _value);
+        /* Register lot on the market */
+        getMarket.appendLot(lot);
     }
 }

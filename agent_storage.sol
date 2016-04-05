@@ -14,10 +14,10 @@ contract AgentStorage is Mortal {
     /* The knowledge base of agent */
     Array.Data knowledges;
     
-    function knowledgesLength() returns (uint)
+    function knowledgesLength() constnant returns (uint)
     { return Array.size(knowledges); }
     
-    function getKnowledge(uint _index) returns (Knowledge)
+    function getKnowledge(uint _index) constnant returns (Knowledge)
     { return Knowledge(Array.get(knowledges, _index)); }
     
     function appendKnowledge(Knowledge _knowledge) onlyOwner
@@ -39,10 +39,10 @@ contract AgentStorage is Mortal {
     /* The active contract base of agent */
     Array.Data contracts;
     
-    function contractsLength() returns (uint)
+    function contractsLength() constnant returns (uint)
     { return Array.size(contracts); }
     
-    function getContract(uint _index) returns (address)
+    function getContract(uint _index) constnant returns (address)
     { return Array.get(contracts, _index); }
     
     function appendContract(address _contract) onlyOwner
@@ -63,10 +63,10 @@ contract HumanAgentStorage is AgentStorage {
     /* Thesaurus interface for knowledge base */
     Thesaurus.Index thesaurus;
     
-    function thesaurusLength() returns (uint)
+    function thesaurusLength() constnant returns (uint)
     { return thesaurus.thesaurus.length; }
     
-    function thesaurusGet(uint _index) returns (string)
+    function thesaurusGet(uint _index) constnant returns (string)
     { return thesaurus.thesaurus[_index]; }
     
     function appendKnowledgeByName(string _name, Knowledge _knowledge) {
@@ -78,7 +78,7 @@ contract HumanAgentStorage is AgentStorage {
             removeKnowledge(replaced);
     }
     
-    function getKnowledgeByName(string _name) returns (Knowledge) {
+    function getKnowledgeByName(string _name) constnant returns (Knowledge) {
         return Thesaurus.get(thesaurus, _name);
     }
 }
