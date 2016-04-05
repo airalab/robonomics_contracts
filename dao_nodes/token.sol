@@ -15,25 +15,25 @@ contract Token is Mortal {
     Config token;
     
     /* Public token getters */
-    function getName() returns (string)
+    function getName() constant returns (string)
     { return token.name; }
     
-    function getSymbol() returns (string)
+    function getSymbol() constant returns (string)
     { return token.symbol;}
     
-    function getTotalSupply() returns (uint)
+    function getTotalSupply() constant returns (uint)
     { return token.total; }
     
-    function getBalance() returns (uint)
+    function getBalance() constant returns (uint)
     { return token.balanceOf[msg.sender]; }
     
-    function getBalance(address _address) returns (uint) {
+    function getBalance(address _address) constant returns (uint) {
         return token.approveOf[_address][msg.sender]
              > token.balanceOf[_address] ? token.balanceOf[_address]
                                          : token.approveOf[_address][msg.sender];
     }
     
-    function isApproved(address _address) returns (bool)
+    function isApproved(address _address) constant returns (bool)
     { return getBalance(_address) > 0; }
 
     /* Token constructor */

@@ -71,13 +71,13 @@ contract Market is Mortal {
     Array.Iterator it;
 
     /* Public getters */
-    function getName() returns (string)
+    function getName() constant returns (string)
     { return market.name; }
 
-    function getLotLength() returns (uint)
+    function getLotLength() constant returns (uint)
     { return Array.size(market.lots); }
 
-    function getLot(uint _index) returns (Lot)
+    function getLot(uint _index) constant returns (Lot)
     { return Lot(Array.get(market.lots, _index)); }
 
     /* Market constructor */

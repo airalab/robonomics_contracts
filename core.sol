@@ -25,40 +25,40 @@ contract Core is Mortal {
     Config dao;
 
     /* Public getters */
-    function getName() returns (string)
+    function getName() constant returns (string)
     { return dao.name; }
 
-    function getDescription() returns (string)
+    function getDescription() constant returns (string)
     { return dao.description; }
 
-    function getFounder() returns (address)
+    function getFounder() constant returns (address)
     { return dao.founder; }
 
-    function getStorage() returns (AgentStorage)
+    function getStorage() constant returns (AgentStorage)
     { return dao.agentStorage; }
 
-    function getNodeLength() returns (uint)
+    function getNodeLength() constant returns (uint)
     { return Array.size(dao.nodes); }
 
-    function getNode(uint _index) returns (address)
+    function getNode(uint _index) constant returns (address)
     { return Array.get(dao.nodes, _index); }
 
-    function getNode(string _name) returns (address)
+    function getNode(string _name) constant returns (address)
     { return dao.getNodeBy[sha3(_name)]; }
 
-    function getNodeName(address _node) returns (string)
+    function getNodeName(address _node) constant returns (string)
     { return dao.getNodeNameBy[_node]; }
 
-    function getTemplateLength() returns (uint)
+    function getTemplateLength() constant returns (uint)
     { return Array.size(dao.templates); }
 
-    function getTemplate(uint _index) returns (address)
+    function getTemplate(uint _index) constant returns (address)
     { return Array.get(dao.templates, _index); }
 
-    function getTemplate(string _name) returns (address)
+    function getTemplate(string _name) constant returns (address)
     { return dao.getTemplateBy[sha3(_name)]; }
 
-    function getTemplateName(address _node) returns (string)
+    function getTemplateName(address _node) constant returns (string)
     { return dao.getTemplateNameBy[_node]; }
 
     /*
