@@ -42,10 +42,10 @@ contract KObject is Knowledge {
     function KObject() Knowledge(OBJECT) {}
 
     /* List of object property names */
-    string[] public properties;
+    string[] public propertyList;
 
-    function propertiesLength() constant returns (uint)
-    { return properties.length; }
+    function propertyLength() constant returns (uint)
+    { return propertyList.length; }
 
     /* Hash name to value mapping */
     mapping (bytes32 => string)  public propertyValueOf;
@@ -59,7 +59,7 @@ contract KObject is Knowledge {
         var nameHash = sha3(_name);
         // Check for inserting new property
         if (propertyHashOf[nameHash] == 0)
-            properties[properties.length++] = _name;
+            propertyList.push(_name);
 
         // Store property value and value hash for future comparation
         propertyValueOf[nameHash] = _value;
@@ -67,18 +67,16 @@ contract KObject is Knowledge {
     }
 
     /* Described object can be consist of some another objects */
-    Array.Data components;
+    address[] public componentList;
 
-    function componentsLength() constant returns (uint)
-    { return Array.size(components); }
+    function componentLength() constant returns (uint)
+    { return componentList.length; }
 
-    function appendComponent(KObject _component) onlyOwner {
-        Array.append(components, _component);
-    }
+    function appendComponent(KObject _component) onlyOwner
+    { componentList.push(_component); }
     
-    function getComponent(uint _index) constant returns (KObject) {
-        return KObject(Array.get(components, _index));
-    }
+    function getComponent(uint _index) returns (KObject)
+    { return KObject(componentList[_index]); }
 
     /*
      * Comparation function over knowledge objects describe equal object,
@@ -92,13 +90,13 @@ contract KObject is Knowledge {
 
     function isEqualProperties(KObject _to) constant returns (bool) {
         // Count of properties in equal objects should be same
-        if (properties.length != _to.propertiesLength())
+        if (propertyList.length != _to.propertyLength())
             return false;
 
         // Compare every property of objects
-        for (uint i = 0; i < properties.length; ++i) {
+        for (uint i = 0; i < propertyList.length; ++i) {
             // Take a name of current property
-            var nameHash = sha3(properties[i]);
+            var nameHash = sha3(propertyList[i]);
 
             // Compare value of the same properties
             if (propertyHashOf[nameHash] != _to.propertyHashOf(nameHash))
@@ -109,14 +107,14 @@ contract KObject is Knowledge {
 
     function isEqualComponents(KObject _to) constant returns (bool) {
         // Count of components in equal objects should be same
-        if (componentsLength() != _to.componentsLength())
+        if (componentList.length != _to.componentLength())
             return false;
 
         // Compare every components of objects
-        for (uint i = 0; i < componentsLength(); ++i) {
+        for (uint i = 0; i < componentList.length; ++i) {
             var equalFound = false;
 
-            for (uint j = 0; j < componentsLength(); ++j)
+            for (uint j = 0; j < componentList.length; ++j)
                 if (getComponent(i).isEqual(_to.getComponent(j))) {
                     equalFound = true;
                     break;
@@ -144,32 +142,30 @@ contract KProcess is Knowledge {
      * this knowledges can be stored in morphism list
      * as [ Ground, AppleTree, Apple ]
      */
-    Array.Data morphism;
+    address[] morphism;
+    using AddressArray for address[];
 
     function morphismLength() constant returns (uint)
-    { return Array.size(morphism); }
+    { return morphism.length; }
 
     /* Append knowledge into line */
-    function append(Knowledge _knowledge) onlyOwner {
-        Array.append(morphism, _knowledge);
-    }
+    function append(Knowledge _knowledge) onlyOwner
+    { morphism.push(_knowledge); }
     
     /* Insert knowledge into position */
-    function insert(Knowledge _knowledge, uint _position) {
-        Array.insert(morphism, _position, _knowledge);
-    }
-    
-    /* Get knowledge by index in line */
-    function get(uint _index) constant returns (Knowledge) {
-        return Knowledge(Array.get(morphism, _index));
-    }
+    function insert(uint _position, Knowledge _knowledge)
+    { morphism.insert(_position, _knowledge); }
+
+    /* Get knowledge by index */
+    function get(uint _index) returns (Knowledge)
+    { return Knowledge(morphism[_index]); }
 
     function isEqualProcess(KProcess _to) constant returns (bool) {
         // Count of knowledges in equal processes should be same
-        if (morphismLength() != _to.morphismLength())
+        if (morphism.length != _to.morphismLength())
             return false;
 
-        for (uint i = 0; i < morphismLength(); i += 1)
+        for (uint i = 0; i < morphism.length; i += 1)
             // All knowledge in morphism line should be equal
             if (!get(i).isEqual(_to.get(i)))
                 return false;

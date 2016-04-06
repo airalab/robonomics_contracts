@@ -57,60 +57,41 @@ contract Lot is Mortal {
  * Token based market contract
  */
 contract Market is Mortal {
-    /* Market configuration */
-    struct Config {
-        /* Market name */
-        string name;
-        /* Available market lots */
-        Array.Data lots;
-    }
-
-    Config market;
-
-    /* Common used array iterator */
-    Array.Iterator it;
-
-    /* Public getters */
-    function getName() constant returns (string)
-    { return market.name; }
-
-    function getLotLength() constant returns (uint)
-    { return Array.size(market.lots); }
-
-    function getLot(uint _index) constant returns (Lot)
-    { return Lot(Array.get(market.lots, _index)); }
+    /* Market name */
+    string public name;
+    
+    /* Available market lots */
+    address[] public lots;
+    using AddressArray for address[];
 
     /* Market constructor */
-    function Market(string _name) {
-        market.name = _name;
-    }
+    function Market(string _name) { name = _name; }
 
     /*
      * The lot on market manipulations
      */
     function appendLot(Lot _lot)
-    { Array.append(market.lots, _lot); }
+    { lots.push(_lot); }
  
     function removeLot(Lot _lot) {
         if (_lot.seller() == msg.sender) {
-            Array.setBegin(market.lots, it);
-            Array.find(it, _lot);
-            Array.remove(it);
+            var index = lots.indexOf(_lot);
+            lots.remove(index);
         }
     }
-    
+
     /*
      * Client public methods
      */
-    function bestDeal(Token _buy, Token _sell, uint _value) returns (Lot) {
+    function bestDeal(Token _buy, Token _sell, uint _value) constant returns (Lot) {
         Lot best = Lot(0);
-        
-        Array.setBegin(market.lots, it);
-        while (!Array.end(it)) {
-            var lot = Lot(Array.get(it));
+
+        /* Step over all lots */
+        for (uint i = 0; i < lots.length; i += 1) {
+            var lot = Lot(lots[i]);
             /* Drop closed lots from array */
             if (lot.closed()) {
-                Array.remove(it);
+                lots.remove(i);
                 continue;
             }
             /* So the lot is candidate to best if token and value suit */
@@ -118,8 +99,6 @@ contract Market is Mortal {
                 /* Best price - low price */
                 if (best == Lot(0) || best.price() > lot.price())
                     best = lot;
-            /* Step next */
-            Array.next(it);
         }
         return best;
     }

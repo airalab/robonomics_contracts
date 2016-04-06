@@ -1,83 +1,54 @@
 import 'unit.sol';
 
-contract Empty {}
-
-contract AppendTest is TestCase {
-    Array.Data data;
-    address public address0 = new Empty();
-    address public address1 = new Empty();
-    address public address2 = new Empty();
-    
-    function get(uint i) returns (address)
-    { return Array.get(data, i); }
-    
-    function run() returns (bool) {
-        Array.append(data, address0);
-        Array.append(data, address1);
-        Array.append(data, address2);
-        
-        var success = Array.get(data, 0) == address0
-                   && Array.get(data, 1) == address1
-                   && Array.get(data, 2) == address2;
-        return success;
-    }
-}
-
 contract InsertTest is TestCase {
-    Array.Data data;
-    address public address0 = new Empty();
-    address public address1 = new Empty();
-    address public address2 = new Empty();
-    
+    using AddressArray for address[];
+    address[] public data;
+
+    address public address0 = 0x36cc51e5a1a3df455daaed83a746acfce28f37d7;
+    address public address1 = 0x46cc51e5a1a3df455daaed83a746acfce28f37d7;
+    address public address2 = 0x56cc51e5a1a3df455daaed83a746acfce28f37d7;
+
+    function InsertTest() { name = "Array insert test"; }
+
+    function push(address _item)
+    { data.push(_item); }
+
     function run() returns (bool) {
-        Array.append(data, address0);
-        Array.append(data, address1);
-        Array.insert(data, 1, address2);
+        data.push(address0);
+        data.push(address1);
+        data.insert(1, address2);
         
-        var success = Array.get(data, 0) == address0
-                   && Array.get(data, 1) == address2
-                   && Array.get(data, 2) == address1;
+        var success = data[0] == address0
+                   && data[1] == address2
+                   && data[2] == address1;
         return success;
     }
 }
 
-contract IteratorTest is TestCase {
-    Array.Data data;
-    Array.Iterator it;
-    address public address0 = new Empty();
-    address public address1 = new Empty();
-    address public address2 = new Empty();
+contract FindTest is TestCase {
+    using AddressArray for address[];
+    address[] public data;
+
+    address public address0 = 0x36cc51e5a1a3df455daaed83a746acfce28f37d7;
+    address public address1 = 0x46cc51e5a1a3df455daaed83a746acfce28f37d7;
+    address public address2 = 0x56cc51e5a1a3df455daaed83a746acfce28f37d7;
+    
+    function FindTest() { name = "Array find test"; }
     
     function run() returns (bool) {
-        Array.append(data, address0);
-        Array.append(data, address1);
-        Array.append(data, address2);
+        data.push(address0);
+        data.push(address1);
+        data.push(address2);
         
-        Array.setEnd(data, it);
-        if (!Array.end(it))
-            return false;
-        
-        Array.setBegin(data, it);
-        if (Array.get(it) != address0 && !Array.begin(it))
-            return false;
-
-        Array.next(it);
-        if (Array.get(it) != address1)
-            return false;
-        
-        Array.next(it);
-        if (Array.get(it) != address2)
-            return false;
-            
-        Array.next(it);
-        return Array.end(it);
+        return data.indexOf(address1) == 1
+            && data.indexOf(address2) == 2
+            && data.indexOf(address0) == 0;
     }
 }
 
 contract ArrayTests is UnitTests {
     function ArrayTests() {
-        append(new AppendTest());
-        append(new InsertTest());
-        append(new IteratorTest());
+        tests.push(new InsertTest());
+        tests.push(new FindTest());
     }
 }
