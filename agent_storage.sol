@@ -4,31 +4,28 @@ import 'thesaurus.sol';
  * Storage contains all agent knowledges and active contracts
  */
 contract AgentStorage is Mortal {
-    /* Common used array iterator */
-    Array.Iterator it;
-    
     /*
      * Knowledge base
      */
     
     /* The knowledge base of agent */
-    Array.Data knowledges;
+    address[] public knowledges;
+    using AddressArray for address[];
     
-    function knowledgesLength() constnant returns (uint)
-    { return Array.size(knowledges); }
+    function knowledgesLength() constant returns (uint)
+    { return knowledges.length; }
     
-    function getKnowledge(uint _index) constnant returns (Knowledge)
-    { return Knowledge(Array.get(knowledges, _index)); }
+    function getKnowledge(uint _index) constant returns (Knowledge)
+    { return Knowledge(knowledges[_index]); }
     
     function appendKnowledge(Knowledge _knowledge) onlyOwner
-    { Array.append(knowledges, _knowledge); }
+    { knowledges.push(_knowledge); }
     
     function removeKnowledge(Knowledge _knowledge) onlyOwner {
-        Array.setBegin(knowledges, it);
-        Array.find(it, _knowledge);
-        if (!Array.end(it)) {
-            Knowledge(Array.get(it)).kill();
-            Array.remove(it);
+        var index = knowledges.indexOf(_knowledge);
+        if (index < knowledges.length) {
+            Knowledge(knowledges[index]).kill();
+            knowledges.remove(index);
         }
     }
     
@@ -37,22 +34,21 @@ contract AgentStorage is Mortal {
      */
     
     /* The active contract base of agent */
-    Array.Data contracts;
+    address[] public contracts;
     
-    function contractsLength() constnant returns (uint)
-    { return Array.size(contracts); }
+    function contractsLength() constant returns (uint)
+    { return contracts.length; }
     
-    function getContract(uint _index) constnant returns (address)
-    { return Array.get(contracts, _index); }
+    function getContract(uint _index) constant returns (address)
+    { return contracts[_index]; }
     
     function appendContract(address _contract) onlyOwner
-    { Array.append(contracts, _contract); }
+    { contracts.push(_contract); }
     
     function removeContract(address _contract) onlyOwner {
-        Array.setBegin(contracts, it);
-        Array.find(it, _contract);
-        if (!Array.end(it))
-            Array.remove(it);
+        var index = contracts.indexOf(_contract);
+        if (index < contracts.length)
+            contracts.remove(index);
     }
 }
 
@@ -63,10 +59,10 @@ contract HumanAgentStorage is AgentStorage {
     /* Thesaurus interface for knowledge base */
     Thesaurus.Index thesaurus;
     
-    function thesaurusLength() constnant returns (uint)
+    function thesaurusLength() constant returns (uint)
     { return thesaurus.thesaurus.length; }
     
-    function thesaurusGet(uint _index) constnant returns (string)
+    function thesaurusGet(uint _index) constant returns (string)
     { return thesaurus.thesaurus[_index]; }
     
     function appendKnowledgeByName(string _name, Knowledge _knowledge) {
@@ -78,7 +74,7 @@ contract HumanAgentStorage is AgentStorage {
             removeKnowledge(replaced);
     }
     
-    function getKnowledgeByName(string _name) constnant returns (Knowledge) {
+    function getKnowledgeByName(string _name) constant returns (Knowledge) {
         return Thesaurus.get(thesaurus, _name);
     }
 }

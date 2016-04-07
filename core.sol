@@ -12,12 +12,12 @@ contract Core is Mortal {
         AgentStorage agentStorage;
 
         /* DAO nodes */
-        Array.Data nodes;
+        address[] nodes;
         mapping (bytes32 => address) getNodeBy;
         mapping (address => string)  getNodeNameBy;
         
         /* DAO templates */
-        Array.Data templates;
+        address[] templates;
         mapping (bytes32 => address) getTemplateBy;
         mapping (address => string)  getTemplateNameBy;
     }
@@ -38,10 +38,10 @@ contract Core is Mortal {
     { return dao.agentStorage; }
 
     function getNodeLength() constant returns (uint)
-    { return Array.size(dao.nodes); }
+    { return dao.nodes.length; }
 
     function getNode(uint _index) constant returns (address)
-    { return Array.get(dao.nodes, _index); }
+    { return dao.nodes[_index]; }
 
     function getNode(string _name) constant returns (address)
     { return dao.getNodeBy[sha3(_name)]; }
@@ -50,10 +50,10 @@ contract Core is Mortal {
     { return dao.getNodeNameBy[_node]; }
 
     function getTemplateLength() constant returns (uint)
-    { return Array.size(dao.templates); }
+    { return dao.templates.length; }
 
     function getTemplate(uint _index) constant returns (address)
-    { return Array.get(dao.templates, _index); }
+    { return dao.templates[_index]; }
 
     function getTemplate(string _name) constant returns (address)
     { return dao.getTemplateBy[sha3(_name)]; }
@@ -66,9 +66,6 @@ contract Core is Mortal {
      *   the contract interface contains GitHub source URI
      */
     mapping (address => string) public interfaceOf;
-    
-    /* Common used array data iterator */
-    Array.Iterator it;
 
     /* DAO constructor */
     function Core(string _name, string _description) {
@@ -78,6 +75,9 @@ contract Core is Mortal {
         dao.agentStorage = new AgentStorage();
     }
 
+    /* Using the AddressArray library */
+    using AddressArray for address[];
+
     /* 
      * DAO nodes setter
      *   set new node for given name, replaced address will returned
@@ -86,13 +86,10 @@ contract Core is Mortal {
             returns (address) {
         // Remove node if replaced
         var replaced = getNode(_name);
-        if (replaced != 0) {
-            Array.setBegin(dao.nodes, it);
-            Array.find(it, replaced);
-            Array.remove(it);
-        }
+        if (replaced != 0)
+            removeNode(replaced);
         // Append new node
-        Array.append(dao.nodes, _node);
+        dao.nodes.push(_node);
         dao.getNodeBy[sha3(_name)] = _node;
         dao.getNodeNameBy[_node]   = _name;
         // Register node interface
@@ -108,9 +105,9 @@ contract Core is Mortal {
     }
     
     function removeNode(address _node) onlyOwner {
-        Array.setBegin(dao.nodes, it);
-        Array.find(it, _node);
-        Array.remove(it);
+        var index = dao.nodes.indexOf(_node);
+        if (index < dao.nodes.length)
+            dao.nodes.remove(index);
     }
     
     /*
@@ -121,16 +118,13 @@ contract Core is Mortal {
             returns (address) {
         // Remove template if replaced
         var replaced = getTemplate(_name);
-        if (replaced != 0) {
-            Array.setBegin(dao.templates, it);
-            Array.find(it, replaced);
-            Array.remove(it);
-        }
-        // Append new node
-        Array.append(dao.templates, _template);
-        dao.getNodeBy[sha3(_name)]   = _template;
-        dao.getNodeNameBy[_template] = _name;
-        // Register node interface
+        if (replaced != 0)
+            removeTemplate(replaced);
+        // Append new template
+        dao.templates.push(_template);
+        dao.getTemplateBy[sha3(_name)]   = _template;
+        dao.getTemplateNameBy[_template] = _name;
+        // Register template interface
         interfaceOf[_template] = _interface;
         // Return replaced address
         return replaced;
@@ -143,8 +137,8 @@ contract Core is Mortal {
     }
     
     function removeTemplate(address _node) onlyOwner {
-        Array.setBegin(dao.templates, it);
-        Array.find(it, _node);
-        Array.remove(it);
+        var index = dao.templates.indexOf(_node);
+        if (index < dao.templates.length)
+            dao.templates.remove(index);
     }
 }
