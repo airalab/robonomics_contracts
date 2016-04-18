@@ -1,5 +1,11 @@
 import 'agent_storage.sol';
 
+/**
+ * The DAO core contract basicaly describe the organisation and contain:
+ * - agent storage,
+ * - infrastructure nodes,
+ * - contract templates,
+ */
 contract Core is Mortal {
     /* DAO configuration */
     struct Config {
@@ -40,7 +46,7 @@ contract Core is Mortal {
     function getNodeLength() constant returns (uint)
     { return dao.nodes.length; }
 
-    function getNode(uint _index) constant returns (address)
+    function getNodeByIndex(uint _index) constant returns (address)
     { return dao.nodes[_index]; }
 
     function getNode(string _name) constant returns (address)
@@ -52,7 +58,7 @@ contract Core is Mortal {
     function getTemplateLength() constant returns (uint)
     { return dao.templates.length; }
 
-    function getTemplate(uint _index) constant returns (address)
+    function getTemplateByIndex(uint _index) constant returns (address)
     { return dao.templates[_index]; }
 
     function getTemplate(string _name) constant returns (address)
@@ -61,9 +67,9 @@ contract Core is Mortal {
     function getTemplateName(address _node) constant returns (string)
     { return dao.getTemplateNameBy[_node]; }
 
-    /*
+    /**
      * Interface storage
-     *   the contract interface contains GitHub source URI
+     *   the contract interface contains source URI
      */
     mapping (address => string) public interfaceOf;
 
@@ -78,9 +84,12 @@ contract Core is Mortal {
     /* Using the AddressArray library */
     using AddressArray for address[];
 
-    /* 
+    /** 
      * DAO nodes setter
-     *   set new node for given name, replaced address will returned
+     * @notice set new node for given name, replaced address will returned
+     * @param _name infrastructure node name
+     * @param _node infrastructure node address
+     * @param _interface node interface URI
      */
     function setNode(string _name, address _node, string _interface) onlyOwner
             returns (address) {
@@ -98,21 +107,33 @@ contract Core is Mortal {
         return replaced;
     }
     
+    /**
+     * Remove node by name
+     * @param _name node name
+     * @return removed node address
+     */
     function removeNode(string _name) onlyOwner returns (address) {
         var removed = getNode(_name);
         removeNode(removed);
         return removed;
     }
     
+    /**
+     * Remove node by address
+     * @param _node target node address
+     */
     function removeNode(address _node) onlyOwner {
         var index = dao.nodes.indexOf(_node);
         if (index < dao.nodes.length)
             dao.nodes.remove(index);
     }
-    
-    /*
+ 
+    /**
      * DAO templates setter
-     *   set new template for given name, replaced address will returned
+     * @notice set new template for given name, replaced address will returned
+     * @param _name contract template name
+     * @param _template contract template address
+     * @param _interface contract template interface URI
      */
     function setTemplate(string _name, address _template, string _interface) onlyOwner
             returns (address) {
@@ -129,15 +150,24 @@ contract Core is Mortal {
         // Return replaced address
         return replaced;
     }
-    
+ 
+    /**
+     * Remove template by name
+     * @param _name template name
+     * @return removed template address
+     */
     function removeTemplate(string _name) onlyOwner returns (address) {
         var removed = getTemplate(_name);
         removeTemplate(removed);
         return removed;
     }
-    
-    function removeTemplate(address _node) onlyOwner {
-        var index = dao.templates.indexOf(_node);
+
+    /**
+     * Remove template by address
+     * @param _template target template address
+     */
+    function removeTemplate(address _template) onlyOwner {
+        var index = dao.templates.indexOf(_template);
         if (index < dao.templates.length)
             dao.templates.remove(index);
     }

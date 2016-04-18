@@ -1,15 +1,22 @@
 import 'token.sol';
 
+/**
+ * Ethereum crypto currency extention for Token contract
+ */
 contract EtherToken is Token {
     function EtherToken() Token("Wei", "EthContractWallet") {}
 
-    /* This methods increse your balance according to sended money */
+    /**
+     * This methods increse your balance according to sended money
+     */
     function loadBalance() {
         token.balanceOf[msg.sender] += msg.value;
         token.total                 += msg.value;
     }
 
-    /* This is the way to withdraw money from token */
+    /**
+     * This is the way to withdraw money from token
+     */
     function withdraw(uint _value) {
         if (token.balanceOf[msg.sender] >= _value) {
             token.balanceOf[msg.sender] -= _value;
