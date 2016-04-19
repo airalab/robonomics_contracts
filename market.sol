@@ -1,8 +1,8 @@
 import 'token.sol';
 
-/*
- * Token lot for market
- *   presents available deal based on token transfers
+/**
+ * @title Token lot for market
+ *        presents available deal based on token transfers
  */
 contract Lot is Mortal {
     /* Operational tokens */
@@ -20,6 +20,13 @@ contract Lot is Mortal {
     /* Lot is deal and closed */
     bool public closed = false;
 
+    /**
+     * @dev Market lot contruction
+     * @param _sale the token to sale by this lot
+     * @param _buy the token to buy by this lot
+     * @param _value amount of saled tokens
+     * @param _price how many `_buy` tokens will send for one `_sale`
+     */
     function Lot(Token _sale, Token _buy, uint _value, uint _price) {
         sale   = _sale;
         buy    = _buy;
@@ -28,12 +35,11 @@ contract Lot is Mortal {
         seller = msg.sender;
     }
     
-    /* Lot deal with buyer is a sender */
-    function deal() returns (bool) {
-        return deal(msg.sender);
-    }
-
-    /* Lot deal method with buyer in argument */
+    /**
+     * @dev Lot deal method with buyer in argument
+     * @param _buyer address of buyer
+     * @return `true` when deal is success
+     */
     function deal(address _buyer) returns (bool) {
         /* So if lot is closed no deal available */
         if (closed) return false;
@@ -41,9 +47,11 @@ contract Lot is Mortal {
         /* Check it to deal this lot */
         if (sale.getBalance(seller) >= value
           && buy.getBalance(_buyer) >= value * price) {
+
             // Do transfer tokens
             sale.transferFrom(seller, _buyer, value);
             buy.transferFrom(_buyer, seller, value * price);
+
             // Store buyer and close lot
             buyer = _buyer;
             closed = true;
@@ -51,10 +59,16 @@ contract Lot is Mortal {
         }
         return false;
     }
+ 
+    /**
+     * @dev Lot deal with buyer is a `sender`, see deal(address)
+     */
+    function deal() returns (bool)
+    { return deal(msg.sender); }
 }
 
-/*
- * Token based market contract
+/**
+ * @title Token based market contract
  */
 contract Market is Mortal {
     /* Market name */
@@ -65,14 +79,24 @@ contract Market is Mortal {
     using AddressArray for address[];
 
     /* Market constructor */
-    function Market(string _name) { name = _name; }
+    function Market(string _name)
+    { name = _name; }
 
     /*
      * The lot on market manipulations
      */
+
+    /**
+     * @dev Append new lot into market lot list
+     * @param _lot new market lot
+     */
     function appendLot(Lot _lot)
     { lots.push(_lot); }
  
+    /**
+     * @dev Remove lot by address from market lot list
+     * @param _lot market lot address
+     */
     function removeLot(Lot _lot) {
         if (_lot.seller() == msg.sender) {
             var index = lots.indexOf(_lot);
@@ -82,6 +106,14 @@ contract Market is Mortal {
 
     /*
      * Client public methods
+     */
+    /**
+     * @dev Take a best lot for given sale and buy tokens with minimal value
+     * @notice The best lot is a cheapest lot
+     * @param _buy the token to buy
+     * @param _sell the token to sell
+     * @param _value amount of tokens to buy
+     * @return market lot address or zero if not found
      */
     function bestDeal(Token _buy, Token _sell, uint _value) constant returns (Lot) {
         Lot best = Lot(0);
@@ -104,8 +136,10 @@ contract Market is Mortal {
     }
 }
 
-/* Very usefull abstract contract
- * presents autonomous agent that use the market and self created token */
+/**
+ * @title Very usefull abstract contract
+ *        presents autonomous agent that use the market and self created tokens
+ */
 contract MarketAgent {
     /* The current agent token */
     Token  public getToken;
@@ -114,6 +148,12 @@ contract MarketAgent {
     /* The market that used by agent */
     Market public getMarket;
 
+    /**
+     * @dev Market agent is a contract that have a associated market,
+     *      self token and public token for market trading
+     * @param _publicToken token used by market trading (e.g. DAO token)
+     * @param _market market address for trading (e.g. DAO market)
+     */
     function MarketAgent(Token _publicToken, Market _market) {
         getPublicToken = _publicToken;
         getMarket      = _market;
@@ -123,7 +163,11 @@ contract MarketAgent {
 
     function makeToken() internal;
 
-    /* Place a Lot on market with price in public tokens */
+    /**
+     * @dev Place a Lot on market with price in public tokens
+     * @param _value amount of tokens to sell
+     * @param _price how many public tokens need for one saled
+     */
     function placeLot(uint _value, uint _price) internal {
         /* Make lot with given value and price */
         var lot = new Lot(getToken, getPublicToken, _value, _price);

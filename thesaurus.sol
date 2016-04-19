@@ -1,6 +1,6 @@
 import 'common.sol';
 
-/*
+/**
  * Knowledge is a generic declaration of object or process
  */
 contract Knowledge is Mortal {
@@ -15,7 +15,11 @@ contract Knowledge is Mortal {
         knowledgeType = _type;
     }
 
-    /* Generic Knowledge comparation procedure */
+    /**
+     * Generic Knowledge comparation procedure
+     * @param _to compared knowledge address
+     * @return `true` when knowledges is equal
+     */
     function isEqual(Knowledge _to) constant returns (bool) {
         // Knowledge with different types can't be equal
         if (_to.knowledgeType() != knowledgeType)
@@ -32,7 +36,7 @@ contract Knowledge is Mortal {
     }
 }
 
-/*
+/**
  * The knowledge object represents the real world object
  * that can be consist of some another objects and have
  * a count of attributes
@@ -52,8 +56,11 @@ contract KObject is Knowledge {
     /* Hash name to value hash mapping */
     mapping (bytes32 => bytes32) public propertyHashOf;
 
-    /* Insert new property value by name
-     *   If the same name exist value will be replaced
+    /**
+     * Insert new property value by name.
+     * @notice If the same name exist value will be replaced.
+     * @param _name name of property
+     * @param _value property value
      */
     function insertProperty(string _name, string _value) onlyOwner {
         var nameHash = sha3(_name);
@@ -78,11 +85,11 @@ contract KObject is Knowledge {
     function getComponent(uint _index) returns (KObject)
     { return KObject(componentList[_index]); }
 
-    /*
+    /**
      * Comparation function over knowledge objects describe equal object,
      * the equal objects has:
-     *  - equal properties
-     *  - equal components
+     * - equal properties
+     * - equal components
      */
     function isEqualObject(KObject _to) constant returns (bool) {
         return isEqualProperties(_to) && isEqualComponents(_to);
@@ -128,14 +135,14 @@ contract KObject is Knowledge {
     }
 }
 
-/*
+/**
  * The knowledge process describe knowledge manipulation
  */
 contract KProcess is Knowledge {
     /* Process constructor */
     function KProcess() Knowledge(PROCESS) {}
 
-    /*
+    /**
      * Morphism describe knowledge manipulation line
      * e.g. apple production have a morphism with 
      * three objects: Ground -> AppleTree -> Apple
@@ -148,15 +155,25 @@ contract KProcess is Knowledge {
     function morphismLength() constant returns (uint)
     { return morphism.length; }
 
-    /* Append knowledge into line */
+    /**
+     * Append knowledge into line
+     * @param _knowledge new item of `morphism` list
+     */
     function append(Knowledge _knowledge) onlyOwner
     { morphism.push(_knowledge); }
     
-    /* Insert knowledge into position */
-    function insert(uint _position, Knowledge _knowledge)
+    /**
+     * Insert knowledge into position
+     * @param _position new item position
+     * @param _knowledge new item value
+     */
+    function insert(uint _position, Knowledge _knowledge) onlyOwner
     { morphism.insert(_position, _knowledge); }
 
-    /* Get knowledge by index */
+    /**
+     * Get knowledge by position
+     * @param _index knowledge position in `morphism`
+     */
     function get(uint _index) returns (Knowledge)
     { return Knowledge(morphism[_index]); }
 
@@ -182,9 +199,9 @@ library Thesaurus {
         mapping (bytes32 => Knowledge) knowledgeOf;
     }
 
-    /*
+    /**
      * Insert knowledge by name
-     *   knowledge instance with the same name will be replaced
+     * @notice Knowledge instance with the same name will be replaced
      */
     function set(Index storage _ix, string _name, Knowledge _knowledge)
             returns (Knowledge) {
@@ -196,7 +213,7 @@ library Thesaurus {
         _ix.knowledgeOf[nameHash] = _knowledge;
         return replaced;
     }
-    
+ 
     function get(Index storage _ix, string _name) constant returns (Knowledge) {
         return _ix.knowledgeOf[sha3(_name)];
     }
