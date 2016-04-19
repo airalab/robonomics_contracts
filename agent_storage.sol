@@ -1,7 +1,7 @@
 import 'thesaurus.sol';
 
 /**
- * Storage contains all agent knowledges and active contracts
+ * @title Storage contains all agent knowledges and active contracts
  */
 contract AgentStorage is Mortal {
     /*
@@ -66,8 +66,10 @@ contract HumanAgentStorage is AgentStorage {
     { return thesaurus.thesaurus[_index]; }
     
     /**
-     * Append new knowledge into thesaurus
+     * @dev Append new knowledge into thesaurus
      * @notice knowledge with the same name will be replaced
+	 * @param _name knowledge name
+	 * @param _knowledge knowledge address
      */
     function appendKnowledgeByName(string _name, Knowledge _knowledge) {
         appendKnowledge(_knowledge);

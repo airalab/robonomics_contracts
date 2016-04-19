@@ -1,8 +1,8 @@
 import 'token.sol';
 
 /**
- * Token lot for market
- *   presents available deal based on token transfers
+ * @title Token lot for market
+ *        presents available deal based on token transfers
  */
 contract Lot is Mortal {
     /* Operational tokens */
@@ -21,7 +21,7 @@ contract Lot is Mortal {
     bool public closed = false;
 
     /**
-     * Market lot contruction
+     * @dev Market lot contruction
      * @param _sale the token to sale by this lot
      * @param _buy the token to buy by this lot
      * @param _value amount of saled tokens
@@ -36,8 +36,9 @@ contract Lot is Mortal {
     }
     
     /**
-     * Lot deal method with buyer in argument
+     * @dev Lot deal method with buyer in argument
      * @param _buyer address of buyer
+     * @return `true` when deal is success
      */
     function deal(address _buyer) returns (bool) {
         /* So if lot is closed no deal available */
@@ -60,15 +61,14 @@ contract Lot is Mortal {
     }
  
     /**
-     * Lot deal with buyer is a `sender`
-     * @see deal(_buyer)
+     * @dev Lot deal with buyer is a `sender`, see deal(address)
      */
     function deal() returns (bool)
     { return deal(msg.sender); }
 }
 
 /**
- * Token based market contract
+ * @title Token based market contract
  */
 contract Market is Mortal {
     /* Market name */
@@ -87,14 +87,14 @@ contract Market is Mortal {
      */
 
     /**
-     * Append new lot into market lot list
+     * @dev Append new lot into market lot list
      * @param _lot new market lot
      */
     function appendLot(Lot _lot)
     { lots.push(_lot); }
  
     /**
-     * Remove lot by address from market lot list
+     * @dev Remove lot by address from market lot list
      * @param _lot market lot address
      */
     function removeLot(Lot _lot) {
@@ -108,8 +108,8 @@ contract Market is Mortal {
      * Client public methods
      */
     /**
-     * Take a best lot for given sale and buy tokens with minimal value
-     * The best lot is a cheapest lot
+     * @dev Take a best lot for given sale and buy tokens with minimal value
+     * @notice The best lot is a cheapest lot
      * @param _buy the token to buy
      * @param _sell the token to sell
      * @param _value amount of tokens to buy
@@ -137,8 +137,8 @@ contract Market is Mortal {
 }
 
 /**
- * Very usefull abstract contract
- * presents autonomous agent that use the market and self created tokens
+ * @title Very usefull abstract contract
+ *        presents autonomous agent that use the market and self created tokens
  */
 contract MarketAgent {
     /* The current agent token */
@@ -149,8 +149,8 @@ contract MarketAgent {
     Market public getMarket;
 
     /**
-     * Market agent is a contract that have a associated market,
-     * self token and public token for market trading
+     * @dev Market agent is a contract that have a associated market,
+     *      self token and public token for market trading
      * @param _publicToken token used by market trading (e.g. DAO token)
      * @param _market market address for trading (e.g. DAO market)
      */
@@ -164,7 +164,7 @@ contract MarketAgent {
     function makeToken() internal;
 
     /**
-     * Place a Lot on market with price in public tokens
+     * @dev Place a Lot on market with price in public tokens
      * @param _value amount of tokens to sell
      * @param _price how many public tokens need for one saled
      */

@@ -1,7 +1,7 @@
 import 'common.sol';
 
 /**
- * Token contract represents any asset in digital economy
+ * @title Token contract represents any asset in digital economy
  */
 contract Token is Mortal {
     struct Config {
@@ -37,8 +37,8 @@ contract Token is Mortal {
     { return token.balanceOf[msg.sender]; }
  
     /**
-     * This method returns non zero result when sender is approved by
-     * argument address and target address have non zero self balance
+     * @dev This method returns non zero result when sender is approved by
+     *      argument address and target address have non zero self balance
      * @param _address target address 
      * @return available for `sender` balance of given address
      */
@@ -50,7 +50,7 @@ contract Token is Mortal {
  
     /**
      * @return `true` wnen `sender` have non zero available balance for target address 
-     * @see getBalance(address _address)
+     * @dev Synonym for getBalance(address _address)
      */
     function isApproved(address _address) constant returns (bool)
     { return getBalance(_address) > 0; }
@@ -66,7 +66,7 @@ contract Token is Mortal {
      */
     
     /**
-     * Token emission
+     * @dev Token emission
      * @param _value amount of token values to emit
      * @notice owner balance will be increased by `_value`
      */
@@ -76,7 +76,7 @@ contract Token is Mortal {
     }
  
     /**
-     * Burn the token values from owner balance and from total
+     * @dev Burn the token values from owner balance and from total
      * @param _value amount of token values for burn 
      * @notice owner balance will be decreased by `_value`
      */
@@ -92,7 +92,7 @@ contract Token is Mortal {
      */
 
     /**
-     * Transfer self tokens to given address
+     * @dev Transfer self tokens to given address
      * @param _to destination address
      * @param _value amount of token values to send
      * @notice `_value` tokens will be sended to `_to`
@@ -108,7 +108,7 @@ contract Token is Mortal {
     }
 
     /**
-     * Transfer with approvement mechainsm
+     * @dev Transfer with approvement mechainsm
      * @param _from source address, `_value` tokens shold be approved for `sender`
      * @param _to destination address
      * @param _value amount of token values to send 
@@ -126,7 +126,7 @@ contract Token is Mortal {
     }
 
     /**
-     * Give to target address ability for self token manipulation without sending
+     * @dev Give to target address ability for self token manipulation without sending
      * @param _address target address
      * @param _value amount of token values for approving
      */
@@ -134,8 +134,7 @@ contract Token is Mortal {
     { token.approveOf[msg.sender][_address] = _value; }
 
     /**
-     * Synonym for approve(_address, 0)
-     * @see approve(_address, _value)
+     * @dev Synonym for approve(_address, 0)
      */
     function unapprove(address _address)
     { token.approveOf[msg.sender][_address] = 0; }

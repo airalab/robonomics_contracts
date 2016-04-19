@@ -1,10 +1,10 @@
 import 'agent_storage.sol';
 
 /**
- * The DAO core contract basicaly describe the organisation and contain:
- * - agent storage,
- * - infrastructure nodes,
- * - contract templates,
+ * @title The DAO core contract basicaly describe the organisation and contain:
+ *		  agent storage,
+ *		  infrastructure nodes,
+ *		  contract templates
  */
 contract Core is Mortal {
     /* DAO configuration */
@@ -68,8 +68,8 @@ contract Core is Mortal {
     { return dao.getTemplateNameBy[_node]; }
 
     /**
-     * Interface storage
-     *   the contract interface contains source URI
+     * @dev Interface storage
+     *		the contract interface contains source URI
      */
     mapping (address => string) public interfaceOf;
 
@@ -85,7 +85,7 @@ contract Core is Mortal {
     using AddressArray for address[];
 
     /** 
-     * DAO nodes setter
+     * @dev DAO nodes setter
      * @notice set new node for given name, replaced address will returned
      * @param _name infrastructure node name
      * @param _node infrastructure node address
@@ -108,7 +108,7 @@ contract Core is Mortal {
     }
     
     /**
-     * Remove node by name
+     * @dev Remove node by name
      * @param _name node name
      * @return removed node address
      */
@@ -119,7 +119,7 @@ contract Core is Mortal {
     }
     
     /**
-     * Remove node by address
+     * @dev Remove node by address
      * @param _node target node address
      */
     function removeNode(address _node) onlyOwner {
@@ -129,7 +129,7 @@ contract Core is Mortal {
     }
  
     /**
-     * DAO templates setter
+     * @dev DAO templates setter
      * @notice set new template for given name, replaced address will returned
      * @param _name contract template name
      * @param _template contract template address
@@ -152,7 +152,7 @@ contract Core is Mortal {
     }
  
     /**
-     * Remove template by name
+     * @dev Remove template by name
      * @param _name template name
      * @return removed template address
      */
@@ -163,7 +163,7 @@ contract Core is Mortal {
     }
 
     /**
-     * Remove template by address
+     * @dev Remove template by address
      * @param _template target template address
      */
     function removeTemplate(address _template) onlyOwner {
