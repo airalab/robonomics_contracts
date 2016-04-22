@@ -11,9 +11,14 @@ contract Knowledge is Mortal {
     /* Knowledge type is a int value */
     int public knowledgeType;
 
-    function Knowledge(int8 _type) {
-        knowledgeType = _type;
-    }
+    function Knowledge(int8 _type)
+    { knowledgeType = _type; }
+
+    /**
+     * @dev Copy knowledge
+     * @param _owner is a owner of copyed knowledge
+     */
+    function copy(address _owner) returns (Knowledge);
 
     /**
      * Generic Knowledge comparation procedure
@@ -45,6 +50,28 @@ contract KObject is Knowledge {
     /* Object constructor */
     function KObject() Knowledge(OBJECT) {}
 
+    /**
+     * @dev Copy object and delegate to another address
+     * @param _owner owner of copyed object
+     */
+    function copy(address _owner) returns (Knowledge) {
+        var newObject = new KObject();
+
+        // Copy properties
+        for (uint i = 0; i < propertyList.length; i += 1) {
+            var name = propertyList[i];
+            newObject.insertProperty(name, propertyValueOf[sha3(name)]); 
+        }
+
+        // Copy components
+        for (uint i = 0; i < componentList.length; i += 1)
+            newObject.appendComponent(getComponent(i).copy(_owner));
+
+        // Delegate base object
+        newObject.delegate(_owner);
+        return newObject;
+    }
+
     /* List of object property names */
     string[] public propertyList;
 
@@ -72,6 +99,13 @@ contract KObject is Knowledge {
         propertyValueOf[nameHash] = _value;
         propertyHashOf[nameHash]  = sha3(_value);
     }
+
+    /**
+     * @dev Get property by name
+     * @param _name property name
+     */
+    function getProperty(string _name) constant returns (string)
+    { return propertyValueOf[sha3(_name)]; }
 
     /* Described object can be consist of some another objects */
     address[] public componentList;
@@ -141,6 +175,21 @@ contract KObject is Knowledge {
 contract KProcess is Knowledge {
     /* Process constructor */
     function KProcess() Knowledge(PROCESS) {}
+
+    /**
+     * @dev Copy
+     */
+    function copy(address _owner) returns (Knowledge) {
+        var newProcess = new KProcess();
+
+        // Copy morphism components
+        for (uint i = 0; i < morphism.length; i += 1)
+            newProcess.append(get(i).copy(_owner));
+
+        // Delegate base process
+        newProcess.delegate(_owner);
+        return newProcess;
+    }
 
     /**
      * Morphism describe knowledge manipulation line

@@ -58,6 +58,7 @@ contract AgentStorage is Mortal {
 contract HumanAgentStorage is AgentStorage {
     /* Thesaurus interface for knowledge base */
     Thesaurus.Index thesaurus;
+	using Thesaurus for Thesaurus.Index;
     
     function thesaurusLength() constant returns (uint)
     { return thesaurus.thesaurus.length; }
@@ -71,16 +72,15 @@ contract HumanAgentStorage is AgentStorage {
 	 * @param _name knowledge name
 	 * @param _knowledge knowledge address
      */
-    function appendKnowledgeByName(string _name, Knowledge _knowledge) {
+    function appendKnowledgeByName(string _name, Knowledge _knowledge) onlyOwner {
         appendKnowledge(_knowledge);
         
-        var replaced = Thesaurus.set(thesaurus, _name, _knowledge);
+        var replaced = thesaurus.set(_name, _knowledge);
         /* Knowledge with same name already exist */
         if (replaced != Knowledge(0x0))
             removeKnowledge(replaced);
     }
     
-    function getKnowledgeByName(string _name) constant returns (Knowledge) {
-        return Thesaurus.get(thesaurus, _name);
-    }
+    function getKnowledgeByName(string _name) constant returns (Knowledge)
+	{ return thesaurus.get(_name); }
 }
