@@ -1,5 +1,5 @@
-import 'core.sol';
 import 'token.sol';
+import 'agent_storage.sol';
 
 contract ThesaurusPoll is Mortal {
     /* Operating agent storage with thesaurus */
@@ -16,9 +16,7 @@ contract ThesaurusPoll is Mortal {
     }
 
     /* Mapping for fast term access */
-    mapping (string => Term) termOf;
-
-    modifier termExist (string _termName) { if (termOf[_termName]) _ }
+    mapping(string => Term) termOf;
 
     using AddressArray for address[];
 
@@ -27,11 +25,11 @@ contract ThesaurusPoll is Mortal {
      *      to high vote results
      * @param _termName the name of calc term
      */
-    function kingOfMountain(string _termName) private {
+    function kingOfMountain(string _termName) internal {
         var term = termOf[_termName];
 
         // Search the high voter
-        var highVoter = voters[0];
+        var highVoter = term.voters[0];
         for (uint i = 0; i < term.voters.length; i += 1) {
             var voter = term.voters[i];
             if (term.shareOf[voter] > term.shareOf[highVoter])
@@ -41,7 +39,7 @@ contract ThesaurusPoll is Mortal {
 
         // Check for knowledge already set
         if (agentStorage.getKnowledgeByName(_termName) != highKnowledge)
-            agentStorage.appendKnowledgeByName(_termName, highKnowledge.copy(this));
+            agentStorage.appendKnowledgeByName(_termName, highKnowledge);
     }
 
     function ThesaurusPoll(HumanAgentStorage _has, Token _shares) {
@@ -54,9 +52,11 @@ contract ThesaurusPoll is Mortal {
      * @param _termName name of term
      * @param _poll knowledge presents given term
      * @param _shares how much shares given for increase
+     * @notice Given knownledge should be `finalized`
      */
-    function pollUp(string _termName, Knowledge _poll, uint _shares)
-            termExist(_termName) {
+    function pollUp(string _termName, Knowledge _poll, uint _shares) {
+        if (!_poll.isFinalized()) throw;
+
         var voter = msg.sender;
         var term = termOf[_termName];
 
@@ -83,7 +83,7 @@ contract ThesaurusPoll is Mortal {
      * @param _termName name of term
      * @param _shares count of shares
      */
-    function pollDown(string _termName, uint _shares) termExist(_termName) {
+    function pollDown(string _termName, uint _shares) {
         var voter = msg.sender;
         var term = termOf[_termName];
 

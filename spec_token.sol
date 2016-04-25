@@ -18,7 +18,5 @@ contract SpecToken is Token {
      * @param _spec is a knowledge which present single token value 
      */
     function SpecToken(string _name, string _symbol, Knowledge _spec)
-        Token(_name, _symbol) {
-		specification = _spec;
-    }
+        Token(_name, _symbol) { specification = _spec; }
 }

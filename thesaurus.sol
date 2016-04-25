@@ -3,7 +3,7 @@ import 'common.sol';
 /**
  * Knowledge is a generic declaration of object or process
  */
-contract Knowledge is Mortal {
+contract Knowledge is Mortal, Finalable {
     /* Knowledge can have a type described below */
     int8 constant OBJECT  = 1;
     int8 constant PROCESS = 2;
@@ -13,12 +13,6 @@ contract Knowledge is Mortal {
 
     function Knowledge(int8 _type)
     { knowledgeType = _type; }
-
-    /**
-     * @dev Copy knowledge
-     * @param _owner is a owner of copyed knowledge
-     */
-    function copy(address _owner) returns (Knowledge);
 
     /**
      * Generic Knowledge comparation procedure
@@ -50,28 +44,6 @@ contract KObject is Knowledge {
     /* Object constructor */
     function KObject() Knowledge(OBJECT) {}
 
-    /**
-     * @dev Copy object and delegate to another address
-     * @param _owner owner of copyed object
-     */
-    function copy(address _owner) returns (Knowledge) {
-        var newObject = new KObject();
-
-        // Copy properties
-        for (uint i = 0; i < propertyList.length; i += 1) {
-            var name = propertyList[i];
-            newObject.insertProperty(name, propertyValueOf[sha3(name)]); 
-        }
-
-        // Copy components
-        for (uint i = 0; i < componentList.length; i += 1)
-            newObject.appendComponent(getComponent(i).copy(_owner));
-
-        // Delegate base object
-        newObject.delegate(_owner);
-        return newObject;
-    }
-
     /* List of object property names */
     string[] public propertyList;
 
@@ -89,7 +61,7 @@ contract KObject is Knowledge {
      * @param _name name of property
      * @param _value property value
      */
-    function insertProperty(string _name, string _value) onlyOwner {
+    function insertProperty(string _name, string _value) onlyOwner finalized {
         var nameHash = sha3(_name);
         // Check for inserting new property
         if (propertyHashOf[nameHash] == 0)
@@ -113,7 +85,7 @@ contract KObject is Knowledge {
     function componentLength() constant returns (uint)
     { return componentList.length; }
 
-    function appendComponent(KObject _component) onlyOwner
+    function appendComponent(KObject _component) onlyOwner finalized
     { componentList.push(_component); }
     
     function getComponent(uint _index) returns (KObject)
@@ -177,21 +149,6 @@ contract KProcess is Knowledge {
     function KProcess() Knowledge(PROCESS) {}
 
     /**
-     * @dev Copy
-     */
-    function copy(address _owner) returns (Knowledge) {
-        var newProcess = new KProcess();
-
-        // Copy morphism components
-        for (uint i = 0; i < morphism.length; i += 1)
-            newProcess.append(get(i).copy(_owner));
-
-        // Delegate base process
-        newProcess.delegate(_owner);
-        return newProcess;
-    }
-
-    /**
      * Morphism describe knowledge manipulation line
      * e.g. apple production have a morphism with 
      * three objects: Ground -> AppleTree -> Apple
@@ -208,7 +165,7 @@ contract KProcess is Knowledge {
      * Append knowledge into line
      * @param _knowledge new item of `morphism` list
      */
-    function append(Knowledge _knowledge) onlyOwner
+    function append(Knowledge _knowledge) onlyOwner finalized
     { morphism.push(_knowledge); }
     
     /**
@@ -216,7 +173,7 @@ contract KProcess is Knowledge {
      * @param _position new item position
      * @param _knowledge new item value
      */
-    function insert(uint _position, Knowledge _knowledge) onlyOwner
+    function insert(uint _position, Knowledge _knowledge) onlyOwner finalized
     { morphism.insert(_position, _knowledge); }
 
     /**

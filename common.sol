@@ -28,15 +28,31 @@ contract Owned {
 }
 
 /**
- * Contract for objects that can be morder
+ * @title Contract for objects that can be morder
  */
 contract Mortal is Owned {
     /**
-	 * @dev Destroy contract and scrub a data
+     * @dev Destroy contract and scrub a data
      * @notice Only owner can kill me
      */
     function kill() onlyOwner
     { suicide(owner); }
+}
+
+/**
+ * @title Contract can be frozed, e.g. specified functions (state changers)
+ *        can not be called in the future after call `froze` function
+ */
+contract Finalable {
+    bool public isFinalized = false;
+
+    /**
+     * @dev Change contract state to `frozen` state
+     * @notice `finalized` functions is unaccessable after call this
+     */
+    function froze() { isFinalized = true; }
+
+    modifier finalized { if (!isFinalized) _ }
 }
 
 /**
