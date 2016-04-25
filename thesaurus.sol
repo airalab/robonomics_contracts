@@ -3,7 +3,7 @@ import 'common.sol';
 /**
  * Knowledge is a generic declaration of object or process
  */
-contract Knowledge is Mortal {
+contract Knowledge is Mortal, Finalable {
     /* Knowledge can have a type described below */
     int8 constant OBJECT  = 1;
     int8 constant PROCESS = 2;
@@ -11,9 +11,8 @@ contract Knowledge is Mortal {
     /* Knowledge type is a int value */
     int public knowledgeType;
 
-    function Knowledge(int8 _type) {
-        knowledgeType = _type;
-    }
+    function Knowledge(int8 _type)
+    { knowledgeType = _type; }
 
     /**
      * Generic Knowledge comparation procedure
@@ -62,7 +61,7 @@ contract KObject is Knowledge {
      * @param _name name of property
      * @param _value property value
      */
-    function insertProperty(string _name, string _value) onlyOwner {
+    function insertProperty(string _name, string _value) onlyOwner finalized {
         var nameHash = sha3(_name);
         // Check for inserting new property
         if (propertyHashOf[nameHash] == 0)
@@ -73,13 +72,20 @@ contract KObject is Knowledge {
         propertyHashOf[nameHash]  = sha3(_value);
     }
 
+    /**
+     * @dev Get property by name
+     * @param _name property name
+     */
+    function getProperty(string _name) constant returns (string)
+    { return propertyValueOf[sha3(_name)]; }
+
     /* Described object can be consist of some another objects */
     address[] public componentList;
 
     function componentLength() constant returns (uint)
     { return componentList.length; }
 
-    function appendComponent(KObject _component) onlyOwner
+    function appendComponent(KObject _component) onlyOwner finalized
     { componentList.push(_component); }
     
     function getComponent(uint _index) returns (KObject)
@@ -159,7 +165,7 @@ contract KProcess is Knowledge {
      * Append knowledge into line
      * @param _knowledge new item of `morphism` list
      */
-    function append(Knowledge _knowledge) onlyOwner
+    function append(Knowledge _knowledge) onlyOwner finalized
     { morphism.push(_knowledge); }
     
     /**
@@ -167,7 +173,7 @@ contract KProcess is Knowledge {
      * @param _position new item position
      * @param _knowledge new item value
      */
-    function insert(uint _position, Knowledge _knowledge) onlyOwner
+    function insert(uint _position, Knowledge _knowledge) onlyOwner finalized
     { morphism.insert(_position, _knowledge); }
 
     /**
@@ -196,7 +202,8 @@ library Thesaurus {
         string [] thesaurus;
 
         /* Mapping to knowledge from name */
-        mapping (bytes32 => Knowledge) knowledgeOf;
+        mapping(bytes32 => Knowledge) knowledgeOf;
+        mapping(address => string)    nameOf;
     }
 
     /**
@@ -211,6 +218,7 @@ library Thesaurus {
         if (replaced == Knowledge(0x0))
             _ix.thesaurus[_ix.thesaurus.length++] = _name;
         _ix.knowledgeOf[nameHash] = _knowledge;
+        _ix.nameOf[_knowledge] = _name;
         return replaced;
     }
  

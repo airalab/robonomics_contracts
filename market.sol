@@ -73,14 +73,21 @@ contract Lot is Mortal {
 contract Market is Mortal {
     /* Market name */
     string public name;
-    
+ 
+	/* Market constructor */
+    function Market(string _name)
+    { name = _name; }
+ 
     /* Available market lots */
     address[] public lots;
     using AddressArray for address[];
 
-    /* Market constructor */
-    function Market(string _name)
-    { name = _name; }
+	/**
+	 * @dev Market size getter
+	 * @return count of lots
+	 */
+	function size() constant returns (uint)
+	{ return lots.length; }
 
     /*
      * The lot on market manipulations
@@ -133,47 +140,5 @@ contract Market is Mortal {
                     best = lot;
         }
         return best;
-    }
-}
-
-/**
- * @title Very usefull abstract contract
- *        presents autonomous agent that use the market and self created tokens
- */
-contract MarketAgent {
-    /* The current agent token */
-    Token  public getToken;
-    /* The public token used by agent */
-    Token  public getPublicToken;
-    /* The market that used by agent */
-    Market public getMarket;
-
-    /**
-     * @dev Market agent is a contract that have a associated market,
-     *      self token and public token for market trading
-     * @param _publicToken token used by market trading (e.g. DAO token)
-     * @param _market market address for trading (e.g. DAO market)
-     */
-    function MarketAgent(Token _publicToken, Market _market) {
-        getPublicToken = _publicToken;
-        getMarket      = _market;
-        /* Making the internal token */
-        makeToken();
-    }
-
-    function makeToken() internal;
-
-    /**
-     * @dev Place a Lot on market with price in public tokens
-     * @param _value amount of tokens to sell
-     * @param _price how many public tokens need for one saled
-     */
-    function placeLot(uint _value, uint _price) internal {
-        /* Make lot with given value and price */
-        var lot = new Lot(getToken, getPublicToken, _value, _price);
-        /* Approve lot to sell */
-        getToken.approve(lot, _value);
-        /* Register lot on the market */
-        getMarket.appendLot(lot);
     }
 }
