@@ -33,11 +33,11 @@ contract MarketAgent is Mortal {
         // Check knowledge consistence
         var spec = agentStorage.getKnowledgeByName(_name);
         if (!spec.isEqual(_token.specification()))
-            return Lot(0);
+            throw;
 
         // Check traded token balance
         if (_token.getBalance(msg.sender) < _value)
-            return Lot(0);
+            throw;
 
         // Transfer traded token for self and approve credits
         _token.transferFrom(msg.sender, this, _value);
@@ -51,28 +51,11 @@ contract MarketAgent is Mortal {
     }
 
     /**
-     * @dev Take a best deal from market with knowledge term check
-     * @param _name traded item term name
-     * @param _token items for the search
-     * @param _value how much items 
-     */
-    function bestDeal(string _name, SpecToken _token, uint _value) constant
-            returns (Lot) {
-        // Check knowledge consistence
-        var spec = agentStorage.getKnowledgeByName(_name);
-        if (!spec.isEqual(_token.specification()))
-            return Lot(0);
-
-        // Search best deal on market
-        return market.bestDeal(_token, credits, _value);
-    }
-
-    /**
      * @dev Get market lot with traded item name
      * @param _index lot position
      * @return traded item description, lot address
      */
-    function marketGet(uint _index) returns (Knowledge, Lot) {
+    function marketGet(uint _index) constant returns (Knowledge, Lot) {
         if (_index >= market.size()) throw;
 
         var lot = Lot(market.lots(_index));
