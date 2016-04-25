@@ -202,7 +202,8 @@ library Thesaurus {
         string [] thesaurus;
 
         /* Mapping to knowledge from name */
-        mapping (bytes32 => Knowledge) knowledgeOf;
+        mapping(bytes32 => Knowledge) knowledgeOf;
+        mapping(address => string)    nameOf;
     }
 
     /**
@@ -217,6 +218,7 @@ library Thesaurus {
         if (replaced == Knowledge(0x0))
             _ix.thesaurus[_ix.thesaurus.length++] = _name;
         _ix.knowledgeOf[nameHash] = _knowledge;
+        _ix.nameOf[_knowledge] = _name;
         return replaced;
     }
  
