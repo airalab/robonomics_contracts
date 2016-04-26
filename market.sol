@@ -71,74 +71,43 @@ contract Lot is Mortal {
  * @title Token based market contract
  */
 contract Market is Mortal {
-    /* Market name */
-    string public name;
- 
-	/* Market constructor */
-    function Market(string _name)
-    { name = _name; }
- 
     /* Available market lots */
     address[] public lots;
     using AddressArray for address[];
 
-	/**
-	 * @dev Market size getter
-	 * @return count of lots
-	 */
-	function size() constant returns (uint)
-	{ return lots.length; }
-
-    /*
-     * The lot on market manipulations
+    /**
+     * @dev Market size getter
+     * @return count of lots
      */
+    function size() constant returns (uint)
+    { return lots.length; }
 
     /**
      * @dev Append new lot into market lot list
      * @param _lot new market lot
      */
-    function appendLot(Lot _lot)
-    { lots.push(_lot); }
- 
-    /**
-     * @dev Remove lot by address from market lot list
-     * @param _lot market lot address
-     */
-    function removeLot(Lot _lot) {
-        if (_lot.seller() == msg.sender) {
-            var index = lots.indexOf(_lot);
-            lots.remove(index);
-        }
-    }
-
-    /*
-     * Client public methods
-     */
-    /**
-     * @dev Take a best lot for given sale and buy tokens with minimal value
-     * @notice The best lot is a cheapest lot
-     * @param _buy the token to buy
-     * @param _sell the token to sell
-     * @param _value amount of tokens to buy
-     * @return market lot address or zero if not found
-     */
-    function bestDeal(Token _buy, Token _sell, uint _value) constant returns (Lot) {
-        Lot best = Lot(0);
-
-        /* Step over all lots */
+    function append(Lot _lot) {
+        // Lot list scrub before pushing
         for (uint i = 0; i < lots.length; i += 1) {
             var lot = Lot(lots[i]);
             /* Drop closed lots from array */
             if (lot.closed()) {
                 lots.remove(i);
-                continue;
+                i -= 1;
             }
-            /* So the lot is candidate to best if token and value suit */
-            if (lot.sale() == _buy && lot.buy() == _sell && lot.value() >= _value)
-                /* Best price - low price */
-                if (best == Lot(0) || best.price() > lot.price())
-                    best = lot;
         }
-        return best;
+        // Push a new lot into list
+        lots.push(_lot);
+    }
+ 
+    /**
+     * @dev Remove lot by address from market lot list
+     * @param _lot market lot address
+     */
+    function remove(Lot _lot) {
+        if (_lot.seller() == msg.sender) {
+            var index = lots.indexOf(_lot);
+            lots.remove(index);
+        }
     }
 }

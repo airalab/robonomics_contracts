@@ -131,10 +131,11 @@ contract Token is Mortal {
      * @param _value amount of token values for approving
      */
     function approve(address _address, uint _value)
-    { token.approveOf[msg.sender][_address] = _value; }
+    { token.approveOf[msg.sender][_address] += _value; }
 
     /**
-     * @dev Synonym for approve(_address, 0)
+     * @dev Reset count of tokens approved for given address
+     * @param _address target address
      */
     function unapprove(address _address)
     { token.approveOf[msg.sender][_address] = 0; }
