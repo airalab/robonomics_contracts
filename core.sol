@@ -2,9 +2,9 @@ import 'agent_storage.sol';
 
 /**
  * @title The DAO core contract basicaly describe the organisation and contain:
- *		  agent storage,
- *		  infrastructure nodes,
- *		  contract templates
+ *          agent storage,
+ *          infrastructure nodes,
+ *          contract templates
  */
 contract Core is Mortal {
     /* DAO configuration */
@@ -69,7 +69,7 @@ contract Core is Mortal {
 
     /**
      * @dev Interface storage
-     *		the contract interface contains source URI
+     *      the contract interface contains source URI
      */
     mapping (address => string) public interfaceOf;
 

@@ -1,4 +1,5 @@
 import 'token.sol';
+import 'voting.sol';
 import 'agent_storage.sol';
 
 contract ThesaurusPoll is Mortal {
@@ -8,90 +9,66 @@ contract ThesaurusPoll is Mortal {
     /* Government shares */
     Token shares;
 
-    /* Thesaurus term voting structure */
-    struct Term {
-        address[]                     voters;
-        mapping(address => uint)      shareOf;
-        mapping(address => Knowledge) pollOf;
-    }
-
     /* Mapping for fast term access */
-    mapping(string => Term) termOf;
+    mapping(string => Voting.Poll) termOf;
 
-    using AddressArray for address[];
-
+    /* Use Voting library */
+    using Voting for Voting.Poll;
+    
     /**
-     * @dev Calc poll of target term and set thesaurus according
-     *      to high vote results
-     * @param _termName the name of calc term
+     * @dev ThesaurusPoll construction
      */
-    function kingOfMountain(string _termName) internal {
-        var term = termOf[_termName];
-
-        // Search the high voter
-        var highVoter = term.voters[0];
-        for (uint i = 0; i < term.voters.length; i += 1) {
-            var voter = term.voters[i];
-            if (term.shareOf[voter] > term.shareOf[highVoter])
-                highVoter = voter;
-        }
-        var highKnowledge = term.pollOf[highVoter];
-
-        // Check for knowledge already set
-        if (agentStorage.getKnowledgeByName(_termName) != highKnowledge)
-            agentStorage.appendKnowledgeByName(_termName, highKnowledge);
-    }
-
     function ThesaurusPoll(HumanAgentStorage _has, Token _shares) {
         agentStorage = _has;
         shares = _shares;
     }
 
     /**
-     * @dev Increase poll for given term
-     * @param _termName name of term
-     * @param _poll knowledge presents given term
-     * @param _shares how much shares given for increase
-     * @notice Given knownledge should be `finalized`
+     * @dev Calc poll of target term and set thesaurus according
+     *      to high vote results
+     * @param _termName the name of calc term
      */
-    function pollUp(string _termName, Knowledge _poll, uint _shares) {
-        if (!_poll.isFinalized()) throw;
-
-        var voter = msg.sender;
+    function updateThesaurus(string _termName) internal {
         var term = termOf[_termName];
 
-        // Check shares balance
-        if (shares.getBalance(voter) < _shares) throw;
+        // Check for knowledge already set
+        var current = Knowledge(term.current);
+        if (agentStorage.getKnowledgeByName(_termName) != current)
+            agentStorage.appendKnowledgeByName(_termName, current);
+    }
 
-        // Transfer from voter to self
-        shares.transferFrom(voter, this, _shares);
+    /**
+     * @dev Increase poll for given term
+     * @param _termName name of term
+     * @param _value knowledge presents given term
+     * @param _count how much shares given for increase
+     * @notice Given knownledge should be delegated to me
+     */
+    function pollUp(string _termName, Knowledge _value, uint _count) {
+        // So throw when knowledge is not my 
+        if (_value.owner() != address(this)) return;
 
-        // Increase shares and set the poll
-        term.shareOf[voter] += _shares;
-        term.pollOf[voter]   = _poll;
+        // Poll up given term name
+        var voter = msg.sender;
+        var term = termOf[_termName];
+        term.up(voter, _value, shares, _count);
 
-        // Append voter if not in list for selected term
-        if (term.voters.indexOf(voter) >= term.voters.length)
-            term.voters.push(voter);
-
-        // Call high knowledge calc procedure
-        kingOfMountain(_termName);
+        // Update thesaurus
+        updateThesaurus(_termName);
     }
 
     /**
      * @dev Decrease shares for given term
      * @param _termName name of term
-     * @param _shares count of shares
+     * @param _count count of refunded shares
      */
-    function pollDown(string _termName, uint _shares) {
+    function pollDown(string _termName, uint _count) {
+        // Poll down given term name
         var voter = msg.sender;
         var term = termOf[_termName];
+        term.down(voter, shares, _count);
 
-        var refund = term.shareOf[voter] > _shares ? _shares : term.shareOf[voter];
-
-        shares.transfer(voter, refund);
-        term.shareOf[voter] -= refund;
-
-        kingOfMountain(_termName);
+        // Update thesaurus
+        updateThesaurus(_termName);
     }
 }

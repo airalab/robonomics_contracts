@@ -16,7 +16,7 @@ contract EtherToken is Token {
 
     /**
      * @dev This is the way to withdraw money from token
-	 * @param _value how many tokens withdraw from balance
+     * @param _value how many tokens withdraw from balance
      */
     function withdraw(uint _value) {
         if (token.balanceOf[msg.sender] >= _value) {

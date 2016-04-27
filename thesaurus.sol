@@ -3,7 +3,7 @@ import 'common.sol';
 /**
  * Knowledge is a generic declaration of object or process
  */
-contract Knowledge is Mortal, Finalable {
+contract Knowledge is Owned {
     /* Knowledge can have a type described below */
     int8 constant OBJECT  = 1;
     int8 constant PROCESS = 2;
@@ -61,7 +61,7 @@ contract KObject is Knowledge {
      * @param _name name of property
      * @param _value property value
      */
-    function insertProperty(string _name, string _value) onlyOwner finalized {
+    function insertProperty(string _name, string _value) onlyOwner {
         var nameHash = sha3(_name);
         // Check for inserting new property
         if (propertyHashOf[nameHash] == 0)
@@ -85,7 +85,7 @@ contract KObject is Knowledge {
     function componentLength() constant returns (uint)
     { return componentList.length; }
 
-    function appendComponent(KObject _component) onlyOwner finalized
+    function appendComponent(KObject _component) onlyOwner
     { componentList.push(_component); }
     
     function getComponent(uint _index) returns (KObject)
@@ -165,7 +165,7 @@ contract KProcess is Knowledge {
      * Append knowledge into line
      * @param _knowledge new item of `morphism` list
      */
-    function append(Knowledge _knowledge) onlyOwner finalized
+    function append(Knowledge _knowledge) onlyOwner
     { morphism.push(_knowledge); }
     
     /**
@@ -173,7 +173,7 @@ contract KProcess is Knowledge {
      * @param _position new item position
      * @param _knowledge new item value
      */
-    function insert(uint _position, Knowledge _knowledge) onlyOwner finalized
+    function insert(uint _position, Knowledge _knowledge) onlyOwner
     { morphism.insert(_position, _knowledge); }
 
     /**
