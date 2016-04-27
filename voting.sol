@@ -15,7 +15,7 @@ library Voting {
     }
 
     using AddressArray for address[];
-	using Voting for Poll;
+    using Voting for Poll;
 
     /**
      * @dev Calc poll of target and set current according

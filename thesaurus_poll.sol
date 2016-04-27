@@ -32,7 +32,7 @@ contract ThesaurusPoll is Mortal {
         var term = termOf[_termName];
 
         // Check for knowledge already set
-		var current = Knowledge(term.current);
+        var current = Knowledge(term.current);
         if (agentStorage.getKnowledgeByName(_termName) != current)
             agentStorage.appendKnowledgeByName(_termName, current);
     }

@@ -96,7 +96,7 @@ contract DAOMarketRegulator is MarketRegulator {
 
     /* The rule poll by asset address */
     mapping(address => Voting.Poll) ruleOf;
-	using Voting for Voting.Poll;
+    using Voting for Voting.Poll;
     
     function MarketRegulator(Token _shares, HumanAgentStorage _thesaurus) {
         shares    = _shares;
@@ -141,7 +141,7 @@ contract DAOMarketRegulator is MarketRegulator {
      * @param _count how much shares given for increase
      */
     function pollUp(Knowledge _asset, MarketRule _rule, uint _count)
-	{ ruleOf[_asset].up(msg.sender, _rule, shares, _count); }
+    { ruleOf[_asset].up(msg.sender, _rule, shares, _count); }
 
     /**
      * @dev Decrease poll for given asset
@@ -149,7 +149,7 @@ contract DAOMarketRegulator is MarketRegulator {
      * @param _count count of refunded shares
      */
     function pollDown(Knowledge _asset, uint _count)
-	{ ruleOf[_asset].down(msg.sender, shares, _count); }
+    { ruleOf[_asset].down(msg.sender, shares, _count); }
 }
 
 contract DAOMarketAgent is MarketAgent {
@@ -223,7 +223,7 @@ contract DAOMarketAgent is MarketAgent {
 
         // Transfer buy value for the lot
         if (!_lot.buy().transferFrom(msg.sender, this, buyValue))
-			return false;
+            return false;
         _lot.buy().approve(_lot, buyValue);
 
         // Try the deal
