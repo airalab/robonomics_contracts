@@ -42,11 +42,11 @@ contract ThesaurusPoll is Mortal {
      * @param _termName name of term
      * @param _value knowledge presents given term
      * @param _count how much shares given for increase
-     * @notice Given knownledge should be `finalized`
+     * @notice Given knownledge should be delegated to me
      */
     function pollUp(string _termName, Knowledge _value, uint _count) {
-        // So throw when knowledge is not finalized 
-        if (!_value.isFinalized()) throw;
+        // So throw when knowledge is not my 
+        if (_value.owner() != address(this)) return;
 
         // Poll up given term name
         var voter = msg.sender;

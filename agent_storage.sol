@@ -24,7 +24,6 @@ contract AgentStorage is Mortal {
     function removeKnowledge(Knowledge _knowledge) onlyOwner {
         var index = knowledges.indexOf(_knowledge);
         if (index < knowledges.length) {
-            Knowledge(knowledges[index]).kill();
             knowledges.remove(index);
         }
     }
