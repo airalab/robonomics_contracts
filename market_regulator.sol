@@ -98,7 +98,7 @@ contract DAOMarketRegulator is MarketRegulator {
     mapping(address => Voting.Poll) ruleOf;
     using Voting for Voting.Poll;
     
-    function MarketRegulator(Token _shares, HumanAgentStorage _thesaurus) {
+    function DAOMarketRegulator(Token _shares, HumanAgentStorage _thesaurus) {
         shares    = _shares;
         thesaurus = _thesaurus;
     }
