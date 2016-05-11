@@ -1,10 +1,13 @@
-all: doc/Core-API.md doc/Market-API.md doc/Thesaurus-API.md
+all:
+	npm install
 
-doc/Core-API.md: core.sol 
+docs: doc/Core-API.md doc/Market-API.md doc/Thesaurus-API.md
+
+doc/Core-API.md: sol/dao/Core.sol 
 	solc --fulldoc $^ | docsol.py > $@
 
-doc/Market-API.md: market_regulator.sol 
+doc/Market-API.md: sol/dao/DAOMarketRegulator.sol 
 	solc --fulldoc $^ | docsol.py > $@
 
-doc/Thesaurus-API.md: thesaurus_poll.sol
+doc/Thesaurus-API.md: sol/dao/DAOKnowledgeStorage.sol
 	solc --fulldoc $^ | docsol.py > $@

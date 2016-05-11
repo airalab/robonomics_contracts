@@ -1,0 +1,32 @@
+{
+  "name": "aira-core",
+  "version": "0.4.0",
+  "description": "AIRALab DAO core",
+  "dependencies": {
+    "solc": "0.2.2-2",
+    "recursive-readdir": "",
+    "string-template": ""
+  },
+  "directories": {
+    "doc": "doc"
+  },
+  "main": "index.js",
+  "bin": { "aira": "./aira.js" }, 
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/airalab/core.git"
+  },
+  "keywords": [
+    "DAO",
+    "Ethereum"
+  ],
+  "author": "airalab",
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/airalab/core/issues"
+  },
+  "homepage": "https://github.com/airalab/core#readme"
+}

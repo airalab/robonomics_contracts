@@ -1,4 +1,4 @@
-import 'token.sol';
+import 'token/Token.sol';
 
 /**
  * @title Token lot for market
@@ -65,49 +65,4 @@ contract Lot is Mortal {
      */
     function deal() returns (bool)
     { return deal(msg.sender); }
-}
-
-/**
- * @title Token based market contract
- */
-contract Market is Mortal {
-    /* Available market lots */
-    address[] public lots;
-    using AddressArray for address[];
-
-    /**
-     * @dev Market size getter
-     * @return count of lots
-     */
-    function size() constant returns (uint)
-    { return lots.length; }
-
-    /**
-     * @dev Append new lot into market lot list
-     * @param _lot new market lot
-     */
-    function append(Lot _lot) {
-        // Lot list scrub before pushing
-        for (uint i = 0; i < lots.length; i += 1) {
-            var lot = Lot(lots[i]);
-            /* Drop closed lots from array */
-            if (lot.closed()) {
-                lots.remove(i);
-                i -= 1;
-            }
-        }
-        // Push a new lot into list
-        lots.push(_lot);
-    }
- 
-    /**
-     * @dev Remove lot by address from market lot list
-     * @param _lot market lot address
-     */
-    function remove(Lot _lot) {
-        if (_lot.seller() == msg.sender) {
-            var index = lots.indexOf(_lot);
-            lots.remove(index);
-        }
-    }
 }

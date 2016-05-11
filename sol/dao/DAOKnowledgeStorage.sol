@@ -1,26 +1,21 @@
-import 'token.sol';
-import 'voting.sol';
-import 'agent_storage.sol';
+import 'thesaurus/KnowledgeStorage.sol';
+import 'token/Token.sol';
+import 'lib/Voting.sol';
 
-contract ThesaurusPoll is Mortal {
+contract DAOKnowledgeStorage is Mortal {
     /* Operating agent storage with thesaurus */
-    HumanAgentStorage agentStorage;
+    KnowledgeStorage public thesaurus;
 
     /* Government shares */
-    Token shares;
+    Token public shares;
 
     /* Mapping for fast term access */
     mapping(string => Voting.Poll) termOf;
-
-    /* Use Voting library */
     using Voting for Voting.Poll;
     
-    /**
-     * @dev ThesaurusPoll construction
-     */
-    function ThesaurusPoll(HumanAgentStorage _has, Token _shares) {
-        agentStorage = _has;
-        shares = _shares;
+    function DAOKnowledgeStorage(Token _shares) {
+        thesaurus = new KnowledgeStorage();
+        shares    = _shares;
     }
 
     /**
@@ -28,13 +23,13 @@ contract ThesaurusPoll is Mortal {
      *      to high vote results
      * @param _termName the name of calc term
      */
-    function updateThesaurus(string _termName) internal {
+    function update(string _termName) internal {
         var term = termOf[_termName];
 
         // Check for knowledge already set
         var current = Knowledge(term.current);
-        if (agentStorage.getKnowledgeByName(_termName) != current)
-            agentStorage.appendKnowledgeByName(_termName, current);
+        if (thesaurus.getByName(_termName) != current)
+            thesaurus.set(_termName, current);
     }
 
     /**
@@ -53,8 +48,8 @@ contract ThesaurusPoll is Mortal {
         var term = termOf[_termName];
         term.up(voter, _value, shares, _count);
 
-        // Update thesaurus
-        updateThesaurus(_termName);
+        // Update thesaurus term
+        update(_termName);
     }
 
     /**
@@ -68,7 +63,7 @@ contract ThesaurusPoll is Mortal {
         var term = termOf[_termName];
         term.down(voter, shares, _count);
 
-        // Update thesaurus
-        updateThesaurus(_termName);
+        // Update thesaurus term
+        update(_termName);
     }
 }

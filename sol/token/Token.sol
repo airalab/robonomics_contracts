@@ -1,40 +1,25 @@
-import 'common.sol';
+import 'common/Mortal.sol';
 
 /**
  * @title Token contract represents any asset in digital economy
  */
 contract Token is Mortal {
-    struct Config {
-        /* Short description of token */
-        string name;
-        string symbol;
-        /* Total count of tokens exist */
-        uint total;
-        /* Token approvement system */
-        mapping (address => uint) balanceOf;
-        mapping (address => mapping (address => uint)) approveOf;
-    }
+    /* Short description of token */
+    string public name;
+    string public symbol;
 
-    Config token;
- 
-    /* Public token getters */
-    function getName() constant returns (string)
-    { return token.name; }
- 
-    function getSymbol() constant returns (string)
-    { return token.symbol; }
-
-    /**
-     * @return amount of token values are emitted
-     */
-    function getTotalSupply() constant returns (uint)
-    { return token.total; }
+    /* Total count of tokens exist */
+    uint public totalSupply;
+    
+    /* Token approvement system */
+    mapping(address => uint) public balanceOf;
+    mapping(address => mapping (address => uint)) public approveOf;
  
     /**
      * @return available balance of `sender` account (self balance)
      */
     function getBalance() constant returns (uint)
-    { return token.balanceOf[msg.sender]; }
+    { return balanceOf[msg.sender]; }
  
     /**
      * @dev This method returns non zero result when sender is approved by
@@ -43,9 +28,9 @@ contract Token is Mortal {
      * @return available for `sender` balance of given address
      */
     function getBalance(address _address) constant returns (uint) {
-        return token.approveOf[_address][msg.sender]
-             > token.balanceOf[_address] ? token.balanceOf[_address]
-                                         : token.approveOf[_address][msg.sender];
+        return approveOf[_address][msg.sender]
+             > balanceOf[_address] ? balanceOf[_address]
+                                   : approveOf[_address][msg.sender];
     }
  
     /**
@@ -53,12 +38,12 @@ contract Token is Mortal {
      * @dev Synonym for getBalance(address _address)
      */
     function isApproved(address _address) constant returns (bool)
-    { return getBalance(_address) > 0; }
+    { return approveOf[_address][msg.sender] > 0; }
 
     /* Token constructor */
     function Token(string _name, string _symbol) {
-        token.name   = _name;
-        token.symbol = _symbol;
+        name   = _name;
+        symbol = _symbol;
     }
     
     /*
@@ -71,8 +56,8 @@ contract Token is Mortal {
      * @notice owner balance will be increased by `_value`
      */
     function emission(uint _value) onlyOwner {
-        token.total            += _value;
-        token.balanceOf[owner] += _value;
+        totalSupply      += _value;
+        balanceOf[owner] += _value;
     }
  
     /**
@@ -81,9 +66,9 @@ contract Token is Mortal {
      * @notice owner balance will be decreased by `_value`
      */
     function burn(uint _value) onlyOwner {
-        if (token.balanceOf[owner] >= _value) {
-            token.balanceOf[owner] -= _value;
-            token.total            -= _value;
+        if (balanceOf[owner] >= _value) {
+            balanceOf[owner] -= _value;
+            totalSupply      -= _value;
         }
     }
 
@@ -99,9 +84,9 @@ contract Token is Mortal {
      * @return `true` when transfer done
      */
     function transfer(address _to, uint _value) returns (bool) {
-        if (token.balanceOf[msg.sender] >= _value) {
-            token.balanceOf[msg.sender] -= _value;
-            token.balanceOf[_to]        += _value;
+        if (balanceOf[msg.sender] >= _value) {
+            balanceOf[msg.sender] -= _value;
+            balanceOf[_to]        += _value;
             return true;
         }
         return false;
@@ -116,10 +101,13 @@ contract Token is Mortal {
      * @return `true` when transfer is done
      */
     function transferFrom(address _from, address _to, uint _value) returns (bool) {
-        if (getBalance(_from) >= _value) {
-            token.approveOf[_from][msg.sender] -= _value;
-            token.balanceOf[_from] -= _value;
-            token.balanceOf[_to]   += _value;
+        var avail = approveOf[_from][msg.sender]
+                  > balanceOf[_from] ? balanceOf[_from]
+                                     : approveOf[_from][msg.sender];
+        if (avail >= _value) {
+            approveOf[_from][msg.sender] -= _value;
+            balanceOf[_from] -= _value;
+            balanceOf[_to]   += _value;
             return true;
         }
         return false;
@@ -131,12 +119,12 @@ contract Token is Mortal {
      * @param _value amount of token values for approving
      */
     function approve(address _address, uint _value)
-    { token.approveOf[msg.sender][_address] += _value; }
+    { approveOf[msg.sender][_address] += _value; }
 
     /**
      * @dev Reset count of tokens approved for given address
      * @param _address target address
      */
     function unapprove(address _address)
-    { token.approveOf[msg.sender][_address] = 0; }
+    { approveOf[msg.sender][_address] = 0; }
 }

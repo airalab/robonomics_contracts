@@ -1,4 +1,4 @@
-import 'common.sol';
+import 'common/Mortal.sol';
 
 contract ContractTemplate is Mortal {
     address promisor;

@@ -1,4 +1,5 @@
-import 'agent_storage.sol';
+import 'lib/AddressArray.sol';
+import 'common/Mortal.sol';
 
 /**
  * @title The DAO core contract basicaly describe the organisation and contain:
@@ -13,9 +14,6 @@ contract Core is Mortal {
         string  name;
         string  description;
         address founder;
-
-        /* DAO knowledge and active contracts storage */
-        AgentStorage agentStorage;
 
         /* DAO nodes */
         address[] nodes;
@@ -39,9 +37,6 @@ contract Core is Mortal {
 
     function getFounder() constant returns (address)
     { return dao.founder; }
-
-    function getStorage() constant returns (AgentStorage)
-    { return dao.agentStorage; }
 
     function getNodeLength() constant returns (uint)
     { return dao.nodes.length; }
@@ -71,14 +66,13 @@ contract Core is Mortal {
      * @dev Interface storage
      *      the contract interface contains source URI
      */
-    mapping (address => string) public interfaceOf;
+    mapping(address => string) public interfaceOf;
 
     /* DAO constructor */
     function Core(string _name, string _description) {
         dao.name         = _name;
         dao.description  = _description;
         dao.founder      = msg.sender;
-        dao.agentStorage = new AgentStorage();
     }
 
     /* Using the AddressArray library */

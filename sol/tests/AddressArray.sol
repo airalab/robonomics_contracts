@@ -1,4 +1,5 @@
-import 'unit.sol';
+import './UnitTests.sol';
+import 'lib/AddressArray.sol';
 
 contract InsertTest is TestCase {
     using AddressArray for address[];
@@ -48,7 +49,7 @@ contract FindTest is TestCase {
 
 contract ArrayTests is UnitTests {
     function ArrayTests() {
-        tests.push(new InsertTest());
-        tests.push(new FindTest());
+        testList.push(new InsertTest());
+        testList.push(new FindTest());
     }
 }

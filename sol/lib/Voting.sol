@@ -1,5 +1,5 @@
-import 'common.sol';
-import 'token.sol';
+import 'token/Token.sol';
+import './AddressArray.sol';
 
 library Voting {
     /* Voting structure */
@@ -15,7 +15,6 @@ library Voting {
     }
 
     using AddressArray for address[];
-    using Voting for Poll;
 
     /**
      * @dev Calc poll of target and set current according
@@ -55,7 +54,7 @@ library Voting {
             _poll.voters.push(_voter);
 
         // Calc poll king
-        _poll.kingOfMountain();
+        kingOfMountain(_poll);
     }
 
     /**
@@ -72,6 +71,6 @@ library Voting {
         _poll.shareOf[_voter] -= refund;
 
         // Calc poll king
-        _poll.kingOfMountain();
+        kingOfMountain(_poll);
     }
 }
