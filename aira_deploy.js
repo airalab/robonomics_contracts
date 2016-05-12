@@ -9,7 +9,7 @@ var mainsol  = __dirname + "/sol";
 var libsfile = __dirname + "/.libs.json";
 
 var argv = require('optimist')
-    .usage('Usage: $0 -I [DIRS] -C [NAME] -A [ARGUMENTS] [--rpc] [--library] --abi')
+    .usage('Usage: $0 -I [DIRS] -C [NAME] -A [ARGUMENTS] [--rpc] [--library] [--abi]')
     .default({I: '', A: '[]', rpc: 'http://localhost:8545'})
     .boolean(['library', 'abi'])
     .describe('I', 'Append source file dirs')
