@@ -9,9 +9,9 @@ var mainsol  = __dirname + "/sol";
 var libsfile = __dirname + "/.libs.json";
 
 var argv = require('optimist')
-    .usage('Usage: $0 -I [DIRS] -C [NAME] -A [ARGUMENTS] [--rpc] [--library]')
+    .usage('Usage: $0 -I [DIRS] -C [NAME] -A [ARGUMENTS] [--rpc] [--library] --abi')
     .default({I: '', A: '[]', rpc: 'http://localhost:8545'})
-    .boolean('library')
+    .boolean(['library', 'abi'])
     .describe('I', 'Append source file dirs')
     .describe('C', 'Contract name')
     .describe('A', 'Contract constructor arguments [JSON]')
@@ -30,11 +30,16 @@ aira.compiler.compile(soldirs, function(compiled){
     var bytecode = compiled[contract].bytecode;
     var linked_bytecode = aira.compiler.link(libsfile, bytecode);
     var interface = compiled[contract].interface.replace("\n", "");
-    aira.deploy(JSON.parse(interface), linked_bytecode, args, web3,
-            function(contract_address) {
-        console.log('Deployed: ' + contract_address);
-        if (argv.library) {
-            aira.compiler.reglib(libsfile, contract, contract_address);
-        }
-    });
+
+    if (argv.abi) {
+        console.log('var '+contract+' = '+interface+';');
+    } else {
+        aira.deploy(JSON.parse(interface), linked_bytecode, args, web3,
+                function(contract_address) {
+            console.log('Deployed: ' + contract_address);
+            if (argv.library) {
+                aira.compiler.reglib(libsfile, contract, contract_address);
+            }
+        });
+    }
 });
