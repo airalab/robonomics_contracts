@@ -34,6 +34,11 @@ contract Lot is Mortal {
         price  = _price;
         seller = msg.sender;
     }
+
+    /**
+     * @dev this event emitted when lot close
+     */
+    event DealDone();
     
     /**
      * @dev Lot deal method with buyer in argument
@@ -55,6 +60,9 @@ contract Lot is Mortal {
             // Store buyer and close lot
             buyer = _buyer;
             closed = true;
+
+            // Notify all for deal done
+            DealDone();
             return true;
         }
         return false;
