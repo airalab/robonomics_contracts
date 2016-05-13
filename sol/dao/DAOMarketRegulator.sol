@@ -17,7 +17,9 @@ contract DAOMarketRegulator is MarketRegulator {
     mapping(address => Voting.Poll) ruleOf;
     using Voting for Voting.Poll;
     
-    function DAOMarketRegulator(Token _shares, KnowledgeStorage _thesaurus) {
+    function DAOMarketRegulator(Token _shares, KnowledgeStorage _thesaurus,
+                                uint credit_emission)
+            MarketRegulator(credit_emission) {
         shares    = _shares;
         thesaurus = _thesaurus;
     }
@@ -29,13 +31,24 @@ contract DAOMarketRegulator is MarketRegulator {
     function sign() returns (MarketAgent) {
         // Make a new market agent
         var agent = new DAOMarketAgent(thesaurus);
+
         // Store agent address for the future usage
         agents.push(agent);
+
         // Delegate agent to sender
         agent.delegate(msg.sender);
+
+        // Notify client for the new agent
+        MarketAgentSign(msg.sender, agent);
+
         // Return agent address
         return agent;
     }
+
+    /**
+     * @dev this event emmitted for every trade based emission
+     */
+    event DealDoneEmission(uint _value);
 
     /**
      * @dev Deal done callback, market regulation is maked according 
@@ -43,13 +56,24 @@ contract DAOMarketRegulator is MarketRegulator {
      * @param _lot is deal description
      */
     function dealDone(Lot _lot) onlyAgents {
+        // Select the traded asset
         var assetToken = _lot.buy() == credits ? _lot.sale() : _lot.buy(); 
+
+        // Get asset specification
         var asset = TokenSpec(assetToken).specification();
+
+        // Select current trade rule for traded asset
         var rule = ruleOf[asset].current;
         if (rule != 0) {
+            // Get emission value based on current rule
             var emission = MarketRule(rule).getEmission(_lot); 
+
+            // Make emission and transfer to owner
             credits.emission(emission);
             credits.transfer(owner, emission);
+
+            // Notify for emission value
+            DealDoneEmission(emission);
         }
     }
 

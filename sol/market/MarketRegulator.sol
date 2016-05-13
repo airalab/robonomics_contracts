@@ -30,6 +30,13 @@ contract MarketRegulator is Mortal {
     }
 
     /**
+     * @dev this event emitted for every new MarketAgent
+     * @param _client is a client address
+     * @param _agent is an agent address
+     */
+    event MarketAgentSign(address indexed _client, address indexed _agent);
+
+    /**
      * @dev Sign a contract with sender for trading on market
      * @return `MarketAgent` instance
      */

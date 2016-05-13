@@ -8,6 +8,16 @@ import './Lot.sol';
  */
 contract MarketAgent is Mortal {
     /**
+     * @dev this event emitted for every lot placed on market
+     */
+    event LotPlaced(address indexed _lot);
+
+    /**
+     * @dev this event emitted for every lot deal done
+     */
+    event LotDeal(address indexed _lot);
+
+    /**
      * @dev Place lot on the market
      * @param _name traded item term name
      * @param _token traded token

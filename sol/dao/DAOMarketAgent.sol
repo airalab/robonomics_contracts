@@ -38,6 +38,9 @@ contract DAOMarketAgent is MarketAgent {
 
         // Approve lot in traded token for deal
         _token.approve(lot, _value);
+
+        // Notify the client
+        LotPlaced(lot);
         return lot;
     }
 
@@ -87,6 +90,9 @@ contract DAOMarketAgent is MarketAgent {
 
         // Notify the regulator
         regulator.dealDone(_lot);
+
+        // Notify the client
+        LotDeal(_lot);
         return true;
     }
 }
