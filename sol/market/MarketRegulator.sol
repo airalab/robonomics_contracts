@@ -22,11 +22,9 @@ contract MarketRegulator is Mortal {
     /* Only market agents can call modified functions */
     modifier onlyAgents { if (agents.indexOf(msg.sender) < agents.length) _ }
 
-    function MarketRegulator(uint credit_emission) {
+    function MarketRegulator(Token _credits) {
         market  = new Market();
-        credits = new Token("Credits", "C");
-        credits.emission(credit_emission);
-        credits.transfer(msg.sender, credit_emission);
+        credits = _credits;
     }
 
     /**
