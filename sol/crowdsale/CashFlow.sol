@@ -61,5 +61,5 @@ contract CashFlow is Mortal {
      */
     function fund(address _target)
     { Fund(_target,
-      itemOf[_target].fund(msg.sender, shares, credits)); }
+      itemOf[_target].fund(msg.sender, credits, shares)); }
 }
