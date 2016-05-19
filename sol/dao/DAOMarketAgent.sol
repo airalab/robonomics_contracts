@@ -21,7 +21,7 @@ contract DAOMarketAgent is MarketAgent {
     function put(string _name, TokenSpec _token,
                  uint _value,  uint _price) onlyOwner returns (Lot) {
         // Check knowledge consistence
-        var spec = thesaurus.getByName(_name);
+        var spec = thesaurus.get(_name);
         if (!spec.isEqual(_token.specification()))
             throw;
 
@@ -56,8 +56,8 @@ contract DAOMarketAgent is MarketAgent {
         var saleToken = TokenSpec(lot.sale());
         var saleSpec = saleToken.specification();
 
-        for (uint i = 0; i < thesaurus.size(); i += 1) {
-            var knowledge = thesaurus.get(i);
+        for (var knowledge = thesaurus.first(); address(knowledge) != 0;
+             knowledge = thesaurus.next(knowledge)) {
             if (knowledge.isEqual(saleSpec))
                 return (knowledge, lot);
         }

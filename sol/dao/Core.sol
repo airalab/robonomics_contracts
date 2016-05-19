@@ -1,4 +1,4 @@
-import 'lib/AddressArray.sol';
+import 'lib/AddressMap.sol';
 import 'common/Mortal.sol';
 
 /**
@@ -8,161 +8,113 @@ import 'common/Mortal.sol';
  *          contract templates
  */
 contract Core is Mortal {
-    /* DAO configuration */
-    struct Config {
-        /* Short description */
-        string  name;
-        string  description;
-        address founder;
+    /* Short description */
+    string  public name;
+    string  public description;
+    address public founder;
 
-        /* DAO nodes */
-        address[] nodes;
-        mapping (bytes32 => address) getNodeBy;
-        mapping (address => string)  getNodeNameBy;
-        
-        /* DAO templates */
-        address[] templates;
-        mapping (bytes32 => address) getTemplateBy;
-        mapping (address => string)  getTemplateNameBy;
+    /* Modules map */
+    AddressMap.Data modules;
+
+    /* Templates map */
+    AddressMap.Data templates;
+
+    /* Using libraries */
+    using AddressList for AddressList.Data;
+    using AddressMap for AddressMap.Data;
+ 
+    /* DAO constructor */
+    function Core(string _name, string _description) {
+        name         = _name;
+        description  = _description;
+        founder      = msg.sender;
     }
 
-    Config dao;
+    /**
+     * @dev Get module by name
+     * @param _name is module name
+     * @return module address
+     */
+    function getModule(string _name) constant returns (address)
+    { return modules.get(_name); }
 
-    /* Public getters */
-    function getName() constant returns (string)
-    { return dao.name; }
+    /**
+     * @dev Get first module
+     * @return first address
+     */
+    function firstModule() constant returns (address)
+    { return modules.items.head; }
 
-    function getDescription() constant returns (string)
-    { return dao.description; }
+    /**
+     * @dev Get next module
+     * @param _current is an current address
+     * @return next address
+     */
+    function nextModule(address _current) constant returns (address)
+    { return modules.items.next(_current); }
 
-    function getFounder() constant returns (address)
-    { return dao.founder; }
-
-    function getNodeLength() constant returns (uint)
-    { return dao.nodes.length; }
-
-    function getNodeByIndex(uint _index) constant returns (address)
-    { return dao.nodes[_index]; }
-
-    function getNode(string _name) constant returns (address)
-    { return dao.getNodeBy[sha3(_name)]; }
-
-    function getNodeName(address _node) constant returns (string)
-    { return dao.getNodeNameBy[_node]; }
-
-    function getTemplateLength() constant returns (uint)
-    { return dao.templates.length; }
-
-    function getTemplateByIndex(uint _index) constant returns (address)
-    { return dao.templates[_index]; }
-
+    /**
+     * @dev Get template by name
+     * @param _name is template name
+     * @return template address
+     */
     function getTemplate(string _name) constant returns (address)
-    { return dao.getTemplateBy[sha3(_name)]; }
+    { return templates.get(_name); }
 
-    function getTemplateName(address _node) constant returns (string)
-    { return dao.getTemplateNameBy[_node]; }
+    /**
+     * @dev Get first template
+     * @return first address
+     */
+    function firstTemplate() constant returns (address)
+    { return templates.items.head; }
 
+    /**
+     * @dev Get next template
+     * @param _current is an current address
+     * @return next address
+     */
+    function nextTemplate(address _current) constant returns (address)
+    { return templates.items.next(_current); }
+ 
     /**
      * @dev Interface storage
      *      the contract interface contains source URI
      */
     mapping(address => string) public interfaceOf;
 
-    /* DAO constructor */
-    function Core(string _name, string _description) {
-        dao.name         = _name;
-        dao.description  = _description;
-        dao.founder      = msg.sender;
-    }
-
-    /* Using the AddressArray library */
-    using AddressArray for address[];
-
-    /** 
-     * @dev DAO nodes setter
-     * @notice set new node for given name, replaced address will returned
+    /**
+     * @dev Set new module for given name
      * @param _name infrastructure node name
-     * @param _node infrastructure node address
+     * @param _module infrastructure node address
      * @param _interface node interface URI
      */
-    function setNode(string _name, address _node, string _interface) onlyOwner
-            returns (address) {
-        // Remove node if replaced
-        var replaced = getNode(_name);
-        if (replaced != 0)
-            removeNode(replaced);
-        // Append new node
-        dao.nodes.push(_node);
-        dao.getNodeBy[sha3(_name)] = _node;
-        dao.getNodeNameBy[_node]   = _name;
+    function setModule(string _name, address _module, string _interface) onlyOwner {
+        // Set module in the map
+        modules.set(_name, _module);
+
         // Register node interface
-        interfaceOf[_node] = _interface;
-        // Return replaced address
-        return replaced;
-    }
-    
-    /**
-     * @dev Remove node by name
-     * @param _name node name
-     * @return removed node address
-     */
-    function removeNode(string _name) onlyOwner returns (address) {
-        var removed = getNode(_name);
-        removeNode(removed);
-        return removed;
-    }
-    
-    /**
-     * @dev Remove node by address
-     * @param _node target node address
-     */
-    function removeNode(address _node) onlyOwner {
-        var index = dao.nodes.indexOf(_node);
-        if (index < dao.nodes.length)
-            dao.nodes.remove(index);
+        interfaceOf[_module] = _interface;
     }
  
     /**
-     * @dev DAO templates setter
-     * @notice set new template for given name, replaced address will returned
-     * @param _name contract template name
-     * @param _template contract template address
-     * @param _interface contract template interface URI
+     * @dev Remove module by name
+     * @param _name module name
      */
-    function setTemplate(string _name, address _template, string _interface) onlyOwner
-            returns (address) {
-        // Remove template if replaced
-        var replaced = getTemplate(_name);
-        if (replaced != 0)
-            removeTemplate(replaced);
-        // Append new template
-        dao.templates.push(_template);
-        dao.getTemplateBy[sha3(_name)]   = _template;
-        dao.getTemplateNameBy[_template] = _name;
-        // Register template interface
-        interfaceOf[_template] = _interface;
-        // Return replaced address
-        return replaced;
-    }
+    function removeModule(string _name) onlyOwner
+    { modules.remove(_name); }
  
+    /**
+     * @dev Set new template for given name
+     * @param _name infrastructure node name
+     * @param _template infrastructure node address
+     */
+    function setTemplate(string _name, address _template) onlyOwner
+    { templates.set(_name, _template); }
+    
     /**
      * @dev Remove template by name
      * @param _name template name
-     * @return removed template address
      */
-    function removeTemplate(string _name) onlyOwner returns (address) {
-        var removed = getTemplate(_name);
-        removeTemplate(removed);
-        return removed;
-    }
-
-    /**
-     * @dev Remove template by address
-     * @param _template target template address
-     */
-    function removeTemplate(address _template) onlyOwner {
-        var index = dao.templates.indexOf(_template);
-        if (index < dao.templates.length)
-            dao.templates.remove(index);
-    }
+    function removeTemplate(string _name) onlyOwner
+    { templates.remove(_name); }
 }

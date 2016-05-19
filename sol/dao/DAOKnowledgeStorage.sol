@@ -13,8 +13,8 @@ contract DAOKnowledgeStorage is Mortal {
     mapping(string => Voting.Poll) termOf;
     using Voting for Voting.Poll;
     
-    function DAOKnowledgeStorage(Token _shares) {
-        thesaurus = new KnowledgeStorage();
+    function DAOKnowledgeStorage(KnowledgeStorage _thesaurus, Token _shares) {
+        thesaurus = _thesaurus;
         shares    = _shares;
     }
 
@@ -28,7 +28,7 @@ contract DAOKnowledgeStorage is Mortal {
 
         // Check for knowledge already set
         var current = Knowledge(term.current);
-        if (thesaurus.getByName(_termName) != current)
+        if (thesaurus.get(_termName) != current)
             thesaurus.set(_termName, current);
     }
 
