@@ -1,4 +1,4 @@
-import 'lib/AddressArray.sol';
+import 'lib/AddressList.sol';
 import 'token/Token.sol';
 import './MarketAgent.sol';
 import './Market.sol';
@@ -16,11 +16,11 @@ contract MarketRegulator is Mortal {
     Token  public credits;
 
     /* The self created market agents */
-    address[] public agents;
-    using AddressArray for address[];
+    AddressList.Data agents;
+    using AddressList for AddressList.Data;
 
     /* Only market agents can call modified functions */
-    modifier onlyAgents { if (agents.indexOf(msg.sender) < agents.length) _ }
+    modifier onlyAgents { if (agents.contains(msg.sender)) _ }
 
     function MarketRegulator(uint credit_emission) {
         market  = new Market();

@@ -45,26 +45,6 @@ contract DAOMarketAgent is MarketAgent {
     }
 
     /**
-     * @dev Get market lot with traded item specification
-     * @param _index lot position
-     * @return traded item description, lot address
-     */
-    function get(uint _index) constant returns (Knowledge, Lot) {
-        if (_index >= regulator.market().size()) throw;
-
-        var lot = Lot(regulator.market().lots(_index));
-        var saleToken = TokenSpec(lot.sale());
-        var saleSpec = saleToken.specification();
-
-        for (var knowledge = thesaurus.first(); address(knowledge) != 0;
-             knowledge = thesaurus.next(knowledge)) {
-            if (knowledge.isEqual(saleSpec))
-                return (knowledge, lot);
-        }
-        return (Knowledge(0), lot);
-    }
-
-    /**
      * @dev Take a deal by given lot
      * @param _lot target lot address
      * @return `true` when deal is ok

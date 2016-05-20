@@ -27,7 +27,7 @@ contract DAOKnowledgeStorage is Mortal {
         var term = termOf[_termName];
 
         // Check for knowledge already set
-        var current = Knowledge(term.current);
+        var current = Knowledge(term.current());
         if (thesaurus.get(_termName) != current)
             thesaurus.set(_termName, current);
     }

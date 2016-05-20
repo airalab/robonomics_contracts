@@ -33,7 +33,7 @@ contract DAOMarketRegulator is MarketRegulator {
         var agent = new DAOMarketAgent(thesaurus);
 
         // Store agent address for the future usage
-        agents.push(agent);
+        agents.append(agent);
 
         // Delegate agent to sender
         agent.delegate(msg.sender);
@@ -63,7 +63,7 @@ contract DAOMarketRegulator is MarketRegulator {
         var asset = TokenSpec(assetToken).specification();
 
         // Select current trade rule for traded asset
-        var rule = ruleOf[asset].current;
+        var rule = ruleOf[asset].current();
         if (rule != 0) {
             // Get emission value based on current rule
             var emission = MarketRule(rule).getEmission(_lot); 
