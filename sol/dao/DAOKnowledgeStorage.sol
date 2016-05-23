@@ -13,9 +13,9 @@ contract DAOKnowledgeStorage is Mortal {
     mapping(string => Voting.Poll) termOf;
     using Voting for Voting.Poll;
     
-    function DAOKnowledgeStorage(KnowledgeStorage _thesaurus, Token _shares) {
-        thesaurus = _thesaurus;
-        shares    = _shares;
+    function DAOKnowledgeStorage(address _thesaurus, address _shares) {
+        thesaurus = KnowledgeStorage(_thesaurus);
+        shares    = Token(_shares);
     }
 
     /**

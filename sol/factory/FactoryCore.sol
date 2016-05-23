@@ -1,6 +1,6 @@
 import 'dao/Core.sol';
 
-library FabricCore {
+library FactoryCore {
     function create(string _name, string _description) returns (Core)
     { return new Core(_name, _description); }
 }

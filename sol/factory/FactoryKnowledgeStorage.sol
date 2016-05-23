@@ -1,6 +1,6 @@
-import 'thesaurus/KnowledgeStorage.sol';
+import 'dao/DAOKnowledgeStorage.sol';
 
-library FabricKnowledgeStorage {
+library FactoryKnowledgeStorage {
     function create() returns (KnowledgeStorage)
     { return new KnowledgeStorage(); }
 }

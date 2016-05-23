@@ -39,6 +39,14 @@ contract Core is Mortal {
     { return modules.get(_name); }
 
     /**
+     * @dev Get module name by address
+     * @param _module is a module address
+     * @return module name
+     */
+    function getModuleName(address _module) constant returns (string)
+    { return modules.keyOf[_module]; }
+
+    /**
      * @dev Get first module
      * @return first address
      */
@@ -60,6 +68,14 @@ contract Core is Mortal {
      */
     function getTemplate(string _name) constant returns (address)
     { return templates.get(_name); }
+ 
+    /**
+     * @dev Get template name by address
+     * @param _template is a template address
+     * @return template name
+     */
+    function getTemplateName(address _template) constant returns (string)
+    { return templates.keyOf[_template]; }
 
     /**
      * @dev Get first template

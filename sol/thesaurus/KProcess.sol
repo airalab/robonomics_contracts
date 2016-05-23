@@ -4,7 +4,7 @@ import './Knowledge.sol';
  * The knowledge process describe knowledge manipulation
  */
 contract KProcess is Knowledge {
-    /* Process constructor */
+    /* KProcess constructor */
     function KProcess() Knowledge(PROCESS) {}
 
     /**

@@ -17,6 +17,6 @@ contract TokenSpec is Token {
      * @param _symbol is a token short name
      * @param _spec is a knowledge which present single token value 
      */
-    function TokenSpec(string _name, string _symbol, Knowledge _spec)
-        Token(_name, _symbol) { specification = _spec; }
+    function TokenSpec(string _name, string _symbol, address _spec)
+        Token(_name, _symbol) { specification = Knowledge(_spec); }
 }
