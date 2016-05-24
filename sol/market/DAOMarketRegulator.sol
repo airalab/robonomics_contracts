@@ -17,11 +17,11 @@ contract DAOMarketRegulator is MarketRegulator {
     mapping(address => Voting.Poll) ruleOf;
     using Voting for Voting.Poll;
     
-    function DAOMarketRegulator(Token _shares, KnowledgeStorage _thesaurus,
-                                Token _dao_credits)
+    function DAOMarketRegulator(address _shares, address _thesaurus,
+                                address _dao_credits)
             MarketRegulator(_dao_credits) {
-        shares    = _shares;
-        thesaurus = _thesaurus;
+        shares    = Token(_shares);
+        thesaurus = KnowledgeStorage(_thesaurus);
     }
 
     /**
