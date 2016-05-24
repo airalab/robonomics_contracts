@@ -1,6 +1,4 @@
-import 'lib/AddressArray.sol';
 import 'token/Token.sol';
-import './CashFlow.sol';
 
 contract IPO is Mortal {
     /* The IPO public token */
@@ -10,25 +8,23 @@ contract IPO is Mortal {
     Token public shares;
 
     /* The IPO cash flow */
-    CashFlow public cashflow;
+    address public cashflow;
 
     /* The funders storage */
     address[] public funders;
     mapping(address => uint) public valueOf;
     
-    /* Use libs */
-    using AddressArray for address[];
-
     /* This field has `true` when IPO is closed */
     bool public closed = false;
 
     /* This event called when IPO closed */
     event Closed(bool indexed success);
 
-    function IPO(Token _credits, uint _shares) {
-        credits = _credits;
-        shares  = new Token("IPO shares", "S");
-        shares.emission(_shares);
+    function IPO(address _credits, address _shares, uint _count) {
+        credits = Token(_credits);
+        shares  = Token(_shares);
+        if (!shares.transferFrom(msg.sender, this, _count))
+            throw;
     }
 
     /**
@@ -55,9 +51,6 @@ contract IPO is Mortal {
      * @dev This internal method should be called when IPO closed success
      */
     function done() internal {
-        // Create the cashflow
-        cashflow = new CashFlow(credits, shares);
-
         // Burn unused shares
         shares.burn(shares.getBalance());
 
@@ -86,8 +79,7 @@ contract IPO is Mortal {
     }
 
     function append(address _funder, uint _value) internal {
-        if (funders.indexOf(_funder) == funders.length)
-            funders.push(_funder);
+        funders.push(_funder);
         valueOf[_funder] += _value;
     }
 }

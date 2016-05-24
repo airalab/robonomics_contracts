@@ -14,9 +14,9 @@ contract IPOFiniteTime is IPO {
     uint public ipoMinValue;
     uint public ipoEndValue;
 
-    function IPOFiniteTime(Token _credits, uint _shares, uint _duration_sec,
-                           uint _start_price, uint _step, uint _period_sec,
-                           uint _min_value, uint _end_value) IPO(_credits, _shares) {
+    function IPOFiniteTime(address _credits, address _shares, uint _shares_count,
+                           uint _duration_sec, uint _start_price, uint _step, uint _period_sec,
+                           uint _min_value, uint _end_value) IPO(_credits, _shares, _shares_count) {
         dateOfStart   = now;
         dateOfStop    = dateOfStart + _duration_sec;
         currentPrice  = _start_price;

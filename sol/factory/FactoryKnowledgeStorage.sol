@@ -1,4 +1,4 @@
-import 'dao/DAOKnowledgeStorage.sol';
+import 'thesaurus/KnowledgeStorage.sol';
 
 library FactoryKnowledgeStorage {
     function create() returns (KnowledgeStorage)

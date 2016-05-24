@@ -1,4 +1,4 @@
-import 'dao/DAOKnowledgeStorage.sol';
+import 'thesaurus/DAOKnowledgeStorage.sol';
 
 library FactoryDAOKnowledgeStorage {
     function create(address _thesaurus, address _shares) returns (DAOKnowledgeStorage)
