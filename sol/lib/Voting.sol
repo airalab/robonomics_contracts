@@ -1,36 +1,30 @@
 import 'token/Token.sol';
-import './AddressArray.sol';
+import './AddressList.sol';
 
+/**
+ * @dev The library for voting actions.
+ *      This data contains stack of voters, its opinion and count of shares.
+ */
 library Voting {
     /* Voting structure */
     struct Poll {
-        /* Stack of all voters */
-        address[]                   voters;
+        /* Stack of all voters by value */
+        AddressList.Data            voters;
         /* Count of shares for given voter */
         mapping(address => uint)    shareOf;
         /* Poll variant for given voter */
         mapping(address => address) pollOf;
-        /* Current high voter variant, setted by `kingOfMountain` */
-        address                     current;
     }
 
-    using AddressArray for address[];
+    using AddressList for AddressList.Data;
 
     /**
-     * @dev Calc poll of target and set current according
-     *      to high vote results
+     * @dev Current high value poll
      * @param _poll ref to `Poll` structure
+     * @return current value
      */
-    function kingOfMountain(Poll storage _poll) {
-        // Search the high voter
-        var highVoter = _poll.voters[0];
-        for (uint i = 0; i < _poll.voters.length; i += 1) {
-            var voter = _poll.voters[i];
-            if (_poll.shareOf[voter] > _poll.shareOf[highVoter])
-                highVoter = voter;
-        }
-        _poll.current = _poll.pollOf[highVoter];
-    }
+    function current(Poll storage _poll) constant returns (address)
+    { return _poll.pollOf[_poll.voters.first()]; } 
 
     /**
      * @dev Increase poll shares for given variant
@@ -50,11 +44,11 @@ library Voting {
         _poll.pollOf[_voter]   = _value;
 
         // Append voter if not in list
-        if (_poll.voters.indexOf(_voter) >= _poll.voters.length)
-            _poll.voters.push(_voter);
+        if (!_poll.voters.contains(_voter))
+            _poll.voters.append(_voter);
 
-        // Calc poll king
-        kingOfMountain(_poll);
+        // Shift voter in the stack
+        shiftLeft(_poll, _voter);
     }
 
     /**
@@ -70,7 +64,39 @@ library Voting {
         _shares.transfer(_voter, refund);
         _poll.shareOf[_voter] -= refund;
 
-        // Calc poll king
-        kingOfMountain(_poll);
+        // Shift right or drop when no shares
+        if (_poll.shareOf[_voter] > 0) {
+            shiftRight(_poll, _voter);
+        } else {
+            _poll.voters.remove(_voter);
+        }
+    }
+
+    /*
+     * Shifting mechanism
+     * Thesys: the stack of voters should be sorted by shareOf value.
+     * Solution:
+     *  - `up` call: voter shifted left while his shareOf value is large
+     *  - `down` call: voter shifted right in the stack while shareOf value is low
+     */
+
+    function shiftLeft(Poll storage _poll, address _voter) internal {
+        var value = _poll.shareOf[_voter];
+        var left  = _poll.voters.prev(_voter);
+
+        while (left != 0 && _poll.shareOf[left] < value) {
+            _poll.voters.swap(left, _voter);
+            left = _poll.voters.prev(_voter);
+        }
+    }
+
+    function shiftRight(Poll storage _poll, address _voter) internal {
+        var value = _poll.shareOf[_voter];
+        var right = _poll.voters.next(_voter);
+
+        while (right != 0 && _poll.shareOf[right] > value) {
+            _poll.voters.swap(right, _voter);
+            right = _poll.voters.next(_voter);
+        }
     }
 }

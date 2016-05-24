@@ -29,13 +29,6 @@ contract MarketAgent is Mortal {
                  uint _value,  uint _price) onlyOwner returns (Lot);
 
     /**
-     * @dev Get market lot with traded item name
-     * @param _index lot position
-     * @return traded item description, lot address
-     */
-    function get(uint _index) constant returns (Knowledge, Lot);
-
-    /**
      * @dev Take a deal by given lot
      * @param _lot target lot address
      * @return `true` when deal is ok

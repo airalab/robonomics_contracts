@@ -35,11 +35,9 @@ library AddressMap {
      * @param _data is an map storage ref
      * @param _key is a item key
      * @param _value is a item value
+     * @notice by design you can't set different keys with same value
      */
     function set(Data storage _data, string _key, address _value) {
-        if (_data.items.contains(_value))
-            throw;
-
         _data.items.append(_value);
         _data.valueOf[sha3(_key)] = _value;
         _data.keyOf[_value]       = _key;
