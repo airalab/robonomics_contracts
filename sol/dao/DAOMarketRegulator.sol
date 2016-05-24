@@ -18,8 +18,8 @@ contract DAOMarketRegulator is MarketRegulator {
     using Voting for Voting.Poll;
     
     function DAOMarketRegulator(Token _shares, KnowledgeStorage _thesaurus,
-                                uint credit_emission)
-            MarketRegulator(credit_emission) {
+                                Token _dao_credits)
+            MarketRegulator(_dao_credits) {
         shares    = _shares;
         thesaurus = _thesaurus;
     }
