@@ -5,6 +5,7 @@
   "dependencies": {
     "web3": "",
     "solc": "0.2.2-2",
+    "nodegit": "",
     "promise": "",
     "optimist": "",
     "optimist": "",

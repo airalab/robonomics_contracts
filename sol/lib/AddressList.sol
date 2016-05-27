@@ -48,10 +48,8 @@ library AddressList {
      * @param _data is list storage ref
      * @param _item is a new list element  
      */
-    function append(Data storage _data, address _item) {
-        append(_data, _item, _data.tail);
-        _data.tail = _item;
-    }
+    function append(Data storage _data, address _item)
+    { append(_data, _item, _data.tail); }
 
     /**
      * @dev Append element to end of element
@@ -86,10 +84,8 @@ library AddressList {
      * @param _data is list storage ref
      * @param _item is a new list element  
      */
-    function prepend(Data storage _data, address _item) {
-        append(_data, _item, _data.head);
-        _data.head = _item;
-    }
+    function prepend(Data storage _data, address _item)
+    { prepend(_data, _item, _data.head); }
 
     /**
      * @dev Prepend element to element of list
