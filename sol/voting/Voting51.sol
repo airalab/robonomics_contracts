@@ -9,6 +9,7 @@ contract Voting51 is Owned {
     uint  public voting_limit;
 
     address[]               public proposal;
+    mapping(uint => uint)   public start_time;
     mapping(uint => string) public description;
 
     mapping(uint => uint)   public total_value;
@@ -20,7 +21,6 @@ contract Voting51 is Owned {
 
     function Voting51(Token _shares) {
         shares = _shares;
-        voting_limit = shares.totalSupply() / 2;
     }
 
     /**
@@ -29,8 +29,10 @@ contract Voting51 is Owned {
      * @param _description is a proposal description
      */
     function appendProposal(address _target,
-                            string _description) onlyOwner {
-        description[proposal.length]  = _description;
+                            string _description,
+                            uint _start_time) onlyOwner {
+        description[proposal.length] = _description;
+        start_time[proposal.length]  = _start_time;
         proposal.push(_target);
     }
 
@@ -41,13 +43,15 @@ contract Voting51 is Owned {
      */
     function vote(uint _count) {
         // Check for no proposal exist
-        if (proposal[current_proposal] == 0) throw;
+        if (proposal[current_proposal] == 0
+         || now < start_time[current_proposal]) throw;
 
         // Voting operation
         if (shares.transferFrom(msg.sender, this, _count)) {
             total_value[current_proposal]             += _count;
             voter_value[current_proposal][msg.sender] += _count;
 
+            var voting_limit = shares.totalSupply() / 2;
             // Check vote done
             if (total_value[current_proposal] > voting_limit) {
                 proposal[current_proposal].call();
