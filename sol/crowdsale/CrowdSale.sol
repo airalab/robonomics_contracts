@@ -1,5 +1,4 @@
 import 'token/Token.sol';
-import 'common/Owned.sol';
 import 'common/FiniteTime.sol';
 
 contract CrowdSale is Owned, FiniteTime {
@@ -41,17 +40,21 @@ contract CrowdSale is Owned, FiniteTime {
         var current_price = price_wei;
         var periods = (now - start_time) / price_period;
         for (uint i = 0; i < periods; ++i)
-            current_price = current_price * price_step / 100;
+            current_price += price_wei * price_step / 100;
         return current_price;
     }
 
     /**
      * @dev Receive ethers for crowdsale
      */
-    function() {
+    function () {
+        // Check time for ending
         checkTime();
 
-        if (msg.value > 0 && is_alive) {
+        // Handle received ethers
+        if (msg.value > 0) {
+            if (!is_alive) throw;
+
             var value = msg.value / currentPrice();
             dao_token.emission(value);
             dao_token.transfer(msg.sender, value);

@@ -1,6 +1,10 @@
 import 'common/Owned.sol'; 
 import 'token/Token.sol'; 
 
+contract ProposalTarget {
+    function targetDone();
+}
+
 /**
  * @dev The 51% voting
  */
@@ -54,7 +58,7 @@ contract Voting51 is Owned {
             var voting_limit = shares.totalSupply() / 2;
             // Check vote done
             if (total_value[current_proposal] > voting_limit) {
-                proposal[current_proposal].call();
+                ProposalTarget(proposal[current_proposal]).targetDone();
                 ProposalDone(current_proposal);
                 ++current_proposal;
             }

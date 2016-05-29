@@ -1,6 +1,6 @@
 import 'voting/Voting51.sol';
 
-contract WithdrawBarrage is Owned {
+contract WithdrawBarrage is Owned, ProposalTarget {
     /* Barrage params */
     uint[] public barrage_level;
     uint public current_barrage = 0;
@@ -25,7 +25,7 @@ contract WithdrawBarrage is Owned {
     /**
      * @dev Change barrage level, only for authority contract
      */
-    function() {
+    function targetDone() {
         if (msg.sender == authority)
             ++current_barrage;
     }
