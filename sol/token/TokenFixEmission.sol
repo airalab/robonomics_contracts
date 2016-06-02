@@ -1,4 +1,4 @@
-import './Token.sol';
+import './TokenEmission.sol';
 
 /**
  * @dev The Token contract with fixed emission value

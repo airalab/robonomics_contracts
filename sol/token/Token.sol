@@ -1,9 +1,7 @@
-import 'common/Mortal.sol';
-
 /**
  * @title Token contract represents any asset in digital economy
  */
-contract Token is Mortal {
+contract Token {
     /* Short description of token */
     string public name;
     string public symbol;
@@ -41,41 +39,13 @@ contract Token is Mortal {
     { return approveOf[_address][msg.sender] > 0; }
 
     /* Token constructor */
-    function Token(string _name, string _symbol) {
+    function Token(string _name, string _symbol, uint _count) {
         name   = _name;
         symbol = _symbol;
+        totalSupply      = _count;
+        balanceOf[owner] = _count;
     }
     
-    /*
-     * Token manipulation methods only for owner
-     */
-    
-    /**
-     * @dev Token emission
-     * @param _value amount of token values to emit
-     * @notice owner balance will be increased by `_value`
-     */
-    function emission(uint _value) onlyOwner {
-        totalSupply      += _value;
-        balanceOf[owner] += _value;
-    }
- 
-    /**
-     * @dev Burn the token values from owner balance and from total
-     * @param _value amount of token values for burn 
-     * @notice owner balance will be decreased by `_value`
-     */
-    function burn(uint _value) onlyOwner {
-        if (balanceOf[owner] >= _value) {
-            balanceOf[owner] -= _value;
-            totalSupply      -= _value;
-        }
-    }
-
-    /*
-     * Public token methods for everyone
-     */
-
     /**
      * @dev Transfer self tokens to given address
      * @param _to destination address
