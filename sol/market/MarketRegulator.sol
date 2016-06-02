@@ -1,5 +1,5 @@
 import 'lib/AddressList.sol';
-import 'token/Token.sol';
+import 'token/TokenEmission.sol';
 import './MarketAgent.sol';
 import './Market.sol';
 
@@ -13,7 +13,7 @@ contract MarketRegulator is Mortal {
     Market public market;
 
     /* The self credits */
-    Token  public credits;
+    TokenEmission public credits;
 
     /* The self created market agents */
     AddressList.Data agents;
@@ -24,7 +24,7 @@ contract MarketRegulator is Mortal {
 
     function MarketRegulator(address _credits) {
         market  = new Market();
-        credits = Token(_credits);
+        credits = TokenEmission(_credits);
     }
 
     /**

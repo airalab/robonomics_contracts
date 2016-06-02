@@ -1,11 +1,11 @@
-import './Token.sol';
+import './TokenEmission.sol';
 import 'thesaurus/Knowledge.sol';
 
 /**
  * @title Token with specification is a same as `Token` but
  *        have a permanent link to presented asset
  */
-contract TokenSpec is Token {
+contract TokenSpec is TokenEmission {
     /**
      * Token value specification
      */
@@ -15,8 +15,11 @@ contract TokenSpec is Token {
      * @dev SpecToken constructor
      * @param _name is a token name
      * @param _symbol is a token short name
+     * @param _count is a start count of tokens
      * @param _spec is a knowledge which present single token value 
      */
-    function TokenSpec(string _name, string _symbol, address _spec)
-        Token(_name, _symbol) { specification = Knowledge(_spec); }
+    function TokenSpec(string _name, string _symbol, uint _count, address _spec)
+            TokenEmission(_name, _symbol, _count) {
+        specification = Knowledge(_spec);
+    }
 }

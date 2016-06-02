@@ -1,9 +1,10 @@
-import 'token/Token.sol';
+import 'token/TokenEmission.sol';
+import 'common/Owned.sol';
 import 'common/FiniteTime.sol';
 
 contract CrowdSale is Owned, FiniteTime {
     /* Crowdsale DAO token */
-    Token public dao_token;
+    TokenEmission public dao_token;
 
     /* Crowdsale credits */
     Token public credits;
@@ -29,7 +30,7 @@ contract CrowdSale is Owned, FiniteTime {
     function CrowdSale(address _credits, address _dao_token, uint _duration_sec,
                        uint _price_wei, uint _price_period, uint _price_step)
             FiniteTime(now, _duration_sec) {
-        dao_token    = Token(_dao_token); 
+        dao_token    = TokenEmission(_dao_token); 
         credits      = Token(_credits);
         price_wei    = _price_wei;
         price_period = _price_period;

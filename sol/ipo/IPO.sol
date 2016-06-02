@@ -1,11 +1,12 @@
-import 'token/Token.sol';
+import 'common/Mortal.sol';
+import 'token/TokenEmission.sol';
 
 contract IPO is Mortal {
     /* The IPO public token */
     Token public credits;
 
     /* The IPO shares token */
-    Token public shares;
+    TokenEmission public shares;
 
     /* The IPO cash flow */
     address public cashflow;
@@ -22,7 +23,7 @@ contract IPO is Mortal {
 
     function IPO(address _credits, address _shares, uint _count) {
         credits = Token(_credits);
-        shares  = Token(_shares);
+        shares  = TokenEmission(_shares);
         if (!shares.transferFrom(msg.sender, this, _count))
             throw;
     }

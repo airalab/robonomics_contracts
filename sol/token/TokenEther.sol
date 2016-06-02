@@ -4,7 +4,7 @@ import './Token.sol';
  * @title Ethereum crypto currency extention for Token contract
  */
 contract TokenEther is Token {
-    function TokenEther() Token("Wei", "EthContractWallet") {}
+    function TokenEther() Token("Wei", "EthContractWallet", 0) {}
 
     /**
      * @dev This methods increse your balance according to sended money

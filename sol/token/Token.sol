@@ -42,8 +42,8 @@ contract Token {
     function Token(string _name, string _symbol, uint _count) {
         name   = _name;
         symbol = _symbol;
-        totalSupply      = _count;
-        balanceOf[owner] = _count;
+        totalSupply           = _count;
+        balanceOf[msg.sender] = _count;
     }
     
     /**

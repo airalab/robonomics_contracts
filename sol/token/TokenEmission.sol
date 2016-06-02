@@ -1,3 +1,4 @@
+import 'common/Owned.sol';
 import './Token.sol';
 
 contract TokenEmission is Owned, Token {

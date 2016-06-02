@@ -1,7 +1,7 @@
 import 'creator/CreatorKnowledgeStorage.sol';
+import 'creator/CreatorTokenEmission.sol';
 import 'creator/CreatorCashFlow.sol';
 import 'creator/CreatorMarket.sol';
-import 'creator/CreatorToken.sol';
 import 'creator/CreatorCore.sol';
 
 contract DAOFactory is Mortal {
@@ -21,14 +21,14 @@ contract DAOFactory is Mortal {
 
         // Create DAO shares with spec
         dao.setModule("shares", 
-                      CreatorToken.create(_shares_name, _shares_symbol),
-                      "github://airalab/core/token/Token.sol");
+                      CreatorTokenEmission.create(_shares_name, _shares_symbol, 0),
+                      "github://airalab/core/token/TokenEmission.sol");
         Owned(dao.getModule("shares")).delegate(msg.sender);
 
         // Create DAO shares with spec
         dao.setModule("credits",
-                      CreatorToken.create(_credits_name, _credits_symbol),
-                      "github://airalab/core/token/Token.sol");
+                      CreatorTokenEmission.create(_credits_name, _credits_symbol, 0),
+                      "github://airalab/core/token/TokenEmission.sol");
         Owned(dao.getModule("credits")).delegate(msg.sender);
 
         // Create market

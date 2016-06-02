@@ -1,3 +1,4 @@
+import 'common/Mortal.sol';
 import 'token/Token.sol';
 
 /**
