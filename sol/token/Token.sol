@@ -56,6 +56,10 @@ contract Token is Mortal {
      * @notice owner balance will be increased by `_value`
      */
     function emission(uint _value) onlyOwner {
+        // Overflow check
+        if (_value + totalSupply < totalSupply) throw;
+
+        // Increase values
         totalSupply      += _value;
         balanceOf[owner] += _value;
     }
