@@ -12,6 +12,9 @@ contract TokenEmission is Owned, Token {
      * @notice owner balance will be increased by `_value`
      */
     function emission(uint _value) onlyOwner {
+        // Overflow check
+        if (_value + totalSupply < totalSupply) throw;
+
         totalSupply      += _value;
         balanceOf[owner] += _value;
     }

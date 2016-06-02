@@ -45,7 +45,7 @@ contract Token {
         totalSupply           = _count;
         balanceOf[msg.sender] = _count;
     }
-    
+ 
     /**
      * @dev Transfer self tokens to given address
      * @param _to destination address
