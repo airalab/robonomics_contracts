@@ -46,36 +46,10 @@ contract Token is Mortal {
         name   = "Pluton";
         symbol = "PLU";
         decimals = 8;
+        totalSupply = 2000000000000000;
+        balanceOf[msg.sender] = 2000000000000000;
     }
-    
-    /*
-     * Token manipulation methods only for owner
-     */
-    
-    /**
-     * @dev Token emission
-     * @param _value amount of token values to emit
-     * @notice owner balance will be increased by `_value`
-     */
-    function emission(uint _value) onlyOwner {
-        if ((totalSupply + _value) <= 2000000000000000) {
-            totalSupply      += _value;
-            balanceOf[owner] += _value;
-            }
-    }
- 
-    /**
-     * @dev Burn the token values from owner balance and from total
-     * @param _value amount of token values for burn 
-     * @notice owner balance will be decreased by `_value`
-     */
-    function burn(uint _value) onlyOwner {
-        if (balanceOf[owner] >= _value) {
-            balanceOf[owner] -= _value;
-            totalSupply      -= _value;
-        }
-    }
-
+   
     /*
      * Public token methods for everyone
      */
