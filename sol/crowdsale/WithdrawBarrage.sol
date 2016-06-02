@@ -1,12 +1,13 @@
-import 'voting/Voting51.sol';
+import 'lib/AddressList.sol'; 
+import 'common/Owned.sol';
 
-contract WithdrawBarrage is Owned, ProposalTarget {
+contract WithdrawBarrage is Owned {
     /* Barrage params */
     uint[] public barrage_level;
     uint public current_barrage = 0;
 
     /* Authority contract */
-    address public authority;
+    mapping(address => bool) public authority;
 
     /* Value of 100% barrage */
     uint public full_balance_value = 0;
@@ -23,10 +24,10 @@ contract WithdrawBarrage is Owned, ProposalTarget {
     }
 
     /**
-     * @dev Change barrage level, only for authority contract
+     * @dev Change barrage level, only for authority
      */
-    function targetDone() {
-        if (msg.sender == authority)
+    function done() {
+        if (authority[msg.sender])
             ++current_barrage;
     }
 }
