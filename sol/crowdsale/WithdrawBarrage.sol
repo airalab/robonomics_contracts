@@ -3,8 +3,8 @@ import 'common/Owned.sol';
 
 contract WithdrawBarrage is Owned {
     /* Barrage params */
-    uint[] public barrage_level;
-    uint public current_barrage = 0;
+    uint public barrage_level = 100;
+    uint public proposal_barrage = 100;
 
     /* Authority contract */
     mapping(address => bool) public authority;
@@ -17,17 +17,25 @@ contract WithdrawBarrage is Owned {
      */
     function withdraw() onlyOwner {
         if (full_balance_value > 0) {
-            var barrage_value = full_balance_value / 100 * barrage_level[current_barrage];
+            var barrage_value = full_balance_value * barrage_level / 100;
             var value = this.balance - barrage_value; 
             if (value > 0) owner.send(value);
         }
     }
 
     /**
-     * @dev Change barrage level, only for authority
+     * @dev Proposal a new barrage level
+     * @param _value is a barrage level in percent 
      */
-    function done() {
-        if (authority[msg.sender])
-            ++current_barrage;
+    function setBarrage(uint _value) onlyOwner
+    { proposal_barrage = _value; }
+
+    /**
+     * @dev Approve barrage level in percent, only for authority
+     * @param _value is a barrage level in percent 
+     */
+    function approveBarrage(uint _value) {
+        if (authority[msg.sender] && _value == proposal_barrage)
+            barrage_level = proposal_barrage;
     }
 }

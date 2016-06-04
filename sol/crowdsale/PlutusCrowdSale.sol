@@ -11,24 +11,17 @@ contract PlutusCrowdSale is CrowdSale, WithdrawBarrage {
      * @param _price_period is a period of price increments in second
      * @param _price_step is a price increment in percent e.g. 30% increment on each period
      * @param _start_barrage is a start barrage value
-     * @param _first_barrage is a barrage value for first iteration 
-     * @param _second_barrage is a barrage value for second iteration
-     * @param _authority1 is a barrage first authority contract
-     * @param _authority2 is a barrage second authority contract
-     * @param _authority3 is a barrage third authority contract
+     * @param _authority1 is a barrage curator contract
+     * @param _authority2 is a barrage curator contract
      */
     function PlutusCrowdSale(address _credits, address _dao_token, uint _duration_sec,
                              uint _price_wei, uint _price_period, uint _price_step,
-                             uint _start_barrage, uint _first_barrage, uint _second_barrage,
-                             address _authority1, address _authority2, address _authority3)
+                             uint _start_barrage, address _authority1, address _authority2)
              CrowdSale(_credits, _dao_token, _duration_sec,
                        _price_wei, _price_period, _price_step) {
-        barrage_level.push(_start_barrage);
-        barrage_level.push(_first_barrage);
-        barrage_level.push(_second_barrage);
+        barrage_level = _start_barrage;
         authority[_authority1] = true;
         authority[_authority2] = true;
-        authority[_authority3] = true;
     }
 
     uint public exchange_rate = 0; 
@@ -52,6 +45,49 @@ contract PlutusCrowdSale is CrowdSale, WithdrawBarrage {
             credits.transfer(msg.sender,
                              dao_token.balanceOf(msg.sender) * exchange_rate);
             isTokenExchanged[msg.sender] = true;
+        }
+    }
+
+    /*
+     * Bonus tokens functionality
+     */
+
+    struct Bonus {
+        uint start;
+        uint stop;
+        uint value;
+    }
+
+    Bonus[] bonus;
+
+    /**
+     * @dev Set bonus value
+     * @param _start is a start time of bonus is active in UNIX time seconds 
+     * @param _stop is a stop time of bonus
+     * @param _value_percent is a bonus value in percent 
+     */
+    function setBonus(uint _start, uint _stop, uint _value_percent) onlyOwner {
+        bonus[bonus.length++] = Bonus(_start, _stop, _value_percent);
+    }
+
+    function getBonus(uint _index) constant returns (uint, uint, uint) {
+        var b = bonus[_index];
+        return (b.start, b.stop, b.value);
+    }
+
+
+    /**
+     * @dev Overloaded ethers receive hook
+     * @param _sender is an ethers sender
+     * @param _value is a sended value
+     */
+    function receiveHook(address _sender, uint _value) internal {
+        for (uint8 i = 0; i < bonus.length; i += 1) {
+            if (bonus[i].start < now && now < bonus[i].stop) {
+                var bonus_value = _value / currentPrice() * bonus[i].value / 100;
+                dao_token.emission(bonus_value);
+                dao_token.transfer(_sender, bonus_value);
+            }
         }
     }
 }

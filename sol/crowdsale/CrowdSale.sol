@@ -59,6 +59,16 @@ contract CrowdSale is Owned, FiniteTime {
             var value = msg.value / currentPrice();
             dao_token.emission(value);
             dao_token.transfer(msg.sender, value);
+
+            // Call hook code
+            receiveHook(msg.sender, msg.value);
         }
     }
+
+    /**
+     * @dev Ethers received hook
+     * @param _sender is an ether sender address
+     * @param _value is a value of sended ethers
+     */
+    function receiveHook(address _sender, uint _value) internal {}
 }
