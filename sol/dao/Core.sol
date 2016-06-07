@@ -16,8 +16,15 @@ contract Core is Mortal {
     /* Modules map */
     AddressMap.Data modules;
 
-    /* Templates map */
-    AddressMap.Data templates;
+    /* Module constant mapping */ 
+    mapping(bytes32 => bool) is_constant;
+
+    /**
+     * @dev Interface storage
+     *      the contract interface contains source URI
+     */
+    mapping(address => string) public interfaceOf;
+
 
     /* Using libraries */
     using AddressList for AddressList.Data;
@@ -29,6 +36,14 @@ contract Core is Mortal {
         description  = _description;
         founder      = msg.sender;
     }
+ 
+    /**
+     * @dev Check for module have permanent name
+     * @param _name is a module name
+     * @return `true` when module have permanent name
+     */
+    function isConstant(string _name) constant returns (bool)
+    { return is_constant[sha3(_name)]; }
 
     /**
      * @dev Get module by name
@@ -62,54 +77,23 @@ contract Core is Mortal {
     { return modules.items.next(_current); }
 
     /**
-     * @dev Get template by name
-     * @param _name is template name
-     * @return template address
-     */
-    function getTemplate(string _name) constant returns (address)
-    { return templates.get(_name); }
- 
-    /**
-     * @dev Get template name by address
-     * @param _template is a template address
-     * @return template name
-     */
-    function getTemplateName(address _template) constant returns (string)
-    { return templates.keyOf[_template]; }
-
-    /**
-     * @dev Get first template
-     * @return first address
-     */
-    function firstTemplate() constant returns (address)
-    { return templates.items.head; }
-
-    /**
-     * @dev Get next template
-     * @param _current is an current address
-     * @return next address
-     */
-    function nextTemplate(address _current) constant returns (address)
-    { return templates.items.next(_current); }
- 
-    /**
-     * @dev Interface storage
-     *      the contract interface contains source URI
-     */
-    mapping(address => string) public interfaceOf;
-
-    /**
      * @dev Set new module for given name
      * @param _name infrastructure node name
      * @param _module infrastructure node address
      * @param _interface node interface URI
+     * @param _constant have a `true` value when you create permanent name of module
      */
-    function setModule(string _name, address _module, string _interface) onlyOwner {
-        // Set module in the map
-        modules.set(_name, _module);
+    function setModule(string _name, address _module, string _interface, bool _constant) onlyOwner {
+        if (!isConstant(_name)) {
+            // Set module in the map
+            modules.set(_name, _module);
 
-        // Register node interface
-        interfaceOf[_module] = _interface;
+            // Register node interface
+            interfaceOf[_module] = _interface;
+
+            // Register constant module
+            is_constant[sha3(_name)] = _constant;
+        }
     }
  
     /**
@@ -118,19 +102,4 @@ contract Core is Mortal {
      */
     function removeModule(string _name) onlyOwner
     { modules.remove(_name); }
- 
-    /**
-     * @dev Set new template for given name
-     * @param _name infrastructure node name
-     * @param _template infrastructure node address
-     */
-    function setTemplate(string _name, address _template) onlyOwner
-    { templates.set(_name, _template); }
-    
-    /**
-     * @dev Remove template by name
-     * @param _name template name
-     */
-    function removeTemplate(string _name) onlyOwner
-    { templates.remove(_name); }
 }
