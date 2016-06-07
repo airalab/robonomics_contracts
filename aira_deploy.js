@@ -19,17 +19,18 @@ var mainsol  = __dirname + "/sol";
 var libsfile = __dirname + "/.libs.json";
 
 var argv = require('optimist')
-    .usage('AIRA Deploy :: version '+version+'\n\nUsage: $0 -I [DIRS] -C [NAME] -A [ARGUMENTS] [-O] [--rpc] [--library] [--] [--abi]')
+    .usage('AIRA Deploy :: version '+version+'\n\nUsage: $0 -I [DIRS] -C [NAME] -A [ARGUMENTS] [-O] [--rpc URI] [--library] [--creator] [--abi] [--bytecode]')
     .default({I: '', A: '[]', rpc: 'http://localhost:8545'})
     .boolean(['library', 'creator', 'abi', 'O'])
     .describe('I', 'Append source file dirs')
     .describe('C', 'Contract name')
     .describe('A', 'Contract constructor arguments [JSON]')
-    .describe('O', 'Enable optimization')
+    .describe('O', 'Enable compiler optimization')
+    .describe('rpc', 'Web3 RPC provider')
     .describe('library', 'Store deployed library address after deploy')
     .describe('creator', 'Generate contract creator library and exit')
+    .describe('bytecode', 'Print compiled and linked bytecode')
     .describe('abi', 'Print contract ABI and exit')
-    .describe('rpc', 'Web3 RPC provider')
     .demand(['C'])
     .argv;
 
@@ -55,7 +56,7 @@ aira.compiler.compile(soldirs, argv.O, function(compiled){
     var interface = compiled.contracts[contract].interface.replace("\n", "");
     var interface_json = JSON.parse(interface);
 
-    //console.log('Bytecode: '+linked_bytecode);
+    if (argv.bytecode) console.log('Bytecode: '+linked_bytecode);
     console.log('Binary size:\t' + linked_bytecode.length / 2 / 1024 + "K");
 
     if (argv.abi) {
@@ -89,7 +90,7 @@ aira.compiler.compile(soldirs, argv.O, function(compiled){
                 break;
             }
 
-        var source = 'import \''+full_name+'\';\n\nlibrary Creator'+contract+' {\n    struct Version { string abi; string version; }\n\n    function create('+constructor_typed_args+') returns ('+contract+')\n    { return new '+contract+'('+constructor_args+'); }\n\n    function version() constant returns (string)\n    { return "v'+version+' ('+gitsha+')"; }\n\n    function abi() constant returns (string)\n    { return \''+interface+'\'; }\n}\n';
+        var source = 'import \''+full_name+'\';\n\nlibrary Creator'+contract+' {\n\n    function create('+constructor_typed_args+') returns ('+contract+')\n    { return new '+contract+'('+constructor_args+'); }\n\n    function version() constant returns (string)\n    { return "v'+version+' ('+gitsha+')"; }\n\n    function abi() constant returns (string)\n    { return \''+interface+'\'; }\n}\n';
         var filename = soldirs[0]+'/creator/Creator'+contract+'.sol'; 
         fs.writeFileSync(filename, source);
         console.log('Creator writen in '+filename);
