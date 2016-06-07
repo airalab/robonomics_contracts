@@ -90,7 +90,7 @@ aira.compiler.compile(soldirs, argv.O, function(compiled){
                 break;
             }
 
-        var source = 'import \''+full_name+'\';\n\nlibrary Creator'+contract+' {\n\n    function create('+constructor_typed_args+') returns ('+contract+')\n    { return new '+contract+'('+constructor_args+'); }\n\n    function version() constant returns (string)\n    { return "v'+version+' ('+gitsha+')"; }\n\n    function abi() constant returns (string)\n    { return \''+interface+'\'; }\n}\n';
+        var source = 'import \''+full_name+'\';\n\nlibrary Creator'+contract+' {\n    event Created(address indexed sender, address indexed instance);\n\n    function create('+constructor_typed_args+') returns ('+contract+') {\n        var inst = new '+contract+'('+constructor_args+');\n        Created(msg.sender, inst);\n        return inst;\n    }\n\n    function version() constant returns (string)\n    { return "v'+version+' ('+gitsha+')"; }\n\n    function abi() constant returns (string)\n    { return \''+interface+'\'; }\n}\n';
         var filename = soldirs[0]+'/creator/Creator'+contract+'.sol'; 
         fs.writeFileSync(filename, source);
         console.log('Creator writen in '+filename);
