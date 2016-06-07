@@ -21,13 +21,13 @@ contract DAOFactory is Mortal {
 
         // Create DAO shares with spec
         dao.setModule("shares", 
-                      CreatorTokenEmission.create(_shares_name, _shares_symbol, 0),
+                      CreatorTokenEmission.create(_shares_name, _shares_symbol, 0, 0),
                       "github://airalab/core/token/TokenEmission.sol");
         Owned(dao.getModule("shares")).delegate(msg.sender);
 
         // Create DAO shares with spec
         dao.setModule("credits",
-                      CreatorTokenEmission.create(_credits_name, _credits_symbol, 0),
+                      CreatorTokenEmission.create(_credits_name, _credits_symbol, 0, 0),
                       "github://airalab/core/token/TokenEmission.sol");
         Owned(dao.getModule("credits")).delegate(msg.sender);
 

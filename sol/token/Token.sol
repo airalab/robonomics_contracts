@@ -8,10 +8,13 @@ contract Token {
 
     /* Total count of tokens exist */
     uint public totalSupply;
+
+    /* Fixed point position */
+    uint8 public decimals;
     
     /* Token approvement system */
     mapping(address => uint) public balanceOf;
-    mapping(address => mapping (address => uint)) public approveOf;
+    mapping(address => mapping(address => uint)) public approveOf;
  
     /**
      * @return available balance of `sender` account (self balance)
@@ -32,16 +35,17 @@ contract Token {
     }
  
     /**
-     * @return `true` wnen `sender` have non zero available balance for target address 
      * @dev Synonym for getBalance(address _address)
+     * @return `true` wnen `sender` have non zero available balance for target address 
      */
     function isApproved(address _address) constant returns (bool)
     { return approveOf[_address][msg.sender] > 0; }
 
     /* Token constructor */
-    function Token(string _name, string _symbol, uint _count) {
-        name   = _name;
-        symbol = _symbol;
+    function Token(string _name, string _symbol, uint8 _decimals, uint _count) {
+        name     = _name;
+        symbol   = _symbol;
+        decimals = _decimals;
         totalSupply           = _count;
         balanceOf[msg.sender] = _count;
     }

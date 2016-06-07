@@ -4,15 +4,9 @@ import './Token.sol';
  * @title Ethereum crypto currency extention for Token contract
  */
 contract TokenEther is Token {
-    function TokenEther() Token("Wei", "EthContractWallet", 0) {}
-
-    /**
-     * @dev This methods increse your balance according to sended money
-     */
-    function loadBalance() {
-        balanceOf[msg.sender] += msg.value;
-        totalSupply           += msg.value;
-    }
+    function TokenEther(string _name, string _symbol)
+             Token(_name, _symbol, 18, 0)
+    {}
 
     /**
      * @dev This is the way to withdraw money from token
@@ -26,13 +20,12 @@ contract TokenEther is Token {
         }
     }
 
+    /**
+     * @dev This method is called when money sended to contract address,
+     *      it increse your balance according to sended money
+     */
     function () {
-        // This function gets executed if a
-        // transaction with invalid data is sent to
-        // the contract or just ether without data.
-        // We revert the send so that no-one
-        // accidentally loses money when using the
-        // contract.
-        throw;
+        balanceOf[msg.sender] += msg.value;
+        totalSupply           += msg.value;
     }
 }
