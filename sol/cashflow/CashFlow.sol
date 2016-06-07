@@ -1,3 +1,4 @@
+import './Proposal.sol';
 import 'lib/AddressList.sol';
 import 'common/Mortal.sol';
 import 'token/Token.sol';
@@ -6,133 +7,102 @@ contract CashFlow is Mortal {
     Token public credits;
     Token public shares;
  
-    event TargetUpdated(address indexed target, bool indexed closed);
- 
-    struct Item {
-        uint total;
-        bool closed;
-        uint summary;
-        AddressList.Data voters;
-        mapping(address => uint) valueOf;
-    }
-
-    mapping(address => Item) itemOf;
-    AddressList.Data targets;
-
+    // Proposal list
+    AddressList.Data proposals;
     using AddressList for AddressList.Data;
 
+    // Events
+    event NewProposal(address indexed proposal);
+    event CloseProposal(address indexed proposal);
+
+    // Constructor
     function CashFlow(address _credits, address _shares) {
         credits = Token(_credits);
         shares  = Token(_shares);
     }
 
     /**
-     * @dev Get first target
-     * @return first target
+     * @dev Get first proposal
+     * @return first proposal
      */
-    function firstTarget() constant returns (address)
-    { return targets.first(); }
+    function firstProposal() constant returns (address)
+    { return proposals.first(); }
 
     /**
-     * @dev Get next target
-     * @param _current is a current target
-     * @return next target
+     * @dev Get next proposal
+     * @param _current is a current proposal
+     * @return next proposal
      */
-    function nextTarget(address _current) constant returns (address)
-    { return targets.next(_current); }
+    function nextProposal(address _current) constant returns (address)
+    { return proposals.next(_current); }
 
     /**
-     * @dev Get short item description
-     * @param _target is item target address
-     * @return item is closed, item goal value, item current value
+     * @dev Initial new proposal
+     * @param _target is a destination address
+     * @param _total is a credits goal
+     * @return proposal address
      */
-    function get(address _target) constant returns (bool, uint, uint) {
-        return (itemOf[_target].closed,
-                itemOf[_target].total,
-                itemOf[_target].summary);
+    function init(address _target, uint _total) returns (Proposal) {
+        var proposal = new Proposal(_target, _total); 
+        proposals.append(proposal);
+        NewProposal(proposal);
+        return proposal;
     }
 
     /**
-     * @dev Get first of funders
-     * @param _target is item address
-     * @return funder address
-     */
-    function firstFunder(address _target) constant returns (address)
-    { return itemOf[_target].voters.first(); }
- 
-    /**
-     * @dev Get next of funders
-     * @param _target is item address
-     * @param _current is a current funder
-     * @return funder address
-     */
-    function nextFunder(address _target, address _current) constant returns (address)
-    { return itemOf[_target].voters.next(_current); }
-
-    /**
-     * @dev Get how much
-     * @param _target is item address
-     * @param _voter is funder address
-     * @return funder value
-     */
-    function getValueOf(address _target, address _voter) constant returns (uint)
-    { return itemOf[_target].valueOf[_voter]; }
-
-    /**
-     * @dev Initial new crowdsale target
-     * @param _target is an target address
-     * @param _total is an target goal
-     */
-    function init(address _target, uint _total) { 
-        itemOf[_target].total  = _total;
-        itemOf[_target].closed = false;
-        targets.append(_target);
-    }
-
-    /**
-     * @dev Append new voter for crowdsale
-     * @param _target is an target address
+     * @dev Vote for the proposal
+     * @param _proposal is an proposal instance
      * @param _value is a count of given shares
      */
-    function fund(address _target, uint _value) {
-        if (!shares.transferFrom(msg.sender, this, _value))
-            throw;
+    function fund(Proposal _proposal, uint _value) {
+        if (_proposal.closed() ||
+            shares.getBalance(msg.sender) < _value) throw;
 
-        var item = itemOf[_target];
-        if (!item.voters.contains(msg.sender))
-            item.voters.append(msg.sender);
-        item.valueOf[msg.sender] += _value;
-        item.summary             += _value;
+        var available   = shares.totalSupply() - shares.getBalance();
+        var share_price = credits.getBalance() / available;
+        var overload    = (_proposal.summary() + _value) * share_price
+                        - _proposal.total_value();
+        if (overload > 0)
+            _value -= overload;
 
-        var available = shares.totalSupply() - shares.getBalance();
-        var scale     = credits.getBalance() / available;
-        if (item.summary * scale >= item.total) {
-            if (credits.transfer(_target, item.total))
-                item.closed = true;
+        // Transfer shares
+        shares.transferFrom(msg.sender, this, _value);
+
+        // Append new funder
+        _proposal.append(msg.sender, _value, share_price);
+
+        // Is proposal done?
+        if (_proposal.closed()) {
+            if (!credits.transfer(_proposal.target(), _proposal.total_value()))
+                throw;
+            else
+                CloseProposal(_proposal);
         }
-
-        TargetUpdated(_target, itemOf[_target].closed);
     }
 
     /**
-     * @dev Decrease self share value from target
-     * @param _target is a crowdsale target
+     * @dev Decrease self share value from opened target
+     * @param _proposal is a proposal instance 
      * @param _value is how amount shares will be refunded
+     * @notice target proposal should be open
      */
-    function refund(address _target, uint _value) {
-        var item = itemOf[_target];
-        var refund_value = item.valueOf[msg.sender] > _value
-                         ? _value : item.valueOf[msg.sender]; 
-
-        // Refund shares
-        shares.transfer(msg.sender, refund_value);
-
-        // Decrease values
-        item.valueOf[msg.sender] -= refund_value;
-        item.summary             -= refund_value;
-
-        // Remove voter if balance is zero
-        if (item.valueOf[msg.sender] == 0)
-            item.voters.remove(msg.sender);
+    function refund(Proposal _proposal, uint _value) {
+        // Check for closed
+        if (!_proposal.closed()) {
+            var refund_value = _proposal.remove(msg.sender, _value);
+            shares.transfer(msg.sender, refund_value);
+        }
+    }
+ 
+    /**
+     * @dev Request for release shares by sending
+     * @param _proposal is a proposal instance
+     * @param _value is a value of returned credits
+     */
+    function fundback(Proposal _proposal, uint _value) {
+        if (credits.transferFrom(msg.sender, this, _value)) {
+            var released_shares = _proposal.fundback(msg.sender, _value);
+            shares.transfer(msg.sender, released_shares);
+        }
     }
 }
