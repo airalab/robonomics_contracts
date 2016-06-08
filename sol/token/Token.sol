@@ -1,7 +1,9 @@
+import 'common/Owned.sol';
+
 /**
  * @title Token contract represents any asset in digital economy
  */
-contract Token {
+contract Token is Owned {
     /* Short description of token */
     string public name;
     string public symbol;

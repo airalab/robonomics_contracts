@@ -1,8 +1,8 @@
-import 'common/Owned.sol';
 import './Token.sol';
 
-contract TokenEmission is Owned, Token {
-    function TokenEmission(string _name, string _symbol, uint8 _decimals, uint _start_count)
+contract TokenEmission is Token {
+    function TokenEmission(string _name, string _symbol, uint8 _decimals,
+                           uint _start_count)
              Token(_name, _symbol, _decimals, _start_count)
     {}
 

@@ -5,9 +5,9 @@ contract DAOMarketAgent is MarketAgent {
     MarketRegulator   regulator;
     KnowledgeStorage  thesaurus; 
 
-    function DAOMarketAgent(KnowledgeStorage _thesaurus) {
-        regulator = MarketRegulator(msg.sender);
-        thesaurus = _thesaurus;
+    function DAOMarketAgent(address _thesaurus, address _regulator) {
+        regulator = MarketRegulator(_regulator);
+        thesaurus = KnowledgeStorage(_thesaurus);
     }
 
     /**

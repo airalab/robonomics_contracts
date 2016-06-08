@@ -1,7 +1,7 @@
 import 'market/MarketRegulator.sol';
 import 'market/MarketRule.sol';
 import 'lib/Voting.sol';
-import './DAOMarketAgent.sol';
+import 'creator/CreatorDAOMarketAgent.sol';
 
 /**
  * @title The DAO market regulator is a market regulator with voting procedure
@@ -30,7 +30,7 @@ contract DAOMarketRegulator is MarketRegulator {
      */
     function sign() returns (MarketAgent) {
         // Make a new market agent
-        var agent = new DAOMarketAgent(thesaurus);
+        var agent = CreatorDAOMarketAgent.create(thesaurus, this);
 
         // Store agent address for the future usage
         agents.append(agent);
