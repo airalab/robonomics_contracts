@@ -4,6 +4,9 @@ import 'common/Owned.sol';
  * @title Token contract represents any asset in digital economy
  */
 contract Token is Owned {
+    event Transfer(address indexed _from,  address indexed _to,      uint256 _value);
+    event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+
     /* Short description of token */
     string public name;
     string public symbol;
@@ -16,7 +19,7 @@ contract Token is Owned {
     
     /* Token approvement system */
     mapping(address => uint) public balanceOf;
-    mapping(address => mapping(address => uint)) public approveOf;
+    mapping(address => mapping(address => uint)) public allowance;
  
     /**
      * @return available balance of `sender` account (self balance)
@@ -31,18 +34,11 @@ contract Token is Owned {
      * @return available for `sender` balance of given address
      */
     function getBalance(address _address) constant returns (uint) {
-        return approveOf[_address][msg.sender]
+        return allowance[_address][msg.sender]
              > balanceOf[_address] ? balanceOf[_address]
-                                   : approveOf[_address][msg.sender];
+                                   : allowance[_address][msg.sender];
     }
  
-    /**
-     * @dev Synonym for getBalance(address _address)
-     * @return `true` wnen `sender` have non zero available balance for target address 
-     */
-    function isApproved(address _address) constant returns (bool)
-    { return approveOf[_address][msg.sender] > 0; }
-
     /* Token constructor */
     function Token(string _name, string _symbol, uint8 _decimals, uint _count) {
         name     = _name;
@@ -63,6 +59,7 @@ contract Token is Owned {
         if (balanceOf[msg.sender] >= _value) {
             balanceOf[msg.sender] -= _value;
             balanceOf[_to]        += _value;
+            Transfer(msg.sender, _to, _value);
             return true;
         }
         return false;
@@ -77,13 +74,14 @@ contract Token is Owned {
      * @return `true` when transfer is done
      */
     function transferFrom(address _from, address _to, uint _value) returns (bool) {
-        var avail = approveOf[_from][msg.sender]
+        var avail = allowance[_from][msg.sender]
                   > balanceOf[_from] ? balanceOf[_from]
-                                     : approveOf[_from][msg.sender];
+                                     : allowance[_from][msg.sender];
         if (avail >= _value) {
-            approveOf[_from][msg.sender] -= _value;
+            allowance[_from][msg.sender] -= _value;
             balanceOf[_from] -= _value;
             balanceOf[_to]   += _value;
+            Transfer(_from, _to, _value);
             return true;
         }
         return false;
@@ -94,13 +92,15 @@ contract Token is Owned {
      * @param _address target address
      * @param _value amount of token values for approving
      */
-    function approve(address _address, uint _value)
-    { approveOf[msg.sender][_address] += _value; }
+    function approve(address _address, uint _value) {
+        allowance[msg.sender][_address] += _value;
+        Approval(msg.sender, _address, _value);
+    }
 
     /**
      * @dev Reset count of tokens approved for given address
      * @param _address target address
      */
     function unapprove(address _address)
-    { approveOf[msg.sender][_address] = 0; }
+    { allowance[msg.sender][_address] = 0; }
 }

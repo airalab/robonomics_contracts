@@ -43,7 +43,7 @@ var contract = argv.C;
 web3.setProvider(new web3.providers.HttpProvider(argv.rpc));
 
 aira.compiler.compile(soldirs, cachedir, argv.O, (compiled) => {
-    console.log('Contract:\t' + contract);
+    console.log('\nContract:\t' + contract);
 
     if (typeof(compiled.errors) != 'undefined') {
         console.log('An error occured:');
@@ -57,8 +57,8 @@ aira.compiler.compile(soldirs, cachedir, argv.O, (compiled) => {
     var linked_bytecode = aira.compiler.link(libsfile, bytecode);
     var interface = compiled.contracts[contract].interface.replace("\n", "");
 
+    console.log('Binary size:\t' + linked_bytecode.length / 2 / 1024 + "K\n");
     if (argv.bytecode) console.log('Bytecode: '+linked_bytecode);
-    console.log('Binary size:\t' + linked_bytecode.length / 2 / 1024 + "K");
 
     if (argv.abi) {
         // Print contract ABI
