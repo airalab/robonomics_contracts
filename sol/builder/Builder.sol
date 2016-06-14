@@ -2,10 +2,11 @@ import 'cashflow/CashFlow.sol';
 import 'cashflow/Proposal.sol';
 
 contract Builder is Owned {
-    uint public buildingCost;
     Proposal proposal;
     CashFlow cashflow;
-    mapping (address => address) public lastContractOf;
+
+    uint public buildingCost;
+    mapping(address => address[]) public getContractsOf;
     
     event Builded(address indexed sender, address indexed instance);
     
@@ -16,7 +17,7 @@ contract Builder is Owned {
     }
     
     function getLastContract() constant returns (address) {
-        return lastContractOf[msg.sender];
+        return getContractsOf[msg.sender][getContractsOf[msg.sender].length - 1];
     }
     
     function setCashflow(address _cashflow) onlyOwner {
@@ -34,7 +35,7 @@ contract Builder is Owned {
     function deal(address _contract) internal {
         if (msg.value < buildingCost) throw;
         
-        lastContractOf[msg.sender] = _contract;
+        getContractsOf[msg.sender].push(_contract);
         Builded(msg.sender, _contract);
         
         msg.sender.send(msg.value - buildingCost);
