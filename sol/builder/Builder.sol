@@ -32,7 +32,7 @@ contract Builder is Owned {
 	}
 	
 	function deal(address _contract) internal {
-		if (msg.value >= buildingCost) throw
+		if (msg.value >= buildingCost) throw;
 		
 		lastContractOf[msg.sender] = _contract;
 		Builded(msg.sender, _contract);

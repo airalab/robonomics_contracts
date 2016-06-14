@@ -1,8 +1,8 @@
 import 'creator/CreatorTokenSpec.sol';
 import './Builder.sol';
 
-contract BuilderTokenSpec {
-	function BuilderToken(uint _price, address _cashflow, address _proposal)
+contract BuilderTokenSpec is Builder {
+	function BuilderTokenSpec(uint _price, address _cashflow, address _proposal)
              Builder(_price, _cashflow, _proposal)
     {}
 	

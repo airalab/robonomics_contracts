@@ -1,8 +1,8 @@
 import 'creator/CreatorDAOMarketRegulator.sol';
 import './Builder.sol';
 
-contract BuilderDAOMarketRegulator {
-	function BuilderToken(uint _price, address _cashflow, address _proposal)
+contract BuilderDAOMarketRegulator is Builder {
+	function BuilderDAOMarketRegulator(uint _price, address _cashflow, address _proposal)
              Builder(_price, _cashflow, _proposal)
     {}
 	

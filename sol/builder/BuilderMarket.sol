@@ -1,8 +1,8 @@
 import 'creator/CreatorMarket.sol';
 import './Builder.sol';
 
-contract BuilderMarket {
-	function BuilderToken(uint _price, address _cashflow, address _proposal)
+contract BuilderMarket is Builder {
+	function BuilderMarket(uint _price, address _cashflow, address _proposal)
              Builder(_price, _cashflow, _proposal)
     {}
 	

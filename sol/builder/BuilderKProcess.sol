@@ -1,8 +1,8 @@
 import 'creator/CreatorKProcess.sol';
 import './Builder.sol';
 
-contract BuilderKProcess {
-	function BuilderToken(uint _price, address _cashflow, address _proposal)
+contract BuilderKProcess is Builder {
+	function BuilderKProcess(uint _price, address _cashflow, address _proposal)
              Builder(_price, _cashflow, _proposal)
     {}
 	

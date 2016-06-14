@@ -1,8 +1,8 @@
 import 'creator/CreatorKObject.sol';
 import './Builder.sol';
 
-contract BuilderKObject {
-	function BuilderToken(uint _price, address _cashflow, address _proposal)
+contract BuilderKObject is Builder {
+	function BuilderKObject(uint _price, address _cashflow, address _proposal)
              Builder(_price, _cashflow, _proposal)
     {}
 	

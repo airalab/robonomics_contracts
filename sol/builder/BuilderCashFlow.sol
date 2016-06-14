@@ -1,9 +1,9 @@
 import 'creator/CreatorCashFlow.sol';
 import './Builder.sol';
 
-contract BuilderCashFlow {
-	function BuilderToken(uint _price, address _cashflow, address _proposal)
-             Builder(_price, _cashflow, _proposal)
+contract BuilderCashFlow is Builder {
+	function BuilderCashFlow(uint _buildingCost, address _cashflow, address _proposal)
+             Builder(_buildingCost, _cashflow, _proposal)
     {}
 	
     function create(address _credits, address _shares) returns (address) {

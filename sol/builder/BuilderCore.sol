@@ -1,8 +1,8 @@
 import 'creator/CreatorCore.sol';
 import './Builder.sol';
 
-contract BuilderCore {
-	function BuilderToken(uint _price, address _cashflow, address _proposal)
+contract BuilderCore is Builder {
+	function BuilderCore(uint _price, address _cashflow, address _proposal)
              Builder(_price, _cashflow, _proposal)
     {}
 	

@@ -1,8 +1,8 @@
 import 'creator/CreatorDAOKnowledgeStorage.sol';
 import './Builder.sol';
 
-contract BuilderDAOKnowledgeStorage {
-	function BuilderToken(uint _price, address _cashflow, address _proposal)
+contract BuilderDAOKnowledgeStorage is Builder {
+	function BuilderDAOKnowledgeStorage(uint _price, address _cashflow, address _proposal)
              Builder(_price, _cashflow, _proposal)
     {}
 	

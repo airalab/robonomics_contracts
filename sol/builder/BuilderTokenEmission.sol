@@ -1,8 +1,8 @@
 import 'creator/CreatorTokenEmission.sol';
 import './Builder.sol';
 
-contract BuilderTokenEmission {
-	function BuilderToken(uint _price, address _cashflow, address _proposal)
+contract BuilderTokenEmission is Builder {
+	function BuilderTokenEmission(uint _price, address _cashflow, address _proposal)
              Builder(_price, _cashflow, _proposal)
     {}
 	

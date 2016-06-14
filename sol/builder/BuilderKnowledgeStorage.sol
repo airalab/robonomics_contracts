@@ -1,8 +1,8 @@
 import 'creator/CreatorKnowledgeStorage.sol';
 import './Builder.sol';
 
-contract BuilderKnowledgeStorage {
-	function BuilderToken(uint _price, address _cashflow, address _proposal)
+contract BuilderKnowledgeStorage is Builder {
+	function BuilderKnowledgeStorage(uint _price, address _cashflow, address _proposal)
              Builder(_price, _cashflow, _proposal)
     {}
 	

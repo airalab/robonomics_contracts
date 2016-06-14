@@ -1,8 +1,8 @@
 import 'creator/CreatorTokenEther.sol';
 import './Builder.sol';
 
-contract BuilderTokenEther {
-	function BuilderToken(uint _price, address _cashflow, address _proposal)
+contract BuilderTokenEther is Builder {
+	function BuilderTokenEther(uint _price, address _cashflow, address _proposal)
              Builder(_price, _cashflow, _proposal)
     {}
 	
