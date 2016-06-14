@@ -61,10 +61,13 @@ contract CashFlow is Mortal {
 
         var available   = shares.totalSupply() - shares.getBalance();
         var share_price = credits.getBalance() / available;
-        var overload    = (_proposal.summary() + _value) * share_price
-                        - _proposal.total_value();
-        if (overload > 0)
-            _value -= overload;
+        var summary     = _proposal.summary() + _value;
+
+        bool overload   = summary * share_price > _proposal.total_value();
+        if (overload) {
+            var correction = summary * share_price - _proposal.total_value();
+            _value -= correction / share_price;
+        }
 
         // Transfer shares
         shares.transferFrom(msg.sender, this, _value);
@@ -76,8 +79,7 @@ contract CashFlow is Mortal {
         if (_proposal.closed()) {
             if (!credits.transfer(_proposal.target(), _proposal.total_value()))
                 throw;
-            else
-                CloseProposal(_proposal);
+            CloseProposal(_proposal);
         }
     }
 
