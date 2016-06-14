@@ -6,6 +6,10 @@ import 'creator/CreatorCore.sol';
 import './Builder.sol';
 
 contract BuilderDAO is Builder {
+    function BuilderDAO(uint _price, address _cashflow, address _proposal)
+             Builder(_price, _cashflow, _proposal)
+    {}
+
     function create(string _dao_name, string _dao_description,
                     string _shares_name, string _shares_symbol,
                     string _credits_name, string _credits_symbol) {
