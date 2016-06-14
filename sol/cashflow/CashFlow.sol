@@ -40,10 +40,11 @@ contract CashFlow is Mortal {
      * @dev Initial new proposal
      * @param _target is a destination address
      * @param _total is a credits goal
+     * @param _description is a short description of new proposal
      * @return proposal address
      */
-    function init(address _target, uint _total) returns (Proposal) {
-        var proposal = new Proposal(_target, _total); 
+    function init(address _target, uint _total, string _description) returns (Proposal) {
+        var proposal = new Proposal(_target, _total, _description); 
         proposals.append(proposal);
         NewProposal(proposal);
         return proposal;

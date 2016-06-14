@@ -3,14 +3,12 @@ import 'creator/CreatorTokenEmission.sol';
 import 'creator/CreatorCashFlow.sol';
 import 'creator/CreatorMarket.sol';
 import 'creator/CreatorCore.sol';
+import './Builder.sol';
 
-contract DAOFactory is Mortal {
-    /* This event emitted on complete DAO build */
-    event NewDAO(address indexed sender, address indexed dao);
-
+contract BuilderDAO is Builder {
     function create(string _dao_name, string _dao_description,
                     string _shares_name, string _shares_symbol,
-                    string _credits_name, string _credits_symbol) returns (address) {
+                    string _credits_name, string _credits_symbol) {
         // DAO core
         var dao = CreatorCore.create(_dao_name, _dao_description);
 
@@ -52,7 +50,6 @@ contract DAOFactory is Mortal {
         dao.delegate(msg.sender);
 
         // Notify
-        NewDAO(msg.sender, dao);
-        return dao;
+        deal(dao);
     }
 }

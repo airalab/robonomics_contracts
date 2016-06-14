@@ -3,9 +3,10 @@ import 'lib/AddressList.sol';
 
 contract Proposal is Owned {
     // Constructor
-    function Proposal(address _target, uint _total) {
+    function Proposal(address _target, uint _total, string _description) {
         target      = _target;
         total_value = _total;
+        description = _description;
     }
 
     // Proposal destination address
@@ -14,6 +15,9 @@ contract Proposal is Owned {
     // Proposal value in credits
     uint public total_value;
     
+    // Proposal description
+    string public description;
+
     // Is proposal closed?
     bool public closed = false;
 
