@@ -5,7 +5,6 @@
   "dependencies": {
     "web3": "",
     "solc": "0.2.2-2",
-    "nodegit": "",
     "promise": "",
     "optimist": "",
     "hash-files": "",
@@ -16,7 +15,7 @@
     "doc": "doc"
   },
   "main": "index.js",
-  "bin": { "aira": "./aira_deploy.js" }, 
+  "bin": { "aira_deploy": "./bin/aira_deploy" }, 
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

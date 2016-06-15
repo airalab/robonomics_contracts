@@ -1,24 +1,15 @@
-#!/usr/bin/env node
-
-var aira = require('./index');
-var Git = require("nodegit");
+var aira = require('../index');
+var child_process = require('child_process');
 var Web3 = require('web3');
 var path = require('path');
 var web3 = new Web3();
 
-var version = require('./package.json').version;
-Git.Repository.open(path.resolve(__dirname, ".git"))
-    .then((repo) => {return repo.getHeadCommit();})
-    .then((commit) => {
-        var gitsha = commit.sha().slice(0,6);
-        if (gitsha.length > 0)
-            version += ' ('+gitsha+')';
-    })
-    .catch((e) => {console.log('This directory is not seems as git repository');});
+const gitsha = child_process.execSync('git rev-parse HEAD').toString().slice(0, 8);
+const version = require('../package.json').version + ' (' + gitsha + ')';
 
-var mainsol  = __dirname + '/sol';
-var cachedir = __dirname + '/.cache';
-var libsfile = __dirname + '/.libs.json';
+const mainsol  = __dirname + '/../sol';
+const cachedir = __dirname + '/../.cache';
+const libsfile = __dirname + '/../.libs.json';
 
 var argv = require('optimist')
     .usage('AIRA Deploy :: version '+version+'\n\nUsage: $0 -I [DIRS] -C [NAME] -A [ARGUMENTS] [-O] [--rpc URI] [--library] [--creator] [--abi] [--bytecode]')
