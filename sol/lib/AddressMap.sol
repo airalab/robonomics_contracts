@@ -38,7 +38,11 @@ library AddressMap {
      * @notice by design you can't set different keys with same value
      */
     function set(Data storage _data, string _key, address _value) {
-        _data.items.replace(get(_data, _key), _value);
+        var replaced = get(_data, _key);
+        if (replaced != 0)
+            _data.items.replace(replaced, _value);
+        else
+            _data.items.append(_value);
         _data.valueOf[sha3(_key)] = _value;
         _data.keyOf[_value]       = _key;
     }
