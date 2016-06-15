@@ -27,13 +27,13 @@ var argv = require('optimist')
     .demand(['C'])
     .argv;
 
-var soldirs = argv.I.split(':').filter((e) => {return e.length > 0});
+var soldirs = argv.I.split(':').filter(function (e) {return e.length > 0});
 soldirs.push(mainsol); 
 var args = JSON.parse(argv.A); 
 var contract = argv.C;
 web3.setProvider(new web3.providers.HttpProvider(argv.rpc));
 
-aira.compiler.compile(soldirs, cachedir, argv.O, (compiled) => {
+aira.compiler.compile(soldirs, cachedir, argv.O, function (compiled) {
     console.log('\nContract:\t' + contract);
 
     if (typeof(compiled.errors) != 'undefined') {
@@ -59,7 +59,8 @@ aira.compiler.compile(soldirs, cachedir, argv.O, (compiled) => {
         aira.codegen.creator(compiled, contract, soldirs[0], version); 
     } else {
         // Deploy contract
-        aira.deploy(JSON.parse(interface), linked_bytecode, args, web3, (contract_address) => {
+        aira.deploy(JSON.parse(interface), linked_bytecode, args, web3,
+                    function (contract_address) {
             if (argv.library)
                 aira.compiler.reglib(libsfile, contract, contract_address);
             
