@@ -5,4 +5,4 @@ if [ -x /usr/bin/node ]; then
     NODEJS=/usr/bin/node
 fi
 
-$NODEJS `dirname $0`/scripts/aira_deploy.js $@ 
+$NODEJS `dirname $0`/scripts/aira_deploy.js "$@" 
