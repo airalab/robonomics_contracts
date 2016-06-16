@@ -1,11 +1,13 @@
 var aira = require('../index');
-var child_process = require('child_process');
 var Web3 = require('web3');
 var path = require('path');
 var web3 = new Web3();
 
-const gitsha = child_process.execSync('git rev-parse HEAD').toString().slice(0, 8);
-const version = require('../package.json').version + ' (' + gitsha + ')';
+var version = require('../package.json').version;
+require('child_process').exec('git rev-parse HEAD', function (err, result) {
+    if (!result.toString().match('fatal'))
+        version += ' (' + result.toString().slice(0, 8) + ')';
+});
 
 const mainsol  = __dirname + '/../sol';
 const cachedir = __dirname + '/../.cache';
