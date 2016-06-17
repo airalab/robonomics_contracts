@@ -1,3 +1,10 @@
+//
+// AIRA Builder for CashFlow contract
+//
+// Ethereum address:
+//  - Testnet: 0x7d587d24ca05a7384b245d260bca3f6deda56a86
+//
+
 import 'creator/CreatorCashFlow.sol';
 import './Builder.sol';
 

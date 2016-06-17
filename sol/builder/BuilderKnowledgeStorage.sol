@@ -1,3 +1,10 @@
+//
+// AIRA Builder for KnowledgeStorage contract
+//
+// Ethereum address:
+//  - Testnet: 0x6e1b20543d14e7059608ce8fc0bcd841d006c157
+//
+
 import 'creator/CreatorKnowledgeStorage.sol';
 import './Builder.sol';
 

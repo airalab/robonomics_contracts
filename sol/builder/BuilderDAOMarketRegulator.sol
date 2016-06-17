@@ -1,3 +1,10 @@
+//
+// AIRA Builder for DAOMarketRegulator contract
+//
+// Ethereum address:
+//  - Testnet: 0x1f5eb69b7bb72d4ebdcc028983c5188b44a06cc2
+//
+
 import 'creator/CreatorDAOMarketRegulator.sol';
 import './Builder.sol';
 

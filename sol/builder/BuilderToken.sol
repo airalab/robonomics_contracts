@@ -1,3 +1,10 @@
+//
+// AIRA Builder for Token contract
+//
+// Ethereum address:
+//  - Testnet: 0xf4c7f9be8c32b20c4e9b844bb09f3e0801f18b89
+//
+
 import 'creator/CreatorToken.sol';
 import './Builder.sol';
 

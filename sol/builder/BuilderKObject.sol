@@ -1,3 +1,10 @@
+//
+// AIRA Builder for KObject contract
+//
+// Ethereum address:
+//  - Testnet: 0xd62517baf6e82ea3b73eb7fe26c31d83af5c5886 
+//
+
 import 'creator/CreatorKObject.sol';
 import './Builder.sol';
 

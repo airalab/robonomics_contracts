@@ -1,3 +1,10 @@
+//
+// AIRA Builder for Market contract
+//
+// Ethereum address:
+//  - Testnet: 0x63ef4b59c672620c4f84b8d432385727a8c95252
+//
+
 import 'creator/CreatorMarket.sol';
 import './Builder.sol';
 

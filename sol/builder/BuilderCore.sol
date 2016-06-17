@@ -1,3 +1,10 @@
+//
+// AIRA Builder for Core contract
+//
+// Ethereum address:
+//  - Testnet: 0x65db698e7a340bc73a60a7da2762feb33b0a312f
+//
+
 import 'creator/CreatorCore.sol';
 import './Builder.sol';
 

@@ -15,7 +15,7 @@
     "doc": "doc"
   },
   "main": "index.js",
-  "bin": { "aira_deploy": "./bin/aira_deploy" }, 
+  "bin": { "aira_deploy": "./aira_deploy.sh" }, 
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

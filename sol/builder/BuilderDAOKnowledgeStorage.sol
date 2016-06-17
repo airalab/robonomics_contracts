@@ -1,3 +1,10 @@
+//
+// AIRA Builder for DAOKnowledgeStorage contract
+//
+// Ethereum address:
+//  - Testnet: 0x777ba2b11dd9ce5ac901654d01c4d84948fb747e
+//
+
 import 'creator/CreatorDAOKnowledgeStorage.sol';
 import './Builder.sol';
 

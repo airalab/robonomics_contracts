@@ -1,3 +1,10 @@
+//
+// AIRA Builder for TokenSpec contract
+//
+// Ethereum address:
+//  - Testnet: 0x279424b9fe32f3dcfb8c2bde51397ba099379ec2
+//
+
 import 'creator/CreatorTokenSpec.sol';
 import './Builder.sol';
 

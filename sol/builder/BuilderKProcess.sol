@@ -1,3 +1,10 @@
+//
+// AIRA Builder for KProcess contract
+//
+// Ethereum address:
+//  - Testnet: 0x5dbb929292c3409bddaa6d5fd9744ef3f214a51c 
+//
+
 import 'creator/CreatorKProcess.sol';
 import './Builder.sol';
 
