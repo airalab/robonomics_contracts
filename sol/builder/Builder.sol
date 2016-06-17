@@ -1,5 +1,6 @@
 import 'cashflow/CashFlow.sol';
 import 'cashflow/Proposal.sol';
+import 'token/TokenEther.sol';
 
 contract Builder is Owned {
     Proposal proposal;
@@ -33,14 +34,13 @@ contract Builder is Owned {
     }
     
     function deal(address _contract) internal {
-        if (msg.value < buildingCost) throw;
+        if (msg.value < buildingCost)                   throw;
+        if (!msg.sender.send(msg.value - buildingCost)) throw;
         
-        getContractsOf[msg.sender].push(_contract);
-        Builded(msg.sender, _contract);
-        
-        msg.sender.send(msg.value - buildingCost);
-        cashflow.credits().send(buildingCost);
+        TokenEther(cashflow.credits()).refill.value(buildingCost)();
         cashflow.credits().approve(cashflow, buildingCost);
         cashflow.fundback(proposal, buildingCost);
+        getContractsOf[msg.sender].push(_contract);
+        Builded(msg.sender, _contract);
     }
 }

@@ -3,7 +3,7 @@ import 'lib/AddressList.sol';
 import 'common/Mortal.sol';
 import 'token/Token.sol';
 
-contract CashFlow is Mortal {
+contract CashFlow is Owned {
     Token public credits;
     Token public shares;
  

@@ -16,13 +16,21 @@ contract TokenEther is Token {
         if (balanceOf[msg.sender] >= _value) {
             balanceOf[msg.sender] -= _value;
             totalSupply           -= _value;
-            msg.sender.send(_value);
+            if(!msg.sender.send(_value)) throw;
         }
     }
 
     /**
+     * @dev This is the way to refill your token balance by ethers
+     */
+    function refill() {
+        balanceOf[msg.sender] += msg.value;
+        totalSupply           += msg.value;
+    }
+
+    /**
      * @dev This method is called when money sended to contract address,
-     *      it increse your balance according to sended money
+     *      a synonym for refill()
      */
     function () {
         balanceOf[msg.sender] += msg.value;
