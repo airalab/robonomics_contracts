@@ -1,4 +1,4 @@
-# PluDAO
+#  Pluton Decentralised Distribution and Crowdsale
 ## Based on Aira core
 
 PluDAO - the DAO in control funding of Plutus and release of Plutons 
