@@ -3,76 +3,59 @@ import 'lib/AddressList.sol';
 
 contract Proposal is Owned {
     // Constructor
-    function Proposal(address _target, uint _total, string _description) {
-        target      = _target;
-        total_value = _total;
+    function Proposal(address _destination, uint _targetValue, string _description) {
+        destination = _destination;
         description = _description;
+        targetValue = _targetValue;
     }
 
     // Proposal destination address
-    address public target;
-
-    // Proposal value in credits
-    uint public total_value;
+    address public destination;
     
     // Proposal description
     string public description;
 
-    // Is proposal closed?
-    bool public closed = false;
+    // Proposal value in credits
+    uint public targetValue;
+
+    // Proposal close time
+    uint public closed = 0;
+
+    function close() onlyOwner
+    { closed = now; }
 
     // Current summary shares given
-    uint public summary = 0;
+    uint public summaryShares = 0;
+
+    function setSummaryShares(uint _summary) onlyOwner
+    { summaryShares = _summary; }
 
     // Current given shares by funder address
-    mapping(address => uint) public valueOf;
+    mapping(address => uint) public sharesOf;
+
+    function setSharesOf(address _funder, uint _shares) onlyOwner
+    { sharesOf[_funder] = _shares; }
 
     // Amount of credits returned
-    uint public total_back = 0;
+    uint public backValue = 0;
+
+    function setBackValue(uint _backValue) onlyOwner
+    { backValue = _backValue; }
 
     // Current released shares
-    mapping(address => uint) public backOf;
+    mapping(address => uint) public refundSharesOf;
+
+    function setRefunSharesOf(address _funder, uint _shares) onlyOwner
+    { refundSharesOf[_funder] = _shares; }
  
-    // Current share price
-    uint public share_price = 0;
+    // List of proposal funders
+    address[] public funders;
 
-    AddressList.Data funders;
-    using AddressList for AddressList.Data;
+    function appendFunder(address _funder) onlyOwner
+    { funders.push(_funder); }
 
-    function append(address _funder, uint _value, uint _price) onlyOwner {
-        if (!funders.contains(_funder))
-            funders.append(_funder);
+    uint public sharePrice = 0;
 
-        valueOf[_funder] += _value;
-        summary          += _value;
-        share_price       = _price;
-
-        if (summary * share_price >= total_value)
-            closed = true;
-    }
-
-    function remove(address _funder, uint _value) onlyOwner returns (uint) {
-        var refund_value = valueOf[_funder] > _value
-                         ? _value : valueOf[_funder]; 
-
-        // Decrease values
-        valueOf[_funder] -= refund_value;
-        summary          -= refund_value;
-
-        // Remove voter if balance is zero
-        if (valueOf[_funder] == 0)
-            funders.remove(_funder);
-
-        return refund_value;
-    }
-
-    function fundback(address _funder, uint _value) onlyOwner returns (uint) {
-        total_back      += _value;
-        var back_value  = valueOf[_funder] * total_back / total_value;
-        var free_shares = back_value <= valueOf[_funder]
-                        ? back_value : valueOf[_funder];
-        var refund = free_shares - backOf[_funder];
-        backOf[_funder] = free_shares;
-        return refund;
-    }
+    function setSharePrice(uint _sharePrice) onlyOwner
+    { sharePrice = _sharePrice; }
 }

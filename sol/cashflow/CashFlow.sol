@@ -8,12 +8,12 @@ contract CashFlow is Owned {
     Token public shares;
  
     // Proposal list
-    AddressList.Data proposals;
-    using AddressList for AddressList.Data;
+    Proposal[] public proposals;
 
     // Events
-    event NewProposal(address indexed proposal);
-    event CloseProposal(address indexed proposal);
+    event Created(address indexed proposal);
+    event Updated(address indexed proposal);
+    event Closed(address indexed proposal);
 
     // Constructor
     function CashFlow(address _credits, address _shares) {
@@ -22,19 +22,11 @@ contract CashFlow is Owned {
     }
 
     /**
-     * @dev Get first proposal
-     * @return first proposal
+     * @dev Nominal price of one share in credits
+     * @return amount of credits in one share
      */
-    function firstProposal() constant returns (address)
-    { return proposals.first(); }
-
-    /**
-     * @dev Get next proposal
-     * @param _current is a current proposal
-     * @return next proposal
-     */
-    function nextProposal(address _current) constant returns (address)
-    { return proposals.next(_current); }
+    function nominalSharePrice() constant returns (uint)
+    { return credits.getBalance() / shares.totalSupply(); }
 
     /**
      * @dev Initial new proposal
@@ -45,8 +37,8 @@ contract CashFlow is Owned {
      */
     function init(address _target, uint _total, string _description) returns (Proposal) {
         var proposal = new Proposal(_target, _total, _description); 
-        proposals.append(proposal);
-        NewProposal(proposal);
+        proposals.push(proposal);
+        Created(proposal);
         return proposal;
     }
 
@@ -56,16 +48,15 @@ contract CashFlow is Owned {
      * @param _value is a count of given shares
      */
     function fund(Proposal _proposal, uint _value) {
-        if (_proposal.closed() ||
+        if (_proposal.closed() == 0 ||
             shares.getBalance(msg.sender) < _value) throw;
 
-        var available   = shares.totalSupply() - shares.getBalance();
-        var share_price = credits.getBalance() / available;
-        var summary     = _proposal.summary() + _value;
+        var share_price = nominalSharePrice();
+        var summary     = _proposal.summaryShares() + _value;
 
-        bool overload   = summary * share_price > _proposal.total_value();
+        bool overload = summary * share_price > _proposal.targetValue();
         if (overload) {
-            var correction = summary * share_price - _proposal.total_value();
+            var correction = summary * share_price - _proposal.targetValue();
             _value -= correction / share_price;
         }
 
@@ -73,28 +64,57 @@ contract CashFlow is Owned {
         shares.transferFrom(msg.sender, this, _value);
 
         // Append new funder
-        _proposal.append(msg.sender, _value, share_price);
+        _proposal.appendFunder(msg.sender);
+        _proposal.setSharesOf(msg.sender, _proposal.sharesOf(msg.sender) + _value);
+        _proposal.setSummaryShares(_proposal.summaryShares() + _value);
 
         // Is proposal done?
-        if (_proposal.closed()) {
-            if (!credits.transfer(_proposal.target(), _proposal.total_value()))
-                throw;
-            CloseProposal(_proposal);
+        if (_proposal.summaryShares() * share_price >= _proposal.targetValue()) {
+            // Transfer credits
+            if (!credits.transfer(_proposal.destination(),
+                                  _proposal.targetValue())) throw;
+
+            // Close proposal
+            _proposal.close();
+            _proposal.setSharePrice(share_price);
+            Closed(_proposal);
+        } else {
+            Updated(_proposal);
         }
     }
 
     /**
-     * @dev Decrease self share value from opened target
+     * @dev Refund shares from proposal 
      * @param _proposal is a proposal instance 
      * @param _value is how amount shares will be refunded
      * @notice target proposal should be open
      */
     function refund(Proposal _proposal, uint _value) {
-        // Check for closed
-        if (!_proposal.closed()) {
-            var refund_value = _proposal.remove(msg.sender, _value);
-            shares.transfer(msg.sender, refund_value);
+        uint sender_balance = _proposal.sharesOf(msg.sender); 
+        uint refund_shares  = 0;
+
+        if (_proposal.closed() == 0) {
+            // CLOSED proposal
+            var free_shares  = sender_balance
+                             * _proposal.backValue()
+                             / _proposal.targetValue();
+
+            refund_shares = free_shares > sender_balance
+                          ? sender_balance : free_shares;
+            refund_shares = refund_shares > _value
+                          ? _value : refund_shares;
+
+            _proposal.setRefunSharesOf(msg.sender, refund_shares);
+        } else {
+            // OPEN proposal
+            refund_shares  = sender_balance > _value ? _value : sender_balance; 
+
+            _proposal.setSharesOf(msg.sender, sender_balance - refund_shares);
+            _proposal.setSummaryShares(_proposal.summaryShares() - refund_shares);
         }
+
+        if (!shares.transfer(msg.sender, refund_shares)) throw;
+        Updated(_proposal);
     }
  
     /**
@@ -103,9 +123,11 @@ contract CashFlow is Owned {
      * @param _value is a value of returned credits
      */
     function fundback(Proposal _proposal, uint _value) {
-        if (credits.transferFrom(msg.sender, this, _value)) {
-            var released_shares = _proposal.fundback(msg.sender, _value);
-            shares.transfer(msg.sender, released_shares);
-        }
+        // Try to take a credits
+        if (!credits.transferFrom(msg.sender, this, _value)) throw;
+
+        // Update back value
+        _proposal.setBackValue(_proposal.backValue() + _value);
+        Updated(_proposal);
     }
 }
