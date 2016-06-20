@@ -93,7 +93,7 @@ contract CashFlow is Owned {
         uint sender_balance = _proposal.sharesOf(msg.sender); 
         uint refund_shares  = 0;
 
-        if (_proposal.closed() == 0) {
+        if (_proposal.closed() > 0) {
             // CLOSED proposal
             var free_shares  = sender_balance
                              * _proposal.backValue()
