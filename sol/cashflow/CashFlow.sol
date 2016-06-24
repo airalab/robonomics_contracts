@@ -35,7 +35,7 @@ contract CashFlow is Owned {
      * @param _description is a short description of new proposal
      * @return proposal address
      */
-    function init(address _target, uint _total, string _description) returns (Proposal) {
+    function proposal(address _target, uint _total, string _description) returns (Proposal) {
         var proposal = new Proposal(_target, _total, _description); 
         proposals.push(proposal);
         Created(proposal);
