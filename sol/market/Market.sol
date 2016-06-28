@@ -37,14 +37,19 @@ contract Market is Mortal {
 
     /**
      * @dev Append new lot into market lot list
-     * @param _lot new market lot
-     * @notice only seller can append lot to market
+     * @param _seller is a seller address
+     * @param _sale the token to sale by this lot
+     * @param _buy the token to buy by this lot
+     * @param _value amount of saled tokens
+     * @param _price how many `_buy` tokens will send for one `_sale`
+     * @return new lot address
      */
-    function append(Lot _lot) {
-        if (_lot.seller() == msg.sender) {
-            lots.append(_lot);
-            ++size;
-        }
+    function append(address _seller, address _sale, address _buy,
+                    uint _value, uint _price) returns (Lot) {
+        var lot = new Lot(_seller, _sale, _buy, _value, _price);
+        lots.append(lot);
+        ++size;
+        return lot;
     }
  
     /**
@@ -53,7 +58,7 @@ contract Market is Mortal {
      * @notice only seller can remove lot from market
      */
     function remove(Lot _lot) {
-        if (_lot.seller() == msg.sender) {
+        if (_lot.seller() == msg.sender || _lot.closed()) {
             lots.remove(_lot);
             --size;
         }

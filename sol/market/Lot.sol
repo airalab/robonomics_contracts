@@ -23,17 +23,18 @@ contract Lot is Mortal {
 
     /**
      * @dev Market lot contruction
+     * @param _seller is a seller address
      * @param _sale the token to sale by this lot
      * @param _buy the token to buy by this lot
      * @param _value amount of saled tokens
      * @param _price how many `_buy` tokens will send for one `_sale`
      */
-    function Lot(Token _sale, Token _buy, uint _value, uint _price) {
-        sale   = _sale;
-        buy    = _buy;
+    function Lot(address _seller, address _sale, address _buy, uint _value, uint _price) {
+        sale   = Token(_sale);
+        buy    = Token(_buy);
         value  = _value;
         price  = _price;
-        seller = msg.sender;
+        seller = _seller;
     }
 
     /**

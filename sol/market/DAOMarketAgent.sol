@@ -33,8 +33,7 @@ contract DAOMarketAgent is MarketAgent {
         regulator.credits().approve(msg.sender, _value * _price);
 
         // Make lot and place on market
-        var lot = new Lot(_token, regulator.credits(), _value, _price);
-        regulator.market().append(lot);
+        var lot = regulator.market().append(this, _token, regulator.credits(), _value, _price);
 
         // Approve lot in traded token for deal
         _token.approve(lot, _value);
