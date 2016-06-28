@@ -48,7 +48,7 @@ contract CashFlow is Owned {
      * @param _value is a count of given shares
      */
     function fund(Proposal _proposal, uint _value) {
-        if (_proposal.closed() == 0 ||
+        if (_proposal.closed() > 0 ||
             shares.getBalance(msg.sender) < _value) throw;
 
         var share_price = nominalSharePrice();
