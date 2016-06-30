@@ -2,7 +2,7 @@
 // AIRA Builder for ShareSale contract
 //
 // Ethereum address:
-//  - Testnet: 
+//  - Testnet: 0x56c58efbf174dc82b4311a68b84bdfd5db13a3db 
 //
 
 import 'creator/CreatorShareSale.sol';
