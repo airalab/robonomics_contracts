@@ -20,6 +20,7 @@ contract BuilderDAO is Builder {
         var dao = CreatorCore.create(_dao_name, _dao_description);
 
         var shares = CreatorTokenEmission.create(_shares_name, _shares_symbol, 0, _shares_count);
+        shares.transfer(msg.sender, _shares_count);
         shares.delegate(msg.sender);
 
         // Append shares module
