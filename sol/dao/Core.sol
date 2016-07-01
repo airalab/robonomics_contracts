@@ -30,12 +30,24 @@ contract Core is Mortal {
     using AddressList for AddressList.Data;
     using AddressMap for AddressMap.Data;
  
-    /* DAO constructor */
+    /**
+     * @dev DAO constructor
+     * @param _name is a DAO name
+     * @param _description is a short DAO description
+     */
     function Core(string _name, string _description) {
         name         = _name;
         description  = _description;
         founder      = msg.sender;
     }
+
+    /**
+     * @dev Fast module exist check
+     * @param _module is a module address
+     * @return `true` wnen core contains module
+     */
+    function contains(address _module) constant returns (bool)
+    { return modules.items.contains(_module); }
  
     /**
      * @dev Check for module have permanent name
@@ -84,22 +96,26 @@ contract Core is Mortal {
      * @param _constant have a `true` value when you create permanent name of module
      */
     function setModule(string _name, address _module, string _interface, bool _constant) onlyOwner {
-        if (!isConstant(_name)) {
-            // Set module in the map
-            modules.set(_name, _module);
+        if (isConstant(_name)) throw;
+ 
+        // Set module in the map
+        modules.set(_name, _module);
 
-            // Register node interface
-            interfaceOf[_module] = _interface;
+        // Register node interface
+        interfaceOf[_module] = _interface;
 
-            // Register constant module
-            is_constant[sha3(_name)] = _constant;
-        }
+        // Register constant module
+        is_constant[sha3(_name)] = _constant;
     }
  
     /**
      * @dev Remove module by name
      * @param _name module name
      */
-    function removeModule(string _name) onlyOwner
-    { modules.remove(_name); }
+    function removeModule(string _name) onlyOwner {
+        if (isConstant(_name)) throw;
+
+        // Remove module
+        modules.remove(_name);
+    }
 }
