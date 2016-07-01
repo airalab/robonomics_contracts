@@ -1,4 +1,5 @@
 import './CashFlow.sol';
+import 'token/TokenEther.sol';
 
 /**
  * @title Contract for direct sale shares for cashflow 
@@ -9,6 +10,9 @@ contract ShareSale is Mortal {
 
     // Price of one share
     uint public priceWei;
+
+    // Time of sale
+    uint public closed = 0;
 
     /**
      * @dev Set price of one share in Wei
@@ -43,10 +47,16 @@ contract ShareSale is Mortal {
     function () {
         var value = available() * priceWei; 
 
-        if (   msg.value < value
-           || !msg.sender.send(msg.value - value)
-           || !cashflow.send(value)
+        if (  closed > 0 
+           || msg.value < value
+           || !msg.sender.send(msg.value - value)) throw;
+
+        TokenEther(cashflow.credits()).refill.value(value)();
+
+        if (  !cashflow.credits().transfer(cashflow, value)
            || !cashflow.shares().transfer(msg.sender, available())
            ) throw;
+
+        closed = now;
     }
 }

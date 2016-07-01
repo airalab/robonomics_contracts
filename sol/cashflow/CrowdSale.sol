@@ -3,62 +3,62 @@ import 'common/FiniteTime.sol';
 import 'token/TokenEmission.sol';
 import './CashFlow.sol';
 
-contract IPO is FiniteTime, Owned {
+contract CrowdSale is FiniteTime, Owned {
     CashFlow public cashflow;
+    Token    public sale;
 
-    /* IPO fail notification */
+    /* fail notification */
     bool public is_fail = false;
     event Failed();
-
-    /* The funders storage */
-    address[] public funders;
-    mapping(address => uint) public creditsOf;
 
     uint public currentPrice;
     uint public currentPeriod;
     uint public priceStep;
     uint public stepPeriod;
     
-    uint public ipoMinValue;
-    uint public ipoEndValue;
-    
-    function IPO(address _cashflow, uint _start_time_sec, uint _duration_sec,
-                 uint _start_price, uint _step, uint _period_sec,
-                 uint _min_value, uint _end_value) FiniteTime(_start_time_sec, _duration_sec) {
+    uint public minValue;
+    uint public endValue;
+
+    mapping(address => uint) public creditsOf;
+ 
+    /**
+     * @dev Crowdsale contract constructor
+     * @param _cashflow is a Cashflow address for send given credits of success end
+     * @param _sale is a saled token
+     * @param _start_time_sec is a start time of Crowdsale in UNIX time
+     * @param _duration_sec is a duration of Crowdsale in seconds
+     * @param _start_price is a start price of one `_sale` token in cashflow credits
+     * @param _step is a step of price up in percent
+     * @param _period_sec is a period of price grown in seconds
+     * @param _min_value is a minimal value for successfull Crowdsale ending
+     * @param _end_value is a value when given for immediate Crowdsale ending
+     */
+    function CrowdSale(address _cashflow, address _sale,
+                       uint _start_time_sec, uint _duration_sec,
+                       uint _start_price, uint _step, uint _period_sec,
+                       uint _min_value, uint _end_value) FiniteTime(_start_time_sec, _duration_sec)
+    {
         owner         = msg.sender;
         cashflow      = CashFlow(_cashflow);
+        sale          = Token(_sale);
         currentPrice  = _start_price;
         currentPeriod = _start_time_sec;
         priceStep     = _step;
         stepPeriod    = _period_sec;
-        ipoMinValue   = _min_value;
-        ipoEndValue   = _end_value;
+        minValue      = _min_value;
+        endValue      = _end_value;
     }
 
     /**
-     * @dev Available shares getter
-     * @return available shares value
+     * @dev This method is called when user accept
+     * @notice Some credits should be approved for before call 
      */
-    function getFreeShares() constant returns (uint)
-    { return cashflow.shares().getBalance(); }
-
-    /**
-     * @dev Founded credits getter
-     * @return founded credits value
-     */
-    function getFoundedCredits() constant returns (uint)
-    { return cashflow.credits().getBalance(); }
-
-    /**
-     * @dev This method is called when user accept the IPO
-     * @notice Some credits should be approved for IPO before call 
-     */
-    function sign() {
+    function deal() {
         checkTime();
 
         // Wnen now is end of time
         if (now > end_time) {
-            if (ipoMinValue < cashflow.credits().getBalance())
+            if (minValue < cashflow.credits().getBalance())
                 // Minimal value funded
                 done();
             else
@@ -68,7 +68,7 @@ contract IPO is FiniteTime, Owned {
         }
 
         // Funded maximal value
-        if (ipoEndValue < cashflow.credits().getBalance()) {
+        if (endValue < cashflow.credits().getBalance()) {
             done();
             return;
         }
@@ -76,20 +76,19 @@ contract IPO is FiniteTime, Owned {
         // Not alowed to start
         if (!is_alive) return;
 
-        // Calculate shares price
+        // Calculate price
         priceCalc();
         
         // Detect sender credits value
         var value = cashflow.credits().getBalance(msg.sender);
         if (value == 0) return;
 
-        // Buy the shares
-        var sharesCount = value / currentPrice;
+        // Buy the
+        var count = value / currentPrice;
         if (!cashflow.credits().transferFrom(msg.sender, this, value)) throw;
-        if (!cashflow.shares().transfer(msg.sender, sharesCount)) throw;
+        if (!sale.transfer(msg.sender, count)) throw;
 
-        // Append sender as a new funder
-        funders.push(msg.sender);
+        // Store given value for refund when fail
         creditsOf[msg.sender] += value;
     }
 
@@ -106,11 +105,11 @@ contract IPO is FiniteTime, Owned {
     }
 
     /**
-     * @dev This internal method should be called when IPO closed success
+     * @dev This internal method should be called when closed success
      */
     function done() internal {
-        // Refund owner unused shares
-        if (!cashflow.shares().transfer(owner, cashflow.shares().getBalance()))
+        // Refund owner unused
+        if (!sale.transfer(owner, sale.getBalance()))
             throw;
 
         // Transfer funded credits to cashflow
@@ -123,11 +122,11 @@ contract IPO is FiniteTime, Owned {
     }
 
     /**
-     * @dev This internal method should be called when IPO closed fail
+     * @dev This internal method should be called when closed fail
      */
     function fail() internal {
-        // Refund owner unused shares
-        if (!cashflow.shares().transfer(owner, cashflow.shares().getBalance()))
+        // Refund owner unused sale
+        if (!sale.transfer(owner, sale.getBalance()))
             throw;
 
         // Close the IPO
@@ -138,7 +137,7 @@ contract IPO is FiniteTime, Owned {
 
     
     /**
-     * @dev Refund sended credits when IPO is fail
+     * @dev Refund sended credits when is fail
      */
     function refund() {
         if (creditsOf[msg.sender] > 0 && is_fail)
