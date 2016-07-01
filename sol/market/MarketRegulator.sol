@@ -22,8 +22,8 @@ contract MarketRegulator is Mortal {
     /* Only market agents can call modified functions */
     modifier onlyAgents { if (agents.contains(msg.sender)) _ }
 
-    function MarketRegulator(address _credits) {
-        market  = new Market();
+    function MarketRegulator(address _market, address _credits) {
+        market  = Market(_market);
         credits = TokenEmission(_credits);
     }
 

@@ -19,12 +19,13 @@ contract BuilderDAOMarketRegulator is Builder {
     /**
      * @dev Run script creation contract
      * @param _shares is address shares token
-     * @param _thesaurus is address thesaurus
+     * @param _core is DAO core address
+     * @param _market is DAO market address
      * @param _dao_credits is address credits token
      * @return address new contract
      */
-    function create(address _shares, address _thesaurus, address _dao_credits) returns (address) {
-        var inst = CreatorDAOMarketRegulator.create(_shares, _thesaurus, _dao_credits);
+    function create(address _shares, address _core, address _market, address _dao_credits) returns (address) {
+        var inst = CreatorDAOMarketRegulator.create(_shares, _core, _market, _dao_credits);
         Owned(inst).delegate(msg.sender);
         
         deal(inst);

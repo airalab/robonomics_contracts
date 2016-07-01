@@ -1,6 +1,7 @@
 import 'market/MarketRegulator.sol';
 import 'market/MarketRule.sol';
 import 'lib/Voting.sol';
+import 'dao/Core.sol';
 import 'creator/CreatorDAOMarketAgent.sol';
 
 /**
@@ -8,20 +9,39 @@ import 'creator/CreatorDAOMarketAgent.sol';
  */
 contract DAOMarketRegulator is MarketRegulator {
     /* The DAO shares token */
-    Token shares;
+    Token public shares;
 
-    /* The DAO thesaurus */
-    KnowledgeStorage thesaurus;
+    /* The DAO Core register */
+    Core public core;
 
     /* The rule poll by asset address */
     mapping(address => Voting.Poll) ruleOf;
     using Voting for Voting.Poll;
     
-    function DAOMarketRegulator(address _shares, address _thesaurus,
-                                address _dao_credits)
-            MarketRegulator(_dao_credits) {
-        shares    = Token(_shares);
-        thesaurus = KnowledgeStorage(_thesaurus);
+    function DAOMarketRegulator(address _shares, address _core,
+                                address _market, address _dao_credits)
+            MarketRegulator(_market, _dao_credits) {
+        shares = Token(_shares);
+        core   = Core(_core);
+    }
+
+    event LotPlaced(address indexed sender, address indexed lot);
+
+    /**
+     * @dev Append new lot into market lot list
+     * @param _seller is a seller address
+     * @param _sale the token to sale by this lot
+     * @param _value amount of saled tokens
+     * @param _price how many `_buy` tokens will send for one `_sale`
+     * @return new lot address
+     */
+    function append(address _seller, address _sale,
+                    uint _value, uint _price) returns (Lot) {
+        if (!core.contains(_sale)) throw;
+
+        var lot = market.append(_seller, _sale, credits, _value, _price);
+        LotPlaced(msg.sender, lot);
+        return lot;
     }
 
     /**
@@ -30,7 +50,7 @@ contract DAOMarketRegulator is MarketRegulator {
      */
     function sign() returns (MarketAgent) {
         // Make a new market agent
-        var agent = CreatorDAOMarketAgent.create(thesaurus, this);
+        var agent = CreatorDAOMarketAgent.create(this);
 
         // Store agent address for the future usage
         agents.append(agent);
@@ -57,10 +77,7 @@ contract DAOMarketRegulator is MarketRegulator {
      */
     function dealDone(Lot _lot) onlyAgents {
         // Select the traded asset
-        var assetToken = _lot.buy() == credits ? _lot.sale() : _lot.buy(); 
-
-        // Get asset specification
-        var asset = TokenSpec(assetToken).specification();
+        var asset = _lot.buy() == credits ? _lot.sale() : _lot.buy(); 
 
         // Select current trade rule for traded asset
         var rule = ruleOf[asset].current();
