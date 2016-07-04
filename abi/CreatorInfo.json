@@ -1,7 +1,1 @@
-Compile...
-(cache)
-
-Contract:	CreatorInfo
-Binary size:	0K
-
-var CreatorInfo = [{"constant":true,"inputs":[],"name":"version","outputs":[{"name":"","type":"string"}],"type":"function"},{"constant":true,"inputs":[],"name":"interface","outputs":[{"name":"","type":"string"}],"type":"function"}];
+[{"constant":true,"inputs":[],"name":"version","outputs":[{"name":"","type":"string"}],"type":"function"},{"constant":true,"inputs":[],"name":"interface","outputs":[{"name":"","type":"string"}],"type":"function"}]
