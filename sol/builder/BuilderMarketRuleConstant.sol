@@ -1,0 +1,29 @@
+//
+// AIRA Builder for MarketRuleConstant contract
+//
+// Ethereum address:
+//  - Testnet: 
+//
+
+import 'creator/CreatorMarketRuleConstant.sol';
+import './Builder.sol';
+
+/**
+ * @title BuilderMarketRuleConstant contract
+ */
+contract BuilderMarketRuleConstant is Builder {
+    function BuilderMarketRuleConstant(uint _buildingCost, address _cashflow, address _proposal)
+             Builder(_buildingCost, _cashflow, _proposal)
+    {}
+    
+    /**
+     * @dev Run script creation contract
+     * @param _emission is how amount of tokens should be emissed
+     * @return address new contract
+     */
+    function create(uint _emission) returns (address) {
+        var inst = CreatorMarketRuleConstant.create(_emission);
+        deal(inst);
+        return inst;
+    }
+}
