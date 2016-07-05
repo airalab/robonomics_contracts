@@ -95,7 +95,7 @@ library Voting {
         var left  = _poll.poll.prev(_variant);
 
         while (left != 0 && _poll.valueOf[left] < value) {
-            _poll.poll.swap(left, _voter);
+            _poll.poll.swap(left, _variant);
             left = _poll.poll.prev(_variant);
         }
     }
