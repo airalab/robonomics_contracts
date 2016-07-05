@@ -17,7 +17,22 @@ contract DAOMarketRegulator is MarketRegulator {
     /* The rule poll by asset address */
     mapping(address => Voting.Poll) ruleOf;
     using Voting for Voting.Poll;
+
+    /**
+     * @dev Rule by asset getter
+     * @param _asset is asset address
+     * @return rule address or `0x` when no rule setted
+     */
+    function currentRuleOf(address _asset) constant returns (address)
+    { return ruleOf[_asset].current(); }
     
+    /**
+     * @dev DAO Market regulator
+     * @param _shares is a share holders token for voting actions
+     * @param _core is a DAO core ref for asset exist checks
+     * @param _market is a DAO market address
+     * @param _dao_credits is a common traded asset
+     */
     function DAOMarketRegulator(address _shares, address _core,
                                 address _market, address _dao_credits)
             MarketRegulator(_market, _dao_credits) {
@@ -100,7 +115,7 @@ contract DAOMarketRegulator is MarketRegulator {
      * @param _rule the rule is maked for given asset
      * @param _count how much shares given for increase
      */
-    function pollUp(Knowledge _asset, MarketRule _rule, uint _count)
+    function pollUp(address _asset, MarketRule _rule, uint _count)
     { ruleOf[_asset].up(msg.sender, _rule, shares, _count); }
 
     /**
@@ -108,6 +123,6 @@ contract DAOMarketRegulator is MarketRegulator {
      * @param _asset asset for applying the rule
      * @param _count count of refunded shares
      */
-    function pollDown(Knowledge _asset, uint _count)
+    function pollDown(address _asset, uint _count)
     { ruleOf[_asset].down(msg.sender, shares, _count); }
 }
