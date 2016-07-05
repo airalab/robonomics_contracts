@@ -8,8 +8,12 @@ import './AddressList.sol';
 library Voting {
     /* Voting structure */
     struct Poll {
-        /* Stack of all voters by value */
+        /* Stack of all voters */
         AddressList.Data            voters;
+        /* Stack of all variants by value */
+        AddressList.Data            poll;
+        /* Count of shares for given variant */
+        mapping(address => uint)    valueOf;
         /* Count of shares for given voter */
         mapping(address => uint)    shareOf;
         /* Poll variant for given voter */
@@ -24,31 +28,36 @@ library Voting {
      * @return current value
      */
     function current(Poll storage _poll) constant returns (address)
-    { return _poll.pollOf[_poll.voters.first()]; } 
+    { return _poll.poll.first(); } 
 
     /**
      * @dev Increase poll shares for given variant
      * @param _poll ref to `Poll` structure
-     * @param _value voter variant value
+     * @param _variant voter variant value
      * @param _shares token represents vote
      * @param _count how much votes are given
      */
-    function up(Poll storage _poll, address _voter, address _value,
+    function up(Poll storage _poll, address _voter, address _variant,
                 Token _shares, uint _count) {
         // Try to transfer count of shares from voter to self
         if (!_shares.transferFrom(_voter, this, _count))
             throw;
 
         // Increase shares and set the poll
-        _poll.shareOf[_voter] += _count;
-        _poll.pollOf[_voter]   = _value;
+        _poll.shareOf[_voter]   += _count;
+        _poll.pollOf[_voter]     = _variant;
+        _poll.valueOf[_variant] += _count;
 
         // Append voter if not in list
         if (!_poll.voters.contains(_voter))
             _poll.voters.append(_voter);
 
+        // Append variant if not in list
+        if (!_poll.poll.contains(_variant))
+            _poll.poll.append(_variant);
+
         // Shift voter in the stack
-        shiftLeft(_poll, _voter);
+        shiftLeft(_poll, _variant);
     }
 
     /**
@@ -62,11 +71,12 @@ library Voting {
 
         // Transfer shares
         _shares.transfer(_voter, refund);
-        _poll.shareOf[_voter] -= refund;
+        _poll.shareOf[_voter]               -= refund;
+        _poll.valueOf[_poll.pollOf[_voter]] -= refund;
 
         // Shift right or drop when no shares
         if (_poll.shareOf[_voter] > 0) {
-            shiftRight(_poll, _voter);
+            shiftRight(_poll, _poll.pollOf[_voter]);
         } else {
             _poll.voters.remove(_voter);
         }
@@ -74,29 +84,29 @@ library Voting {
 
     /*
      * Shifting mechanism
-     * Thesys: the stack of voters should be sorted by shareOf value.
+     * Thesys: the stack of variants should be sorted by valueOf value.
      * Solution:
-     *  - `up` call: voter shifted left while his shareOf value is large
-     *  - `down` call: voter shifted right in the stack while shareOf value is low
+     *  - `up` call: variant shifted left while his valueOf value is large
+     *  - `down` call: varian shifted right in the stack while valueOf value is low
      */
 
-    function shiftLeft(Poll storage _poll, address _voter) internal {
-        var value = _poll.shareOf[_voter];
-        var left  = _poll.voters.prev(_voter);
+    function shiftLeft(Poll storage _poll, address _variant) internal {
+        var value = _poll.valueOf[_variant];
+        var left  = _poll.poll.prev(_variant);
 
-        while (left != 0 && _poll.shareOf[left] < value) {
-            _poll.voters.swap(left, _voter);
-            left = _poll.voters.prev(_voter);
+        while (left != 0 && _poll.valueOf[left] < value) {
+            _poll.poll.swap(left, _voter);
+            left = _poll.poll.prev(_variant);
         }
     }
 
-    function shiftRight(Poll storage _poll, address _voter) internal {
-        var value = _poll.shareOf[_voter];
-        var right = _poll.voters.next(_voter);
+    function shiftRight(Poll storage _poll, address _variant) internal {
+        var value = _poll.valueOf[_variant];
+        var right = _poll.poll.next(_variant);
 
-        while (right != 0 && _poll.shareOf[right] > value) {
-            _poll.voters.swap(right, _voter);
-            right = _poll.voters.next(_voter);
+        while (right != 0 && _poll.valueOf[right] > value) {
+            _poll.poll.swap(right, _variant);
+            right = _poll.poll.next(_variant);
         }
     }
 }
