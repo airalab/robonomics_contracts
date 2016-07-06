@@ -1,19 +1,20 @@
 import 'common/Owned.sol'; 
 import 'token/Token.sol'; 
 
-contract ProposalTarget {
-    function targetDone();
+contract ProposalDoneReceiver {
+    function proposalDone(uint _index);
 }
 
 /**
  * @dev The 51% voting
  */
 contract Voting51 is Owned {
-    Token public shares;
-    uint  public voting_limit;
+    Token                public voting_token;
+    ProposalDoneReceiver public receiver;
 
-    address[]               public proposal;
+    address[]               public proposal_target;
     mapping(uint => uint)   public start_time;
+    mapping(uint => uint)   public end_time;
     mapping(uint => string) public description;
 
     mapping(uint => uint)   public total_value;
@@ -21,57 +22,78 @@ contract Voting51 is Owned {
 
     uint public current_proposal = 0;
 
-    event ProposalDone(uint indexed proposal);
+    event ProposalDone(uint indexed index);
+    event ProposalNew(uint indexed index);
 
-    function Voting51(Token _shares) {
-        shares = _shares;
+    /**
+     * @dev Create voting contract for given voting token
+     * @param _voting_token is a token used for voting actions
+     * @param _receiver is a receiver for proposal done actions
+     */
+    function Voting51(Token _voting_token, ProposalDoneReceiver _receiver) {
+        voting_token = _voting_token;
+        receiver     = _receiver;
     }
 
     /**
      * @dev Append new proposal for voting
      * @param _target is a proposal target
      * @param _description is a proposal description
+     * @param _start_time is a start time of voting
+     * @param _duration_sec is a duration of voting
+     * @notice only voters (accounts with positive voting token balance) can call it
      */
-    function appendProposal(address _target,
-                            string _description,
-                            uint _start_time) onlyOwner {
-        description[proposal.length] = _description;
-        start_time[proposal.length]  = _start_time;
-        proposal.push(_target);
+    function proposal(address _target, string _description,
+                      uint _start_time, uint _duration_sec) onlyOwner {
+        description[proposal_target.length] = _description;
+        start_time[proposal_target.length]  = _start_time;
+        end_time[proposal_target.length]    = _start_time + _duration_sec;
+        proposal_target.push(_target);
+        ProposalNew(proposal_target.length-1);
     }
 
     /**
      * @dev Voting for current proposal
-     * @param _count is how amount of shares used
-     * @notice shares should be approved for voting
+     * @param _count is how amount of `voting_token` used
+     * @notice `voting_token` should be approved for voting
      */
     function vote(uint _count) {
         // Check for no proposal exist
-        if (proposal[current_proposal] == 0
+        if (proposal_target[current_proposal] == 0
          || now < start_time[current_proposal]) throw;
 
+        // Check for end of voting time
+        if (now > end_time[current_proposal]) {
+            ++current_proposal;
+            return;
+        }
+
         // Voting operation
-        if (shares.transferFrom(msg.sender, this, _count)) {
+        if (voting_token.transferFrom(msg.sender, this, _count)) {
             total_value[current_proposal]             += _count;
             voter_value[current_proposal][msg.sender] += _count;
 
-            var voting_limit = shares.totalSupply() / 2;
+            var voting_limit = voting_token.totalSupply() / 2;
             // Check vote done
             if (total_value[current_proposal] > voting_limit) {
-                ProposalTarget(proposal[current_proposal]).targetDone();
                 ProposalDone(current_proposal);
+                receiver.proposalDone(current_proposal);
                 ++current_proposal;
             }
         }
     }
 
     /**
-     * @dev Refund shares
+     * @dev Refund voting tokens
      * @param _proposal is a proposal id
-     * @param _count is how amount of shares should be refunded
+     * @param _count is how amount of tokens should be refunded
      */
     function refund(uint _proposal, uint _count) {
-        if (voter_value[_proposal][msg.sender] >= _count)
-            shares.transfer(msg.sender, _count);
+        if (voter_value[_proposal][msg.sender] >= _count) {
+            voting_token.transfer(msg.sender, _count);
+            voter_value[_proposal][msg.sender] -= _count;
+        } else {
+            throw;
+        }
     }
 }
