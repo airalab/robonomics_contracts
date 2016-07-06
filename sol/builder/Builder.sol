@@ -12,7 +12,7 @@ contract Builder is Owned {
     CashFlow cashflow;
 
     /* Building cost  */
-    uint public buildingCost;
+    uint public buildingCostWei;
     /* Addresses builded contracts at sender */
     mapping(address => address[]) public getContractsOf;
     
@@ -23,12 +23,12 @@ contract Builder is Owned {
     
     /**
      * @dev Builder constructor
-     * @param _buildingCost is module name
+     * @param _buildingCostWei is module name
      * @param _cashflow is address cashflow
      * @param _proposal is address proposal
      */
-    function Builder(uint _buildingCost, address _cashflow, address _proposal) {
-        buildingCost = _buildingCost;
+    function Builder(uint _buildingCostWei, address _cashflow, address _proposal) {
+        buildingCostWei = _buildingCostWei;
         proposal = Proposal(_proposal);
         cashflow = CashFlow(_cashflow);
     }
@@ -59,10 +59,10 @@ contract Builder is Owned {
     
     /**
      * @dev Set building cost
-     * @param _buildingCost is cost
+     * @param _buildingCostWei is cost
      */
-    function setCost(uint _buildingCost) onlyOwner {
-        buildingCost = _buildingCost;
+    function setCost(uint _buildingCostWei) onlyOwner {
+        buildingCostWei = _buildingCostWei;
     }
     
     /**
@@ -71,12 +71,12 @@ contract Builder is Owned {
      * @notice Called after builded contract
      */
     function deal(address _contract) internal {
-        if (msg.value < buildingCost)                   throw;
-        if (!msg.sender.send(msg.value - buildingCost)) throw;
+        if (msg.value < buildingCostWei)                   throw;
+        if (!msg.sender.send(msg.value - buildingCostWei)) throw;
         
-        TokenEther(cashflow.credits()).refill.value(buildingCost)();
-        cashflow.credits().approve(cashflow, buildingCost);
-        cashflow.fundback(proposal, buildingCost);
+        TokenEther(cashflow.credits()).refill.value(buildingCostWei)();
+        cashflow.credits().approve(cashflow, buildingCostWei);
+        cashflow.fundback(proposal, buildingCostWei);
         getContractsOf[msg.sender].push(_contract);
         Builded(msg.sender, _contract);
     }

@@ -12,16 +12,15 @@ contract Market is Mortal {
     /* Market size */
     uint public size = 0;
 
-    bool public open = true;
+    bool public regulatorEnabled = false;
 
     /**
-     * @dev Market mode modifier, the open mode by defaul allow anyone place lot on market
-     *      in another case(`false` in open var) only owner can place a lot, this sute is 
-     *      used e.g. regulator
-     * @param _open is new mode value
+     * @dev Market mode modifier, the regulator disabled by defaul allow anyone place lot on market
+     *      in another case only owner can place a lot, this sute is used for market regulator
+     * @param _enable is new regulator mode value
      */
-    function setMode(bool _open) onlyOwner
-    { open = _open; }
+    function setRegulator(bool _enable) onlyOwner
+    { regulatorEnabled = _enable; }
 
     /**
      * @dev Take a first lot from market
@@ -57,7 +56,7 @@ contract Market is Mortal {
      */
     function append(address _seller, address _sale, address _buy,
                     uint _value, uint _price) returns (Lot) {
-        if (!open && msg.sender != owner) throw;
+        if (regulatorEnabled && msg.sender != owner) throw;
 
         var lot = new Lot(_seller, _sale, _buy, _value, _price);
         lots.append(lot);
