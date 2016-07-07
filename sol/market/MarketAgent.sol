@@ -1,14 +1,12 @@
-import 'thesaurus/Knowledge.sol';
-import 'token/Token.sol';
 import './Lot.sol';
 
 /**
  * @title The market agent interface,
  *        market agent is contract presents a person on the market
  */
-contract MarketAgent is Mortal {
+contract MarketAgent is Owned {
     /**
-     * @dev this event emitted for every lot deal done
+     * @dev this event emitted for every lot deal
      */
     event LotDeal(address indexed _lot);
 

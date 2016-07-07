@@ -8,7 +8,7 @@ import './Market.sol';
  *        this contract creates market and `credits` token
  *        for market trade
  */
-contract MarketRegulator is Mortal {
+contract MarketRegulator is Owned {
     /* The self market */
     Market public market;
 
@@ -29,10 +29,10 @@ contract MarketRegulator is Mortal {
 
     /**
      * @dev this event emitted for every new MarketAgent
-     * @param _client is a client address
-     * @param _agent is an agent address
+     * @param sender is a client address
+     * @param agent is an agent address
      */
-    event MarketAgentSign(address indexed _client, address indexed _agent);
+    event MarketAgentSign(address indexed sender, address indexed agent);
 
     /**
      * @dev Sign a contract with sender for trading on market
@@ -41,9 +41,9 @@ contract MarketRegulator is Mortal {
     function sign() returns (MarketAgent);
 
     /**
-     * @dev Deal done callback, this called by market agent 
+     * @dev Deal notify callback, this called by market agent 
      *      after call deal of `Lot`
      * @param _lot is deal description
      */
-    function dealDone(Lot _lot) onlyAgents;
+    function notifyDeal(Lot _lot) onlyAgents;
 }

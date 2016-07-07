@@ -4,7 +4,7 @@ import './Lot.sol';
 /**
  * @title Token based market contract
  */
-contract Market is Mortal {
+contract Market is Owned {
     /* Available market lots */
     AddressList.Data lots;
     using AddressList for AddressList.Data;
@@ -50,15 +50,15 @@ contract Market is Mortal {
      * @param _seller is a seller address
      * @param _sale the token to sale by this lot
      * @param _buy the token to buy by this lot
-     * @param _value amount of saled tokens
-     * @param _price how many `_buy` tokens will send for one `_sale`
+     * @param _quantity_sale amount of tokens to sale;
+     * @param _quantity_buy amount of tokens to buy 
      * @return new lot address
      */
     function append(address _seller, address _sale, address _buy,
-                    uint _value, uint _price) returns (Lot) {
+                    uint _quantity_sale, uint _quantity_buy) returns (Lot) {
         if (regulatorEnabled && msg.sender != owner) throw;
 
-        var lot = new Lot(_seller, _sale, _buy, _value, _price);
+        var lot = new Lot(_seller, _sale, _buy, _quantity_sale, _quantity_buy);
         lots.append(lot);
         ++size;
         return lot;

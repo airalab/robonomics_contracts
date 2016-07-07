@@ -12,7 +12,7 @@ contract DAOMarketRegulator is MarketRegulator {
     Token public shares;
 
     /* The DAO Core register */
-    Core public core;
+    Core public dao_core;
 
     /* The rule poll by asset address */
     mapping(address => Voting.Poll) ruleOf;
@@ -36,26 +36,39 @@ contract DAOMarketRegulator is MarketRegulator {
     function DAOMarketRegulator(address _shares, address _core,
                                 address _market, address _dao_credits)
             MarketRegulator(_market, _dao_credits) {
-        shares = Token(_shares);
-        core   = Core(_core);
+        shares   = Token(_shares);
+        dao_core = Core(_core);
     }
 
-    event LotPlaced(address indexed sender, address indexed lot);
+    event NewLot(address indexed sender, address indexed lot);
 
     /**
-     * @dev Append new lot into market lot list
-     * @param _seller is a seller address
+     * @dev Append new lot into the market for sale
      * @param _sale the token to sale by this lot
-     * @param _value amount of saled tokens
-     * @param _price how many `_buy` tokens will send for one `_sale`
+     * @param _quantity amount of tokens to sale;
+     * @param _price price of one in credits 
      * @return new lot address
      */
-    function append(address _seller, address _sale,
-                    uint _value, uint _price) returns (Lot) {
-        if (!core.contains(_sale)) throw;
+    function sale(Token _sale, uint _quantity, uint _price) returns (Lot) {
+        if (!dao_core.contains(_sale)) throw;
 
-        var lot = market.append(_seller, _sale, credits, _value, _price);
-        LotPlaced(msg.sender, lot);
+        var lot = market.append(msg.sender, _sale, credits, _quantity, _quantity * _price);
+        NewLot(msg.sender, lot);
+        return lot;
+    }
+ 
+    /**
+     * @dev Append new lot into the market for buy
+     * @param _buy the token to buy by this lot
+     * @param _quantity amount of tokens to sale;
+     * @param _price price of one in credits 
+     * @return new lot address
+     */
+    function buy(Token _buy, uint _quantity, uint _price) returns (Lot) {
+        if (!dao_core.contains(_buy)) throw;
+
+        var lot = market.append(msg.sender, credits, _buy, _quantity * _price, _quantity);
+        NewLot(msg.sender, lot);
         return lot;
     }
 
@@ -83,14 +96,14 @@ contract DAOMarketRegulator is MarketRegulator {
     /**
      * @dev this event emmitted for every trade based emission
      */
-    event DealDoneEmission(uint _value);
+    event Emission(uint _value);
 
     /**
-     * @dev Deal done callback, market regulation is maked according 
+     * @dev Deal notify callback, market regulation is maked according 
      *      the rules taked from poll stack
      * @param _lot is deal description
      */
-    function dealDone(Lot _lot) onlyAgents {
+    function notifyDeal(Lot _lot) onlyAgents {
         // Select the traded asset
         var asset = _lot.buy() == credits ? _lot.sale() : _lot.buy(); 
 
@@ -105,7 +118,7 @@ contract DAOMarketRegulator is MarketRegulator {
             credits.transfer(owner, emission);
 
             // Notify for emission value
-            DealDoneEmission(emission);
+            Emission(emission);
         }
     }
 
