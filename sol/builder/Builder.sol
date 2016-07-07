@@ -8,11 +8,13 @@ import 'token/TokenEther.sol';
 contract Builder is Owned {
     /* Proposal */
     Proposal proposal;
+
     /* The DAO cashflow */
     CashFlow cashflow;
 
     /* Building cost  */
     uint public buildingCostWei;
+
     /* Addresses builded contracts at sender */
     mapping(address => address[]) public getContractsOf;
     

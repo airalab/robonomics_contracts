@@ -29,10 +29,10 @@ contract BoardOfDirectors is Owned, ProposalDoneReceiver {
      * @param _shares is a share holders token
      * @param _credits is a fund token
      */
-    function BoardOfDirectors(Core _dao_core, Token _shares, Token _credits) {
-        dao_core = _dao_core;
-        shares   = _shares;
-        credits  = _credits;
+    function BoardOfDirectors(address _dao_core, address _shares, address _credits) {
+        dao_core = Core(_dao_core);
+        shares   = Token(_shares);
+        credits  = Token(_credits);
     }
 
     modifier onlyDirectors {
