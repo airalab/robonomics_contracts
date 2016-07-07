@@ -18,12 +18,15 @@ contract BuilderShareSale is Builder {
     
     /**
      * @dev Run script creation contract
-     * @param _cashflow is Cashflow address
+     * @param _target is a target of funds
+     * @param _etherFund is a ether wallet token
+     * @param _shares is a shareholders token contract 
      * @param _price_wei is price of one share in wei
      * @return address new contract
      */
-    function create(address _cashflow, uint _price_wei) returns (address) {
-        var inst = CreatorShareSale.create(_cashflow, _price_wei);
+    function create(address _target, address _etherFund,
+                    address _shares, uint _price_wei) returns (address) {
+        var inst = CreatorShareSale.create(_target, _etherFund, _shares, _price_wei);
         Owned(inst).delegate(msg.sender);
         
         deal(inst);

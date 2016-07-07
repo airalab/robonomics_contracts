@@ -5,8 +5,14 @@ import 'token/TokenEther.sol';
  * @title Contract for direct sale shares for cashflow 
  */
 contract ShareSale is Mortal {
-    // Assigned cashflow contract
-    CashFlow public cashflow;
+    // Assigned shares contract
+    Token public shares;
+
+    // Ether fund token 
+    TokenEther public etherFund;
+
+    // Target address for funds
+    address public target;
 
     // Price of one share
     uint public priceWei;
@@ -22,21 +28,19 @@ contract ShareSale is Mortal {
     { priceWei = _price_wei; }
     
     /**
-     * @dev Get count of shares on contract balance
-     * @return shares on balance
-     */
-    function available() returns (uint)
-    { return cashflow.shares().getBalance(); }
-
-    /**
      * @dev Create the contract for given cashflow and start price
-     * @param _cashflow is a `CashFlow` contract 
+     * @param _target is a target of funds
+     * @param _etherFund is a ether wallet token
+     * @param _shares is a shareholders token contract 
      * @param _price_wei is a price of one share
      * @notice After creation you should send shares to contract for sale
      */
-    function ShareSale(address _cashflow, uint _price_wei) {
-        cashflow = CashFlow(_cashflow);
-        priceWei = _price_wei;
+    function ShareSale(address _target, address _etherFund,
+                       address _shares, uint _price_wei) {
+        target    = _target;
+        etherFund = TokenEther(_etherFund);
+        shares    = Token(_shares);
+        priceWei  = _price_wei;
     }
 
     /**
@@ -45,18 +49,25 @@ contract ShareSale is Mortal {
      * @notice only full packet of shares can be saled
      */
     function () {
-        var value = available() * priceWei; 
+        var value = shares.getBalance() * priceWei; 
 
         if (  closed > 0 
            || msg.value < value
            || !msg.sender.send(msg.value - value)) throw;
 
-        TokenEther(cashflow.credits()).refill.value(value)();
+        etherFund.refill.value(value)();
 
-        if (  !cashflow.credits().transfer(cashflow, value)
-           || !cashflow.shares().transfer(msg.sender, available())
+        if (  !etherFund.transfer(target, value)
+           || !shares.transfer(msg.sender, shares.getBalance())
            ) throw;
 
         closed = now;
+    }
+
+    function kill() onlyOwner {
+        // Save the shares
+        if (!shares.transfer(owner, shares.getBalance())) throw;
+
+        super.kill();
     }
 }
