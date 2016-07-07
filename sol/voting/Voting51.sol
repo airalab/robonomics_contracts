@@ -30,9 +30,9 @@ contract Voting51 is Owned {
      * @param _voting_token is a token used for voting actions
      * @param _receiver is a receiver for proposal done actions
      */
-    function Voting51(Token _voting_token, ProposalDoneReceiver _receiver) {
-        voting_token = _voting_token;
-        receiver     = _receiver;
+    function Voting51(address _voting_token, address _receiver) {
+        voting_token = Token(_voting_token);
+        receiver     = ProposalDoneReceiver(_receiver);
     }
 
     /**

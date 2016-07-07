@@ -1,4 +1,4 @@
-import 'voting/Voting51.sol';
+import 'creator/CreatorVoting51.sol';
 import 'dao/CoreModify.sol';
 import 'lib/Voting.sol';
 
@@ -138,7 +138,7 @@ contract BoardOfDirectors is Owned, ProposalDoneReceiver {
     function checkVotingToken() internal {
         if (( address(voting) == 0 || voting.voting_token() != voting_token.current())
            && voting_token.valueOf[voting_token.current()] > shares.totalSupply() / 2) {
-                voting = new Voting51(Token(voting_token.current()), this);
+                voting = CreatorVoting51.create(Token(voting_token.current()), this);
                 VotingTokenChanged(voting_token.current());
         }
     }
