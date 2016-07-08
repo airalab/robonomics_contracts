@@ -6,7 +6,7 @@ import './Core.sol';
  * @dev   It's contract can modify core by set/remove modules
  */
 contract CoreModify is Modify {
-    function CoreModify(Core _target) Modify(_target) {}
+    function CoreModify(address _target) Modify(Owned(_target)) {}
 
     enum ModifyType {
         SetModule,

@@ -1,5 +1,5 @@
+import 'creator/CreatorCoreModify.sol';
 import 'creator/CreatorVoting51.sol';
-import 'dao/CoreModify.sol';
 import 'lib/Voting.sol';
 
 contract BoardOfDirectorsFund {
@@ -55,7 +55,9 @@ contract BoardOfDirectors is Owned, ProposalDoneReceiver {
      */
     function removeCoreModule(string _name, string _description,
                               uint _start_time, uint _duration_sec) onlyDirectors {
-        var mod = new CoreModify(dao_core);
+        if (address(voting) == 0) throw;
+
+        var mod = CreatorCoreModify.create(dao_core);
         typeOf[mod] = ProposalType.CoreModify;
         mod.removeModule(_name);
         voting.proposal(mod, _description, _start_time, _duration_sec);
@@ -75,7 +77,9 @@ contract BoardOfDirectors is Owned, ProposalDoneReceiver {
                            string _interface, bool _constant,
                            string _description,
                            uint _start_time, uint _duration_sec) onlyDirectors {
-        var mod = new CoreModify(dao_core);
+        if (address(voting) == 0) throw;
+
+        var mod = CreatorCoreModify.create(dao_core);
         typeOf[mod] = ProposalType.CoreModify;
         mod.setModule(_name, _module, _interface, _constant);
         voting.proposal(mod, _description, _start_time, _duration_sec);
@@ -91,6 +95,8 @@ contract BoardOfDirectors is Owned, ProposalDoneReceiver {
      */
     function fund(address _target, uint _value,
                   string _description, uint _start_time, uint _duration_sec) onlyDirectors {
+        if (address(voting) == 0) throw;
+
         var bod_fund = new BoardOfDirectorsFund(_target, _value);
         typeOf[bod_fund] = ProposalType.Fund;
         voting.proposal(bod_fund, _description, _start_time, _duration_sec);
@@ -135,7 +141,7 @@ contract BoardOfDirectors is Owned, ProposalDoneReceiver {
         checkVotingToken();
     }
 
-    function checkVotingToken() internal {
+    function checkVotingToken() private {
         if (( address(voting) == 0 || voting.voting_token() != voting_token.current())
            && voting_token.valueOf[voting_token.current()] > shares.totalSupply() / 2) {
                 voting = CreatorVoting51.create(Token(voting_token.current()), this);
