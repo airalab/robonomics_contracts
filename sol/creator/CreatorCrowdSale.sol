@@ -1,8 +1,8 @@
 import 'cashflow/CrowdSale.sol';
 
 library CreatorCrowdSale {
-    function create(address _cashflow, address _sale, uint256 _start_time_sec, uint256 _duration_sec, uint256 _start_price, uint256 _step, uint256 _period_sec, uint256 _min_value, uint256 _end_value) returns (CrowdSale)
-    { return new CrowdSale(_cashflow, _sale, _start_time_sec, _duration_sec, _start_price, _step, _period_sec, _min_value, _end_value); }
+    function create(address _target, address _credits, address _sale, uint256 _start_time_sec, uint256 _duration_sec, uint256 _start_price, uint256 _step, uint256 _period_sec, uint256 _min_value, uint256 _end_value) returns (CrowdSale)
+    { return new CrowdSale(_target, _credits, _sale, _start_time_sec, _duration_sec, _start_price, _step, _period_sec, _min_value, _end_value); }
 
     function version() constant returns (string)
     { return "v0.4.0 (89a1e5f9)"; }

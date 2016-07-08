@@ -17,7 +17,8 @@ contract BuilderCrowdSale is Builder {
     
     /**
      * @dev Run script creation contract
-     * @param _cashflow is a cashflow contract
+     * @param _target is a target address for send given credits of success end
+     * @param _credits is a DAO fund token
      * @param _sale is a saled token
      * @param _start_time_sec is start time  in seconds
      * @param _duration_sec is a duration in seconds
@@ -28,11 +29,11 @@ contract BuilderCrowdSale is Builder {
      * @param _end_value is a complete value of credits for success termination
      * @return address new contract
      */
-    function create(address _cashflow, address _sale,
+    function create(address _target, address _credits, address _sale,
                     uint _start_time_sec, uint _duration_sec,
                     uint _start_price, uint _step, uint _period_sec,
                     uint _min_value, uint _end_value) returns (address) {
-        var inst = CreatorCrowdSale.create(_cashflow, _sale,
+        var inst = CreatorCrowdSale.create(_target, _credits, _sale,
                                      _start_time_sec, _duration_sec,
                                      _start_price, _step, _period_sec,
                                      _min_value, _end_value);

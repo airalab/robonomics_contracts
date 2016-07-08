@@ -4,8 +4,9 @@ import 'token/TokenEmission.sol';
 import './CashFlow.sol';
 
 contract CrowdSale is FiniteTime, Owned {
-    CashFlow public cashflow;
-    Token    public sale;
+    address public target;
+    Token   public credits;
+    Token   public sale;
 
     /* fail notification */
     bool public is_fail = false;
@@ -23,23 +24,25 @@ contract CrowdSale is FiniteTime, Owned {
  
     /**
      * @dev Crowdsale contract constructor
-     * @param _cashflow is a Cashflow address for send given credits of success end
+     * @param _target is a target address for send given credits of success end
+     * @param _credits is a DAO fund token
      * @param _sale is a saled token
      * @param _start_time_sec is a start time of Crowdsale in UNIX time
      * @param _duration_sec is a duration of Crowdsale in seconds
-     * @param _start_price is a start price of one `_sale` token in cashflow credits
+     * @param _start_price is a start price of one `_sale` token in credits
      * @param _step is a step of price up in percent
      * @param _period_sec is a period of price grown in seconds
      * @param _min_value is a minimal value for successfull Crowdsale ending
      * @param _end_value is a value when given for immediate Crowdsale ending
      */
-    function CrowdSale(address _cashflow, address _sale,
+    function CrowdSale(address _target, address _credits, address _sale,
                        uint _start_time_sec, uint _duration_sec,
                        uint _start_price, uint _step, uint _period_sec,
                        uint _min_value, uint _end_value) FiniteTime(_start_time_sec, _duration_sec)
     {
         owner         = msg.sender;
-        cashflow      = CashFlow(_cashflow);
+        target        = _target;
+        credits       = Token(_credits);
         sale          = Token(_sale);
         currentPrice  = _start_price;
         currentPeriod = _start_time_sec;
@@ -58,7 +61,7 @@ contract CrowdSale is FiniteTime, Owned {
 
         // Wnen now is end of time
         if (now > end_time) {
-            if (minValue < cashflow.credits().getBalance())
+            if (minValue < credits.getBalance())
                 // Minimal value funded
                 done();
             else
@@ -68,7 +71,7 @@ contract CrowdSale is FiniteTime, Owned {
         }
 
         // Funded maximal value
-        if (endValue < cashflow.credits().getBalance()) {
+        if (endValue < credits.getBalance()) {
             done();
             return;
         }
@@ -80,12 +83,12 @@ contract CrowdSale is FiniteTime, Owned {
         priceCalc();
         
         // Detect sender credits value
-        var value = cashflow.credits().getBalance(msg.sender);
+        var value = credits.getBalance(msg.sender);
         if (value == 0) return;
 
         // Buy the
         var count = value / currentPrice;
-        if (!cashflow.credits().transferFrom(msg.sender, this, value)) throw;
+        if (!credits.transferFrom(msg.sender, this, value)) throw;
         if (!sale.transfer(msg.sender, count)) throw;
 
         // Store given value for refund when fail
@@ -112,8 +115,8 @@ contract CrowdSale is FiniteTime, Owned {
         if (!sale.transfer(owner, sale.getBalance()))
             throw;
 
-        // Transfer funded credits to cashflow
-        if (!cashflow.credits().transfer(cashflow, cashflow.credits().getBalance()))
+        // Transfer funded credits to target
+        if (!credits.transfer(target, credits.getBalance()))
             throw;
 
         // Close the IPO
@@ -141,7 +144,7 @@ contract CrowdSale is FiniteTime, Owned {
      */
     function refund() {
         if (creditsOf[msg.sender] > 0 && is_fail)
-            if (!cashflow.credits().transfer(msg.sender, creditsOf[msg.sender]))
+            if (!credits.transfer(msg.sender, creditsOf[msg.sender]))
                 throw;
     }
 }
