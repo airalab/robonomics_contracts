@@ -16,7 +16,7 @@ contract Owned is Object {
 
     /**
      * @dev Delegate contract to another person
-     * @param _owner another person address
+     * @param _owner is another person address
      */
     function delegate(address _owner) onlyOwner
     { owner = _owner; }
@@ -24,5 +24,5 @@ contract Owned is Object {
     /**
      * @dev Owner check modifier
      */
-    modifier onlyOwner { if (msg.sender == owner) _ }
+    modifier onlyOwner { if (msg.sender != owner) throw; _ }
 }

@@ -20,13 +20,13 @@ contract TokenEmission is Token {
     }
  
     /**
-     * @dev Burn the token values from owner balance and from total
+     * @dev Burn the token values from sender balance and from total
      * @param _value amount of token values for burn 
-     * @notice owner balance will be decreased by `_value`
+     * @notice sender balance will be decreased by `_value`
      */
-    function burn(uint _value) onlyOwner {
-        if (balanceOf[owner] >= _value) {
-            balanceOf[owner] -= _value;
+    function burn(uint _value) {
+        if (balanceOf[msg.sender] >= _value) {
+            balanceOf[msg.sender] -= _value;
             totalSupply      -= _value;
         }
     }
