@@ -4,9 +4,9 @@ import 'acl/ACL.sol';
 contract TokenEmissionACL is TokenEmission, ACL {
     function TokenEmissionACL(string _name, string _symbol, uint8 _decimals,
                               uint _start_count,
-                              ACLStorage _acl_storage, string _emitent_group)
+                              address _acl_storage, string _emitent_group)
              TokenEmission(_name, _symbol, _decimals, _start_count) {
-        acl          = _acl_storage;
+        acl          = ACLStorage(_acl_storage);
         emitentGroup = _emitent_group;
     }
 
