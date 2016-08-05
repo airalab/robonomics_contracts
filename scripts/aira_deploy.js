@@ -29,7 +29,7 @@ var argv = require('optimist')
     .demand(['C'])
     .argv;
 
-var soldirs = argv.I.split(':').filter(function (e) {return e.length > 0});
+var soldirs = argv.I;
 soldirs.push(mainsol); 
 var args = JSON.parse(argv.A); 
 var contract = argv.C;
