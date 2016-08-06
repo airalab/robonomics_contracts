@@ -96,7 +96,7 @@ function payOut() {
 **Противодействие:** избегать итерации по большим массивам данных, либо переносить перебор на программную логику вне контракта; если невозможно избавиться от перебора, необходимо разбить его на несколько шагов, либо выполнять действия по запросу, например, добавить метод `withdraw` для вывода средств.
 
 ## Ссылки
-1. [Ethereum Contract Security Techniques and Tips]((https://github.com/ConsenSys/smart-contract-best-practices))
+1. [Ethereum Contract Security Techniques and Tips](https://github.com/ConsenSys/smart-contract-best-practices)
 2. [Публикация в блоге Ethereum Christian Reitwiessner: Smart contract security](https://blog.ethereum.org/2016/06/10/smart-contract-security/)
 3. [Публикация в блоге Ethereum Виталика Бутерина: Thinking About Smart Contract Security](https://blog.ethereum.org/2016/06/19/thinking-smart-contract-security/)
 4. [Запись лекции по безопасности умных контрактов на Youtube: Smart contract security in Ethereum](https://www.youtube.com/watch?v=pv032ppbakA)
