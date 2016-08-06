@@ -1,6 +1,6 @@
 # Smart contract "Token.sol" security check
 - Семейство контрактов: [Aira DAO Core](https://github.com/airalab/core)
-- Исходный код контракта: [Sharesale.sol](sol/token/Token.sol)
+- Исходный код контракта: [Token.sol](sol/token/Token.sol)
 
 ## Проверка общих рекомендаций Airalab
 - отсутсвуют внешние вызовы
