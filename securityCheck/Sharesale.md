@@ -1,4 +1,4 @@
-# ShareSale
+# Airalab smart contract "ShareSale.sol" security check
 - Семейство контрактов: [Aira DAO Core](https://github.com/airalab/core)
 - Исходный код контракта: [Sharesale.sol](sol/cashflow/ShareSale.sol)
 
