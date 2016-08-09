@@ -23,8 +23,8 @@ contract BuilderShareholder is Builder {
      * @param _recipient is a shares recipient
      * @return address new contract
      */
-    function create(address _shares, uint _count, address _recipient) returns (address) {
-        var inst = CreatorShareholder.create(_shares, _count, _recipient);
+    function create(string _desc, address _shares, uint _count, address _recipient) returns (address) {
+        var inst = CreatorShareholder.create(_desc, _shares, _count, _recipient);
         Owned(inst).delegate(msg.sender);
         
         deal(inst);

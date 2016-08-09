@@ -1,8 +1,8 @@
 import 'dao/Shareholder.sol';
 
 library CreatorShareholder {
-    function create(address _shares, uint256 _count, address _recipient) returns (Shareholder)
-    { return new Shareholder(_shares, _count, _recipient); }
+    function create(string _description, address _shares, uint256 _count, address _recipient) returns (Shareholder)
+    { return new Shareholder(_description, _shares, _count, _recipient); }
 
     function version() constant returns (string)
     { return "v0.4.9 (7b7a3ce5)"; }

@@ -20,7 +20,7 @@ contract FiniteTime {
     /**
      * @dev This method runs start and finish events
      */
-    function checkTime() {
+    function checkTime() internal {
         if (now >= start_time) {
             if (now >= end_time) {
                 is_alive = false;

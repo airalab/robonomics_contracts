@@ -1,11 +1,12 @@
 import 'cashflow/CashFlow.sol';
 import 'cashflow/Proposal.sol';
 import 'token/TokenEther.sol';
+import './BuilderBase.sol';
 
 /**
  * @title Builder based contract
  */
-contract Builder is Owned {
+contract Builder is BuilderBase {
     /* Proposal */
     Proposal proposal;
 
@@ -15,14 +16,6 @@ contract Builder is Owned {
     /* Building cost  */
     uint public buildingCostWei;
 
-    /* Addresses builded contracts at sender */
-    mapping(address => address[]) public getContractsOf;
-    
-    /**
-     * @dev this event emitted for every builded contract
-     */
-    event Builded(address indexed sender, address indexed instance);
-    
     /**
      * @dev Builder constructor
      * @param _buildingCostWei is module name
@@ -33,14 +26,6 @@ contract Builder is Owned {
         buildingCostWei = _buildingCostWei;
         proposal = Proposal(_proposal);
         cashflow = CashFlow(_cashflow);
-    }
-    
-    /**
-     * @dev Get last address
-     * @return last address contract
-     */
-    function getLastContract() constant returns (address) {
-        return getContractsOf[msg.sender][getContractsOf[msg.sender].length - 1];
     }
     
     /**
