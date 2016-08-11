@@ -8,6 +8,9 @@ contract Offer is Mortal {
     Token   public token;
     uint    public value;
 
+    /* Mapping of offer accepters by count of accept */
+    mapping(address => bool) public signer;
+
     uint public closed = 0;
     /**
      * @dev Force close the offer
@@ -35,6 +38,7 @@ contract Offer is Mortal {
         if (closed > 0) throw;
         if (hardOffer != 0 && msg.sender != hardOffer) throw;
         if (!token.transferFrom(msg.sender, beneficiary, value)) throw;
+        signer[msg.sender] = true;
         closed = now;
     }
 }
