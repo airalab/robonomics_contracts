@@ -77,8 +77,8 @@ contract Voting51 is Owned {
             // Check vote done
             if (total_value[current_proposal] > voting_limit) {
                 ProposalDone(current_proposal);
-                receiver.proposalDone(current_proposal);
                 ++current_proposal;
+                receiver.proposalDone(current_proposal);
             }
         }
     }
@@ -90,7 +90,7 @@ contract Voting51 is Owned {
      */
     function refund(uint _proposal, uint _count) {
         if (voter_value[_proposal][msg.sender] >= _count) {
-            voting_token.transfer(msg.sender, _count);
+            if(!voting_token.transfer(msg.sender, _count)) throw;
             voter_value[_proposal][msg.sender] -= _count;
         } else {
             throw;
