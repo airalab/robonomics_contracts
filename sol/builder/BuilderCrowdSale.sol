@@ -11,10 +11,6 @@ import './Builder.sol';
  * @title BuilderStart contract
  */
 contract BuilderCrowdSale is Builder {
-    function BuilderCrowdSale(uint _buildingCost, address _cashflow, address _proposal)
-             Builder(_buildingCost, _cashflow, _proposal)
-    {}
-    
     /**
      * @dev Run script creation contract
      * @param _target is a target address for send given credits of success end

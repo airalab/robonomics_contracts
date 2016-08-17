@@ -12,10 +12,6 @@ import './Builder.sol';
  * @title BuilderDAOMarketRegulator contract
  */
 contract BuilderDAOMarketRegulator is Builder {
-    function BuilderDAOMarketRegulator(uint _buildingCost, address _cashflow, address _proposal)
-             Builder(_buildingCost, _cashflow, _proposal)
-    {}
-    
     /**
      * @dev Run script creation contract
      * @param _shares is address shares token

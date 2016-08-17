@@ -6,12 +6,12 @@
 //
 
 import 'creator/CreatorOffer.sol';
-import './BuilderBase.sol';
+import './Builder.sol';
 
 /**
  * @title BuilderOffer contract
  */
-contract BuilderOffer is BuilderBase {
+contract BuilderOffer is Builder {
     /**
      * @dev Run script creation contract
      * @param _description is a short description

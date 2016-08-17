@@ -12,10 +12,6 @@ import './Builder.sol';
  * @title ShareSale contract builder
  */
 contract BuilderShareSale is Builder {
-    function BuilderShareSale(uint _buildingCost, address _cashflow, address _proposal)
-             Builder(_buildingCost, _cashflow, _proposal)
-    {}
-    
     /**
      * @dev Run script creation contract
      * @param _target is a target of funds

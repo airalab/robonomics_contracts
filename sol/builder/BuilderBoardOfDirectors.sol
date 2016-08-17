@@ -12,10 +12,6 @@ import './Builder.sol';
  * @title BuilderBoardOfDirectors contract
  */
 contract BuilderBoardOfDirectors is Builder {
-    function BuilderBoardOfDirectors(uint _buildingCost, address _cashflow, address _proposal)
-             Builder(_buildingCost, _cashflow, _proposal)
-    {}
-    
     /**
      * @dev Run script creation contract
      * @param _dao_core is a DAO core register

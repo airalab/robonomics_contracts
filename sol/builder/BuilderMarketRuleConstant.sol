@@ -12,10 +12,6 @@ import './Builder.sol';
  * @title BuilderMarketRuleConstant contract
  */
 contract BuilderMarketRuleConstant is Builder {
-    function BuilderMarketRuleConstant(uint _buildingCost, address _cashflow, address _proposal)
-             Builder(_buildingCost, _cashflow, _proposal)
-    {}
-    
     /**
      * @dev Run script creation contract
      * @param _emission is how amount of tokens should be emissed

@@ -1,9 +1,9 @@
-import 'common/Owned.sol';
+import 'common/Mortal.sol';
 
 /**
  * @title Builder based contract
  */
-contract BuilderBase is Owned {
+contract BuilderBase is Mortal {
     /* Addresses builded contracts at sender */
     mapping(address => address[]) public getContractsOf;
     

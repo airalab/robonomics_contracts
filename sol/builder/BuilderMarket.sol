@@ -12,10 +12,6 @@ import './Builder.sol';
  * @title BuilderMarket contract
  */
 contract BuilderMarket is Builder {
-    function BuilderMarket(uint _buildingCost, address _cashflow, address _proposal)
-             Builder(_buildingCost, _cashflow, _proposal)
-    {}
-    
     /**
      * @dev Run script creation contract
      * @return address new contract

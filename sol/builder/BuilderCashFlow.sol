@@ -12,10 +12,6 @@ import './Builder.sol';
  * @title BuilderCashFlow contract
  */
 contract BuilderCashFlow is Builder {
-    function BuilderCashFlow(uint _buildingCost, address _cashflow, address _proposal)
-             Builder(_buildingCost, _cashflow, _proposal)
-    {}
-    
     /**
      * @dev Run script creation contract
      * @param _credits is address credits token

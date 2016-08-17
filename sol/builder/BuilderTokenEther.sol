@@ -12,10 +12,6 @@ import './Builder.sol';
  * @title BuilderTokenEther contract
  */
 contract BuilderTokenEther is Builder {
-    function BuilderTokenEther(uint _buildingCost, address _cashflow, address _proposal)
-             Builder(_buildingCost, _cashflow, _proposal)
-    {}
-    
     /**
      * @dev Run script creation contract
      * @param _name is name token
