@@ -2,8 +2,11 @@ import 'token/Token.sol';
 import './AddressList.sol';
 
 /**
- * @dev The library for voting actions.
- *      This data contains stack of voters, its opinion and count of shares.
+ * @dev The library for multiuser singletoken regulation.
+ *      This data contains stack of variants sorted by value on its internal balance,
+ *      any account(voter) can increase variant balance by self balance from given token,
+ *      and any voter can decrease balance of variant but no more that given.
+ *      The variant with high balance placed on top of voting pool and return by `current()`.
  */
 library Voting {
     /* Voting structure */
@@ -95,6 +98,8 @@ library Voting {
         var value = _poll.valueOf[_variant];
         var left  = _poll.variants.prev(_variant);
 
+        /* XXX: possible DoS by block gas limit
+                when a lot of same value variants */
         while (left != 0 && _poll.valueOf[left] < value) {
             _poll.variants.swap(left, _variant);
             left = _poll.variants.prev(_variant);
@@ -105,6 +110,8 @@ library Voting {
         var value = _poll.valueOf[_variant];
         var right = _poll.variants.next(_variant);
 
+        /* XXX: possible DoS by block gas limit
+                when a lot of same value variants */
         while (right != 0 && _poll.valueOf[right] > value) {
             _poll.variants.swap(right, _variant);
             right = _poll.variants.next(_variant);
