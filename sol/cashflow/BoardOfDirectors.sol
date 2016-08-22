@@ -142,8 +142,10 @@ contract BoardOfDirectors is Owned, ProposalDoneReceiver {
     }
 
     function checkVotingToken() private {
-        if (( address(voting) == 0 || voting.voting_token() != voting_token.current())
-           && voting_token.valueOf[voting_token.current()] > shares.totalSupply() / 2) {
+        if (address(voting) == 0) throw;
+
+        if ( voting.voting_token() != voting_token.current()
+          && voting_token.valueOf[voting_token.current()] > shares.totalSupply() / 2) {
                 voting = CreatorVoting51.create(Token(voting_token.current()), this);
                 VotingTokenChanged(voting_token.current());
         }
