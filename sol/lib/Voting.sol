@@ -42,6 +42,10 @@ library Voting {
      */
     function up(Poll storage _poll, address _voter, address _variant,
                 Token _shares, uint _count) {
+        // Check for already voting for any variant
+        if (_poll.pollOf[_voter] && _poll.pollOf[_voter] != _variant)
+            throw;
+
         // Try to transfer count of shares from voter to self
         if (!_shares.transferFrom(_voter, this, _count))
             throw;
@@ -77,6 +81,10 @@ library Voting {
         _shares.transfer(_voter, refund);
         _poll.shareOf[_voter]  -= refund;
         _poll.valueOf[variant] -= refund;
+
+        // Clean voter poll
+        if (_poll.shareOf[_voter] == 0)
+            _poll.pollOf[_voter] = 0;
 
         // Shift right or drop when no shares
         if (_poll.valueOf[variant] > 0) {
