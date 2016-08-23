@@ -120,6 +120,13 @@ contract BoardOfDirectors is Owned, ProposalDoneReceiver {
             }
         }
     }
+
+    /**
+     * @dev Voting DoS protection
+     * @return minimal count of shares to voting for new token
+     */
+    function minVotingShares() constant returns (uint)
+    { return shares.totalSupply() / 100 }
  
     /**
      * @dev Vote for the new directors token
@@ -128,6 +135,11 @@ contract BoardOfDirectors is Owned, ProposalDoneReceiver {
      * @notice shares should be approved for this contract
      */
     function pollUp(Token _new_voting, uint _count) {
+        // Voting DoS protection
+        if (!voting_token.variants.contains(_new_voting)
+          && _count < minVotingShares()) throw;
+
+        // Voting
         voting_token.up(msg.sender, _new_voting, shares, _count);
         checkVotingToken();
     }
