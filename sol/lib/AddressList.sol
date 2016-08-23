@@ -121,24 +121,24 @@ library AddressList {
      * @param _item is a removed list element
      */
     function remove(Data storage _data, address _item) {
-        if (_data.isContain[_item]) {
-            var elemPrev = _data.prevOf[_item];
-            var elemNext = _data.nextOf[_item];
+        if (!_data.isContain[_item]) throw;
 
-            if (elemPrev != 0) {
-                _data.nextOf[elemPrev] = elemNext;
-            } else {
-                _data.head = elemNext;
-            }
+        var elemPrev = _data.prevOf[_item];
+        var elemNext = _data.nextOf[_item];
 
-            if (elemNext != 0) {
-                _data.prevOf[elemNext] = elemPrev;
-            } else {
-                _data.tail = elemPrev;
-            }
-
-            _data.isContain[_item] = false;
+        if (elemPrev != 0) {
+            _data.nextOf[elemPrev] = elemNext;
+        } else {
+            _data.head = elemNext;
         }
+
+        if (elemNext != 0) {
+            _data.prevOf[elemNext] = elemPrev;
+        } else {
+            _data.tail = elemPrev;
+        }
+
+        _data.isContain[_item] = false;
     }
 
     /**
@@ -148,26 +148,26 @@ library AddressList {
      * @param _to is a new element
      */
     function replace(Data storage _data, address _from, address _to) {
-        if (_data.isContain[_from]) {
-            var elemPrev = _data.prevOf[_from];
-            var elemNext = _data.nextOf[_from];
+        if (!_data.isContain[_from]) throw;
 
-            if (elemPrev != 0) {
-                _data.nextOf[elemPrev] = _to;
-            } else {
-                _data.head = _to;
-            }
-            
-            if (elemNext != 0) {
-                _data.prevOf[elemNext] = _to;
-            } else {
-                _data.tail = _to;
-            }
+        var elemPrev = _data.prevOf[_from];
+        var elemNext = _data.nextOf[_from];
 
-            _data.prevOf[_to] = elemPrev;
-            _data.nextOf[_to] = elemNext;
-            _data.isContain[_from] = false;
+        if (elemPrev != 0) {
+            _data.nextOf[elemPrev] = _to;
+        } else {
+            _data.head = _to;
         }
+            
+        if (elemNext != 0) {
+            _data.prevOf[elemNext] = _to;
+        } else {
+            _data.tail = _to;
+        }
+
+        _data.prevOf[_to] = elemPrev;
+        _data.nextOf[_to] = elemNext;
+        _data.isContain[_from] = false;
     }
 
     /**
@@ -177,41 +177,43 @@ library AddressList {
      * @param _b is a second element
      */
     function swap(Data storage _data, address _a, address _b) {
-        if (_data.isContain[_a] && _data.isContain[_b]) {
-            var prevA = _data.prevOf[_a];
-            var prevB = _data.prevOf[_b];
-            var nextA = _data.nextOf[_a];
-            var nextB = _data.nextOf[_b];
-            // Insert A
-            _data.nextOf[_a] = nextB;
-            _data.prevOf[_a] = prevB;
+        if (!_data.isContain[_a] || !_data.isContain[_b]) throw; 
 
-            if (prevB != 0) {
-                _data.nextOf[prevB] = _a;
-            } else {
-                _data.head = _a;
-            }
+        var prevA = _data.prevOf[_a];
+        var prevB = _data.prevOf[_b];
+        var nextA = _data.nextOf[_a];
+        var nextB = _data.nextOf[_b];
 
-            if (nextB != 0) {
-                _data.prevOf[nextB] = _a;
-            } else {
-                _data.tail = _a;
-            }
-            // Inser B
-            _data.nextOf[_b]    = nextA;
-            _data.prevOf[_b]    = prevA;
+        // Insert A
+        _data.nextOf[_a] = nextB;
+        _data.prevOf[_a] = prevB;
 
-            if (prevA != 0) {
-                _data.nextOf[prevA] = _b;
-            } else {
-                _data.head = _b;
-            }
+        if (prevB != 0) {
+            _data.nextOf[prevB] = _a;
+        } else {
+            _data.head = _a;
+        }
 
-            if (nextA != 0) {
-                _data.prevOf[nextA] = _b;
-            } else {
-                _data.tail = _b;
-            }
+        if (nextB != 0) {
+            _data.prevOf[nextB] = _a;
+        } else {
+            _data.tail = _a;
+        }
+
+        // Inser B
+        _data.nextOf[_b]    = nextA;
+        _data.prevOf[_b]    = prevA;
+
+        if (prevA != 0) {
+            _data.nextOf[prevA] = _b;
+        } else {
+            _data.head = _b;
+        }
+
+        if (nextA != 0) {
+            _data.prevOf[nextA] = _b;
+        } else {
+            _data.tail = _b;
         }
     }
 }

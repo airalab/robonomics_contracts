@@ -43,7 +43,7 @@ library Voting {
     function up(Poll storage _poll, address _voter, address _variant,
                 Token _shares, uint _count) {
         // Check for already voting for any variant
-        if (_poll.pollOf[_voter] && _poll.pollOf[_voter] != _variant)
+        if (_poll.pollOf[_voter] != 0 && _poll.pollOf[_voter] != _variant)
             throw;
 
         // Try to transfer count of shares from voter to self
