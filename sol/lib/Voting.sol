@@ -104,25 +104,27 @@ library Voting {
 
     function shiftLeft(Poll storage _poll, address _variant) internal {
         var value = _poll.valueOf[_variant];
-        var left  = _poll.variants.prev(_variant);
+        var left  = _poll.variants.prevOf[_variant];
 
         /* XXX: possible DoS by block gas limit
                 when a lot of same value variants */
-        while (left != 0 && _poll.valueOf[left] < value) {
-            _poll.variants.swap(left, _variant);
-            left = _poll.variants.prev(_variant);
-        }
+        while (left != 0 && _poll.valueOf[left] < value)
+            left = _poll.variants.prevOf[_variant];
+
+        _poll.variants.remove(_variant);
+        _poll.variants.append(_variant, left);
     }
 
     function shiftRight(Poll storage _poll, address _variant) internal {
         var value = _poll.valueOf[_variant];
-        var right = _poll.variants.next(_variant);
+        var right = _poll.variants.nextOf[_variant];
 
         /* XXX: possible DoS by block gas limit
                 when a lot of same value variants */
-        while (right != 0 && _poll.valueOf[right] > value) {
-            _poll.variants.swap(right, _variant);
-            right = _poll.variants.next(_variant);
-        }
+        while (right != 0 && _poll.valueOf[right] > value)
+            right = _poll.variants.nextOf[_variant];
+
+        _poll.variants.remove(_variant);
+        _poll.variants.prepend(_variant, right);
     }
 }
