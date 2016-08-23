@@ -5,6 +5,8 @@ contract LibAddressList is Mortal {
     AddressList.Data list;
     using AddressList for AddressList.Data;
 
+    uint public m = 42;
+
     function first() constant returns (address)
     { return list.first(); }
 
@@ -23,13 +25,13 @@ contract LibAddressList is Mortal {
     function append(address _item)
     { list.append(_item); }
 
-    function append(address _item, address _to)
+    function appendTo(address _item, address _to)
     { list.append(_item, _to); }
-
+ 
     function prepend(address _item)
     { list.prepend(_item); }
- 
-    function prepend(address _item, address _to)
+
+    function prependTo(address _item, address _to)
     { list.prepend(_item, _to); }
  
     function remove(address _item)

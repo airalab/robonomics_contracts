@@ -56,6 +56,7 @@ library AddressList {
      * @param _data is list storage ref
      * @param _item is a new list element  
      * @param _to is a item element before new 
+     * @notice gas usage < 100000
      */
     function append(Data storage _data, address _item, address _to) {
         // Unable to contain double element
@@ -65,6 +66,8 @@ library AddressList {
         if (_data.head == 0) {
             _data.head = _data.tail = _item;
         } else {
+            if (!_data.isContain[_to]) throw;
+ 
             var nextTo = _data.nextOf[_to];
             if (nextTo != 0) {
                 _data.prevOf[nextTo] = _item;
@@ -101,6 +104,8 @@ library AddressList {
         if (_data.head == 0) {
             _data.head = _data.tail = _item;
         } else {
+            if (!_data.isContain[_to]) throw;
+ 
             var prevTo = _data.prevOf[_to];
             if (prevTo != 0) {
                 _data.nextOf[prevTo] = _item;
@@ -180,40 +185,14 @@ library AddressList {
         if (!_data.isContain[_a] || !_data.isContain[_b]) throw; 
 
         var prevA = _data.prevOf[_a];
-        var prevB = _data.prevOf[_b];
-        var nextA = _data.nextOf[_a];
-        var nextB = _data.nextOf[_b];
 
-        // Insert A
-        _data.nextOf[_a] = nextB;
-        _data.prevOf[_a] = prevB;
+        remove(_data, _a);
+        replace(_data, _b, _a);
 
-        if (prevB != 0) {
-            _data.nextOf[prevB] = _a;
+        if (prevA == 0) {
+            prepend(_data, _b);
         } else {
-            _data.head = _a;
-        }
-
-        if (nextB != 0) {
-            _data.prevOf[nextB] = _a;
-        } else {
-            _data.tail = _a;
-        }
-
-        // Inser B
-        _data.nextOf[_b]    = nextA;
-        _data.prevOf[_b]    = prevA;
-
-        if (prevA != 0) {
-            _data.nextOf[prevA] = _b;
-        } else {
-            _data.head = _b;
-        }
-
-        if (nextA != 0) {
-            _data.prevOf[nextA] = _b;
-        } else {
-            _data.tail = _b;
+            append(_data, _b, prevA);
         }
     }
 }
