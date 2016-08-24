@@ -68,18 +68,18 @@ contract Voting51 is Owned {
             return;
         }
 
-        // Voting operation
-        if (voting_token.transferFrom(msg.sender, this, _count)) {
-            total_value[current_proposal]             += _count;
-            voter_value[current_proposal][msg.sender] += _count;
+        // Thransfer token
+        if (!voting_token.transferFrom(msg.sender, this, _count)) throw;
 
-            var voting_limit = voting_token.totalSupply() / 2;
-            // Check vote done
-            if (total_value[current_proposal] > voting_limit) {
-                ProposalDone(current_proposal);
-                ++current_proposal;
-                receiver.proposalDone(current_proposal);
-            }
+        // Increment values
+        total_value[current_proposal]             += _count;
+        voter_value[current_proposal][msg.sender] += _count;
+
+        var voting_limit = voting_token.totalSupply() / 2; // 50%
+        // Check vote done
+        if (total_value[current_proposal] > voting_limit) {
+            ProposalDone(current_proposal);
+            receiver.proposalDone(current_proposal++);
         }
     }
 
@@ -89,11 +89,8 @@ contract Voting51 is Owned {
      * @param _count is how amount of tokens should be refunded
      */
     function refund(uint _proposal, uint _count) {
-        if (voter_value[_proposal][msg.sender] >= _count) {
-            if(!voting_token.transfer(msg.sender, _count)) throw;
-            voter_value[_proposal][msg.sender] -= _count;
-        } else {
-            throw;
-        }
+        if (voter_value[_proposal][msg.sender] < _count) throw;
+        if (!voting_token.transfer(msg.sender, _count)) throw;
+        voter_value[_proposal][msg.sender] -= _count;
     }
 }

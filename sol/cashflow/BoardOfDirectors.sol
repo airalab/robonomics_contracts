@@ -20,6 +20,7 @@ contract BoardOfDirectors is Owned, ProposalDoneReceiver {
 
     Voting.Poll voting_token;
     using Voting for Voting.Poll;
+    using AddressList for AddressList.Data;
 
     event VotingTokenChanged(address indexed new_token);
 
@@ -126,7 +127,7 @@ contract BoardOfDirectors is Owned, ProposalDoneReceiver {
      * @return minimal count of shares to voting for new token
      */
     function minVotingShares() constant returns (uint)
-    { return shares.totalSupply() / 100 }
+    { return shares.totalSupply() / 100; }
  
     /**
      * @dev Vote for the new directors token
