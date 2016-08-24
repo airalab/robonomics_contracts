@@ -83,8 +83,10 @@ library Voting {
         _poll.valueOf[variant] -= refund;
 
         // Clean voter poll
-        if (_poll.shareOf[_voter] == 0)
+        if (_poll.shareOf[_voter] == 0) {
             _poll.pollOf[_voter] = 0;
+            _poll.voters.remove(_voter);
+        }
 
         // Shift right or drop when no shares
         if (_poll.valueOf[variant] > 0) {
@@ -109,10 +111,14 @@ library Voting {
         /* XXX: possible DoS by block gas limit
                 when a lot of same value variants */
         while (left != 0 && _poll.valueOf[left] < value)
-            left = _poll.variants.prevOf[_variant];
+            left = _poll.variants.prevOf[left];
 
         _poll.variants.remove(_variant);
-        _poll.variants.append(_variant, left);
+        if (left == 0) {
+            _poll.variants.prepend(_variant);
+        } else {
+            _poll.variants.append(_variant, left);
+        }
     }
 
     function shiftRight(Poll storage _poll, address _variant) internal {
@@ -122,9 +128,13 @@ library Voting {
         /* XXX: possible DoS by block gas limit
                 when a lot of same value variants */
         while (right != 0 && _poll.valueOf[right] > value)
-            right = _poll.variants.nextOf[_variant];
+            right = _poll.variants.nextOf[right];
 
         _poll.variants.remove(_variant);
-        _poll.variants.prepend(_variant, right);
+        if (right == 0) {
+            _poll.variants.append(_variant);
+        } else {
+            _poll.variants.prepend(_variant, right);
+        }
     }
 }
