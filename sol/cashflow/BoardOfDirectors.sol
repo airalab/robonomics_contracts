@@ -111,10 +111,12 @@ contract BoardOfDirectors is Owned, ProposalDoneReceiver {
 
         var proposal = voting.proposal_target(_index);
         if (typeOf[proposal] == ProposalType.CoreModify) {
+            // DAO Core modification
             dao_core.delegate(proposal);
             Modify(proposal).run();
         } else {
             if (typeOf[proposal] == ProposalType.Fund) {
+                // Credits fund
                 var bod_fund = BoardOfDirectorsFund(proposal);
                 if (!credits.transfer(bod_fund.target(), bod_fund.value()))
                     throw;
@@ -155,12 +157,14 @@ contract BoardOfDirectors is Owned, ProposalDoneReceiver {
     }
 
     function checkVotingToken() private {
-        if (address(voting) == 0) throw;
+        var current_value = voting_token.valueOf[voting_token.current()];
+        var current_token = Token(voting_token.current());
+        var token_changed = address(voting) == 0
+                         || voting.voting_token() != current_token;
 
-        if ( voting.voting_token() != voting_token.current()
-          && voting_token.valueOf[voting_token.current()] > shares.totalSupply() / 2) {
-                voting = CreatorVoting51.create(Token(voting_token.current()), this);
-                VotingTokenChanged(voting_token.current());
+        if (token_changed && current_value > shares.totalSupply() / 2) {
+                voting = CreatorVoting51.create(current_token, this);
+                VotingTokenChanged(current_token);
         }
     }
 }
