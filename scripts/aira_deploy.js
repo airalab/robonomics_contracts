@@ -30,7 +30,7 @@ var argv = require('optimist')
     .argv;
 
 console.log(argv.I);
-var soldirs = argv.I == '' ? [] : argv.I;
+var soldirs = argv.I == '' ? [] : (typeof(argv.I) == 'string' ? [argv.I] : argv.I);
 soldirs.push(mainsol); 
 var args = JSON.parse(argv.A); 
 var contract = argv.C;
