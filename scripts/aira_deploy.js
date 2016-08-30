@@ -29,7 +29,6 @@ var argv = require('optimist')
     .demand(['C'])
     .argv;
 
-console.log(argv.I);
 var soldirs = argv.I == '' ? [] : (typeof(argv.I) == 'string' ? [argv.I] : argv.I);
 soldirs.push(mainsol); 
 var args = JSON.parse(argv.A); 
