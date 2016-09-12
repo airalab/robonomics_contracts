@@ -4,7 +4,7 @@ import './Lot.sol';
 /**
  * @title Token based market contract
  */
-contract Market is Owned {
+contract Market is Mortal {
     /* Available market lots */
     AddressList.Data lots;
     using AddressList for AddressList.Data;

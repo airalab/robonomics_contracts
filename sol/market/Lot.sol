@@ -1,11 +1,11 @@
-import 'common/Owned.sol';
+import 'common/Mortal.sol';
 import 'token/Token.sol';
 
 /**
  * @title Token lot for market
  *        presents available deal based on token transfers
  */
-contract Lot is Owned {
+contract Lot is Mortal {
     /* Operational tokens */
     Token public sale;
     Token public buy;
