@@ -4,7 +4,7 @@ import './ACLStorage.sol';
  * @title Access Control List contract
  */
 contract ACL {
-    ACLStorage acl;
+    ACLStorage public acl;
 
     modifier onlyGroup(string _name) { if (!acl.isMemberOf(_name, msg.sender)) throw; _ }
 }
