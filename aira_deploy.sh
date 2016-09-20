@@ -1,8 +1,16 @@
 #!/bin/sh
 
-NODEJS=/usr/bin/nodejs
-if [ -x /usr/bin/node ]; then
-    NODEJS=/usr/bin/node
+NODEJS=`whereis -b node | awk '{print $2}'`
+if [ -x "$NODEJS" ]; then
+    $NODEJS `dirname $0`/scripts/aira_deploy.js "$@" 
+    exit 0
 fi
 
-$NODEJS `dirname $0`/scripts/aira_deploy.js "$@" 
+NODEJS=`whereis -b nodejs | awk '{print $2}'`
+if [ -x "$NODEJS" ]; then
+    $NODEJS `dirname $0`/scripts/aira_deploy.js "$@" 
+    exit 0
+fi
+
+echo "nodejs binary isn't found in PATH"
+exit 1
