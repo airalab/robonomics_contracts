@@ -9,3 +9,7 @@ install:
 
 script:
 - ./aira_deploy.sh -O -C Core --abi
+
+cache:
+  directories:
+  - .cache
