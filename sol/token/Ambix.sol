@@ -119,6 +119,7 @@ contract Ambix is Mortal {
                 if (token.transferFrom(msg.sender, this, value)) {
                     token.burn(value);
                     tokenBurned = true;
+                    break;
                 }
             }
 
