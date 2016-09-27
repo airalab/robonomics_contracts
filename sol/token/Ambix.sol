@@ -43,13 +43,12 @@ import 'common/Mortal.sol';
   part of equation and send (transfer) right part.
 */
 contract Ambix is Mortal {
-    struct Recipe {
-        TokenEmission[][] source;
-        uint[][]          sourceCoef;
-        TokenEmission[]   sink;
-        uint[]            sinkCoef;
-    }
-    Recipe recipe;
+    /* Recipe fields */
+    TokenEmission[][] public rSource;
+    uint[][]          public rSourceCoef;
+    TokenEmission[]   public rSink;
+    uint[]            public rSinkCoef;
+    /* Recipe end */
 
     /**
      * @dev Set source by index
@@ -59,8 +58,20 @@ contract Ambix is Mortal {
      */
     function setSource(uint _index, TokenEmission[] _source, uint[] _coef) onlyOwner {
         if (_source.length != _coef.length) throw;
-        recipe.source[_index]     = _source;
-        recipe.sourceCoef[_index] = _coef;
+
+        // Lenght fix
+        if (rSource.length < _index + 1) {
+            rSource.length = _index + 1;
+            rSourceCoef.length = _index + 1;
+        }
+
+        // Push values
+        delete rSource[_index];
+        delete rSourceCoef[_index];
+        for (uint i = 0; i < _source.length; ++i) {
+            rSource[_index].push(_source[i]);
+            rSourceCoef[_index].push(_coef[i]);
+        }
     }
 
     /**
@@ -70,32 +81,13 @@ contract Ambix is Mortal {
      */
     function setSink(TokenEmission[] _sink, uint[] _coef) onlyOwner {
         if (_sink.length != _coef.length) throw;
-        recipe.sink     = _sink;
-        recipe.sinkCoef = _coef;
-    }
 
-    /**
-     * @dev Get source by index 
-     * @param _index is a source index
-     * @return list of source alternatives and its coeficients
-     */
-    function getSource(uint _index) constant returns (address[], uint[]) {
-        var source = recipe.source[_index];
-        address[] memory sourceOut;
-        for (uint i = 0; i < source.length; ++i)
-            sourceOut[i] = source[i];
-        return (sourceOut, recipe.sourceCoef[_index]);
-    }
-
-    /**
-     * @dev Get sink 
-     * @return list of source alternatives and its coeficients
-     */
-    function getSink() constant returns (address[], uint[]) {
-        address[] memory sinkOut;
-        for (uint i = 0; i < recipe.sink.length; ++i)
-            sinkOut[i] = recipe.sink[i];
-        return (sinkOut, recipe.sinkCoef);
+        delete rSink;
+        delete rSource;
+        for (uint i = 0; i < _sink.length; ++i) {
+            rSink.push(_sink[i]);
+            rSinkCoef.push(_coef[i]);
+        }
     }
 
     /**
@@ -109,13 +101,13 @@ contract Ambix is Mortal {
         uint j;
 
         // Take a source tokens
-        for (i = 0; i < recipe.source.length; ++i) {
+        for (i = 0; i < rSource.length; ++i) {
             bool tokenBurned = false;
 
             // Try to transfer alternatives and burn it
-            for (j = 0; j < recipe.source[i].length; ++j) {
-                token = recipe.source[i][j];
-                value = recipe.sourceCoef[i][j];
+            for (j = 0; j < rSource[i].length; ++j) {
+                token = rSource[i][j];
+                value = rSourceCoef[i][j];
                 if (token.transferFrom(msg.sender, this, value)) {
                     token.burn(value);
                     tokenBurned = true;
@@ -127,10 +119,10 @@ contract Ambix is Mortal {
         }
 
         // Generate sink tokens
-        for (i = 0; i < recipe.sink.length; ++i) {
-            token = recipe.sink[i];
-            value = recipe.sinkCoef[i];
-            token.emission(recipe.sinkCoef[i]);
+        for (i = 0; i < rSink.length; ++i) {
+            token = rSink[i];
+            value = rSinkCoef[i];
+            token.emission(value);
             if (!token.transfer(msg.sender, value)) throw;
         }
     }
