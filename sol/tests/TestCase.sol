@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 /** @title Unit test interface */
 contract TestCase {
     /* This field is a short test description */

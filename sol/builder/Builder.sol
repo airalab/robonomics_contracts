@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 import 'cashflow/CashFlow.sol';
 import 'cashflow/Proposal.sol';
 import 'token/TokenEther.sol';

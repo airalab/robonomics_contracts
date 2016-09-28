@@ -4,6 +4,7 @@
 // Ethereum address:
 //
 
+pragma solidity ^0.4.2;
 import 'creator/CreatorCrowdSale.sol';
 import './Builder.sol';
 

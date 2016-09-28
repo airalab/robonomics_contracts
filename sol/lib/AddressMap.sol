@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 import './AddressList.sol';
 
 /**
@@ -12,6 +13,13 @@ library AddressMap {
     }
 
     using AddressList for AddressList.Data;
+
+    /**
+     * @dev Get size of map
+     * @return count of elements
+     */
+    function size(Data storage _data) constant returns (uint)
+    { return _data.items.length; }
 
     /**
      * @dev Get element by name

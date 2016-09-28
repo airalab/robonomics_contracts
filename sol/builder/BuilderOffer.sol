@@ -5,6 +5,7 @@
 //  - Testnet: 
 //
 
+pragma solidity ^0.4.2;
 import 'creator/CreatorOffer.sol';
 import './Builder.sol';
 

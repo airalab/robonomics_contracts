@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 import 'creator/CreatorCoreModify.sol';
 import 'creator/CreatorVoting51.sol';
 import 'lib/Voting.sol';
@@ -37,7 +38,8 @@ contract BoardOfDirectors is Owned, ProposalDoneReceiver {
     }
 
     modifier onlyDirectors {
-        if (address(voting) != 0 && voting.voting_token().balanceOf(msg.sender) > 0) _
+        if (address(voting) != 0 && voting.voting_token().balanceOf(msg.sender) > 0)
+            _;
     }
 
     enum ProposalType {

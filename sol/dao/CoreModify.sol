@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 import 'common/Modify.sol';
 import './Core.sol';
 
@@ -14,10 +15,10 @@ contract CoreModify is Modify {
     }
 
     struct ModuleParams {
-        string name;
+        string  name;
         address module;
-        string interface;
-        bool isConstant;
+        string  abi;
+        bool    is_constant;
     }
 
     ModuleParams modParams;
@@ -25,12 +26,12 @@ contract CoreModify is Modify {
 
     function modify() internal {
         if (modType == ModifyType.SetModule) {
-                Core(target).setModule(modParams.name,
-                                       modParams.module,
-                                       modParams.interface,
-                                       modParams.isConstant);
+                Core(target).set(modParams.name,
+                                 modParams.module,
+                                 modParams.abi,
+                                 modParams.is_constant);
         } else {
-            Core(target).removeModule(modParams.name);
+            Core(target).remove(modParams.name);
         }
     }
 
@@ -38,12 +39,12 @@ contract CoreModify is Modify {
      * @dev Set core module
      * @param _name is a module name
      * @param _module is a module address
-     * @param _interface is a module interface
+     * @param _abi is a module interface
      * @param _constant is a flag for set module constant
      */
     function setModule(string _name, address _module,
-                       string _interface, bool _constant) onlyOwner {
-        modParams = ModuleParams(_name, _module, _interface, _constant);
+                       string _abi, bool _constant) onlyOwner {
+        modParams = ModuleParams(_name, _module, _abi, _constant);
         modType   = ModifyType.SetModule;
     }
 

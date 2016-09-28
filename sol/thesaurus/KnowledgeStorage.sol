@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 import 'lib/AddressMap.sol';
 import 'common/Mortal.sol';
 import './Knowledge.sol';

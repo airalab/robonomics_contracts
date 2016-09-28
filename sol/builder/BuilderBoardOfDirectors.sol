@@ -5,6 +5,7 @@
 //  - Testnet: 
 //
 
+pragma solidity ^0.4.2;
 import 'creator/CreatorBoardOfDirectors.sol';
 import './Builder.sol';
 

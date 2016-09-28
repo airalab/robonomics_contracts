@@ -5,6 +5,7 @@
 //  - Testnet: 0x56c58efbf174dc82b4311a68b84bdfd5db13a3db 
 //
 
+pragma solidity ^0.4.2;
 import 'creator/CreatorShareSale.sol';
 import './Builder.sol';
 

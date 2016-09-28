@@ -1,3 +1,5 @@
+pragma solidity ^0.4.2;
+
 import 'token/Ambix.sol';
 
 library CreatorAmbix {
@@ -5,8 +7,8 @@ library CreatorAmbix {
     { return new Ambix(); }
 
     function version() constant returns (string)
-    { return "v0.4.9 (c84ea47d)"; }
+    { return "v0.4.9 (b6490d28)"; }
 
-    function interface() constant returns (string)
-    { return '[{"constant":false,"inputs":[{"name":"_index","type":"uint256"},{"name":"_source","type":"address[]"},{"name":"_coef","type":"uint256[]"}],"name":"setSource","outputs":[],"type":"function"},{"constant":true,"inputs":[],"name":"getSink","outputs":[{"name":"","type":"address[]"},{"name":"","type":"uint256[]"}],"type":"function"},{"constant":false,"inputs":[],"name":"kill","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_sink","type":"address[]"},{"name":"_coef","type":"uint256[]"}],"name":"setSink","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_owner","type":"address"}],"name":"delegate","outputs":[],"type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"type":"function"},{"constant":false,"inputs":[],"name":"run","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"_index","type":"uint256"}],"name":"getSource","outputs":[{"name":"","type":"address[]"},{"name":"","type":"uint256[]"}],"type":"function"}]'; }
+    function abi() constant returns (string)
+    { return '[{"constant":false,"inputs":[{"name":"_index","type":"uint256"},{"name":"_source","type":"address[]"},{"name":"_coef","type":"uint256[]"}],"name":"setSource","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"},{"name":"","type":"uint256"}],"name":"rSource","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"kill","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_sink","type":"address[]"},{"name":"_coef","type":"uint256[]"}],"name":"setSink","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_owner","type":"address"}],"name":"delegate","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"rSink","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"run","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"},{"name":"","type":"uint256"}],"name":"rSourceCoef","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"rSinkCoef","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"}]'; }
 }

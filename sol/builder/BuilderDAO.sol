@@ -5,6 +5,7 @@
 //  - Testnet: 
 //
 
+pragma solidity ^0.4.2;
 import 'creator/CreatorTokenEmission.sol';
 import 'creator/CreatorCore.sol';
 import './Builder.sol';
@@ -20,8 +21,8 @@ contract BuilderDAO is Builder {
         shares.delegate(msg.sender);
 
         // Append shares module
-        dao.setModule(_shares_name, shares,
-                      "github://airalab/core/token/TokenEmission.sol", true);
+        dao.set(_shares_name, shares,
+                "github://airalab/core/token/TokenEmission.sol", true);
 
         // Delegate DAO to sender
         dao.delegate(msg.sender);

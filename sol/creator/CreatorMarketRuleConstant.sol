@@ -1,3 +1,5 @@
+pragma solidity ^0.4.2;
+
 import 'market/MarketRuleConstant.sol';
 
 library CreatorMarketRuleConstant {
@@ -5,8 +7,8 @@ library CreatorMarketRuleConstant {
     { return new MarketRuleConstant(_emission); }
 
     function version() constant returns (string)
-    { return "v0.4.9 (47c069a9)"; }
+    { return "v0.4.9 (b6490d28)"; }
 
-    function interface() constant returns (string)
-    { return '[{"constant":true,"inputs":[],"name":"emission","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"_deal","type":"address"}],"name":"getEmission","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"inputs":[{"name":"_emission","type":"uint256"}],"type":"constructor"}]'; }
+    function abi() constant returns (string)
+    { return '[{"constant":true,"inputs":[],"name":"emission","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_deal","type":"address"}],"name":"getEmission","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"inputs":[{"name":"_emission","type":"uint256"}],"type":"constructor"}]'; }
 }

@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 import 'lib/AddressMap.sol';
 import 'common/Mortal.sol';
 
@@ -13,6 +14,11 @@ contract Core is Mortal {
     string  public description;
     address public founder;
 
+    /* Module manipulation events */
+    event ModuleAdded(address indexed module);
+    event ModuleRemoved(address indexed module);
+    event ModuleReplaced(address indexed from, address indexed to);
+
     /* Modules map */
     AddressMap.Data modules;
 
@@ -20,10 +26,10 @@ contract Core is Mortal {
     mapping(bytes32 => bool) is_constant;
 
     /**
-     * @dev Interface storage
+     * @dev Contract ABI storage
      *      the contract interface contains source URI
      */
-    mapping(address => string) public interfaceOf;
+    mapping(address => string) public abiOf;
 
 
     /* Using libraries */
@@ -48,6 +54,13 @@ contract Core is Mortal {
      */
     function contains(address _module) constant returns (bool)
     { return modules.items.contains(_module); }
+
+    /**
+     * @dev Modules counter
+     * @return count of modules in core
+     */
+    function size() constant returns (uint)
+    { return modules.size(); }
  
     /**
      * @dev Check for module have permanent name
@@ -62,7 +75,7 @@ contract Core is Mortal {
      * @param _name is module name
      * @return module address
      */
-    function getModule(string _name) constant returns (address)
+    function get(string _name) constant returns (address)
     { return modules.get(_name); }
 
     /**
@@ -70,14 +83,14 @@ contract Core is Mortal {
      * @param _module is a module address
      * @return module name
      */
-    function getModuleName(address _module) constant returns (string)
+    function getName(address _module) constant returns (string)
     { return modules.keyOf[_module]; }
 
     /**
      * @dev Get first module
      * @return first address
      */
-    function firstModule() constant returns (address)
+    function first() constant returns (address)
     { return modules.items.head; }
 
     /**
@@ -85,26 +98,32 @@ contract Core is Mortal {
      * @param _current is an current address
      * @return next address
      */
-    function nextModule(address _current) constant returns (address)
+    function next(address _current) constant returns (address)
     { return modules.items.next(_current); }
 
     /**
      * @dev Set new module for given name
      * @param _name infrastructure node name
      * @param _module infrastructure node address
-     * @param _interface node interface URI
+     * @param _abi node interface URI
      * @param _constant have a `true` value when you create permanent name of module
      */
-    function setModule(string _name, address _module, string _interface, bool _constant) onlyOwner {
+    function set(string _name, address _module, string _abi, bool _constant) onlyOwner {
         if (isConstant(_name)) throw;
+
+        // Notify
+        if (modules.get(_name) != 0)
+            ModuleReplaced(modules.get(_name), _module);
+        else
+            ModuleAdded(_module);
  
         // Set module in the map
         modules.set(_name, _module);
 
-        // Register node interface
-        interfaceOf[_module] = _interface;
+        // Register module abi
+        abiOf[_module] = _abi;
 
-        // Register constant module
+        // Register constant flag 
         is_constant[sha3(_name)] = _constant;
     }
  
@@ -112,8 +131,11 @@ contract Core is Mortal {
      * @dev Remove module by name
      * @param _name module name
      */
-    function removeModule(string _name) onlyOwner {
+    function remove(string _name) onlyOwner {
         if (isConstant(_name)) throw;
+
+        // Notify
+        ModuleRemoved(modules.get(_name));
 
         // Remove module
         modules.remove(_name);

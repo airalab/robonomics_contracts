@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 import './Offer.sol';
 
 contract Shareholder is Offer {

@@ -5,6 +5,7 @@
 //  - Testnet: 0x7d587d24ca05a7384b245d260bca3f6deda56a86
 //
 
+pragma solidity ^0.4.2;
 import 'creator/CreatorCashFlow.sol';
 import './Builder.sol';
 

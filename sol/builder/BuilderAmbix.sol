@@ -4,6 +4,7 @@
 // Ethereum address:
 //
 
+pragma solidity ^0.4.2;
 import 'creator/CreatorAmbix.sol';
 import './Builder.sol';
 

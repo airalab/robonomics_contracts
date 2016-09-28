@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 import './TokenEmission.sol';
 import 'thesaurus/Knowledge.sol';
 

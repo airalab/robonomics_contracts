@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 import 'common/Mortal.sol';
 import 'common/FiniteTime.sol';
 import 'token/TokenEmission.sol';

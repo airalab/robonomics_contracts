@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 import 'thesaurus/KnowledgeStorage.sol';
 import 'token/Token.sol';
 import 'lib/Voting.sol';

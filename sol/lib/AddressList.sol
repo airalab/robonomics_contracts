@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 /**
  * @dev Double linked list with address items
  */
@@ -5,6 +6,7 @@ library AddressList {
     struct Data {
         address head;
         address tail;
+        uint    length;
         mapping(address => bool)    isContain;
         mapping(address => address) nextOf;
         mapping(address => address) prevOf;
@@ -80,6 +82,7 @@ library AddressList {
             _data.nextOf[_item]  = nextTo;
         }
         _data.isContain[_item] = true;
+        ++_data.length;
     }
  
     /**
@@ -118,6 +121,7 @@ library AddressList {
             _data.prevOf[_to]    = _item;
         }
         _data.isContain[_item] = true;
+        ++_data.length;
     }
 
     /**
@@ -144,6 +148,7 @@ library AddressList {
         }
 
         _data.isContain[_item] = false;
+        --_data.length;
     }
 
     /**

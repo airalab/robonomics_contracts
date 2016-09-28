@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 /**
  * @dev Finite time contract
  */

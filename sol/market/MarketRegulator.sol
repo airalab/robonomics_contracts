@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 import 'lib/AddressList.sol';
 import 'token/TokenEmission.sol';
 import './MarketAgent.sol';
@@ -20,7 +21,7 @@ contract MarketRegulator is Owned {
     using AddressList for AddressList.Data;
 
     /* Only market agents can call modified functions */
-    modifier onlyAgents { if (agents.contains(msg.sender)) _ }
+    modifier onlyAgents { if (agents.contains(msg.sender)) _; }
 
     function MarketRegulator(address _market, address _credits) {
         market  = Market(_market);

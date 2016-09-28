@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 import './ACLStorage.sol';
 
 /**
@@ -6,5 +7,8 @@ import './ACLStorage.sol';
 contract ACL {
     ACLStorage public acl;
 
-    modifier onlyGroup(string _name) { if (!acl.isMemberOf(_name, msg.sender)) throw; _ }
+    modifier onlyGroup(string _name) {
+        if (!acl.isMemberOf(_name, msg.sender)) throw;
+        _;
+    }
 }

@@ -1,9 +1,8 @@
-import './Object.sol';
-
+pragma solidity ^0.4.2;
 /**
  * @title Contract for object that have an owner
  */
-contract Owned is Object {
+contract Owned {
     /**
      * Contract owner address
      */
@@ -24,5 +23,5 @@ contract Owned is Object {
     /**
      * @dev Owner check modifier
      */
-    modifier onlyOwner { if (msg.sender != owner) throw; _ }
+    modifier onlyOwner { if (msg.sender != owner) throw; _; }
 }

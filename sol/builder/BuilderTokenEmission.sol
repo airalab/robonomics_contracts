@@ -2,9 +2,9 @@
 // AIRA Builder for TokenEmission contract
 //
 // Ethereum address:
-//  - Testnet: 0x30c92e56e648e80f69f1fcb580d86ae7ca5a2d3a 
 //
 
+pragma solidity ^0.4.2;
 import 'creator/CreatorTokenEmission.sol';
 import './Builder.sol';
 

@@ -5,6 +5,7 @@
 //  - Testnet: 0x65db698e7a340bc73a60a7da2762feb33b0a312f
 //
 
+pragma solidity ^0.4.2;
 import 'creator/CreatorCore.sol';
 import './Builder.sol';
 

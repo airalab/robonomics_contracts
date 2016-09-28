@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 import './Token.sol';
 
 /**
@@ -23,7 +24,7 @@ contract TokenEther is Token {
     /**
      * @dev This is the way to refill your token balance by ethers
      */
-    function refill() {
+    function refill() payable {
         balanceOf[msg.sender] += msg.value;
         totalSupply           += msg.value;
     }
@@ -32,7 +33,7 @@ contract TokenEther is Token {
      * @dev This method is called when money sended to contract address,
      *      a synonym for refill()
      */
-    function () {
+    function () payable {
         balanceOf[msg.sender] += msg.value;
         totalSupply           += msg.value;
     }

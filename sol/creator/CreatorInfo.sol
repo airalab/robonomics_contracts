@@ -1,3 +1,4 @@
+pragma solidity ^0.4.2;
 library CreatorInfo {
     /**
      * @dev Get version of created contract
@@ -6,5 +7,5 @@ library CreatorInfo {
     /**
      * @dev Get ABI of created contract
      */
-    function interface() constant returns (string);
+    function abi() constant returns (string);
 }
