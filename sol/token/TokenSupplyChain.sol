@@ -1,7 +1,5 @@
 pragma solidity ^0.4.2;
 import 'common/Mortal.sol';
-import 'lib/AddressList.sol';
-import 'creator/CreatorSupplyChain.sol';
 
 contract TokenSupplyChain is Mortal {
     /**
@@ -9,27 +7,27 @@ contract TokenSupplyChain is Mortal {
      */
     event Transfer(address indexed _from,
                    address indexed _to,
-                   address indexed _chain);
+                   uint    indexed _chain_id);
 
     /**
      * @dev Triggered whenever `approve` is called.
      */
     event Approval(address indexed _owner,
                    address indexed _spender,
-                   address indexed _chain);
+                   uint    indexed _chain_id);
 
     /**
      * @dev Triggered whenever `fork` is called.
      */
-    event ChainFork(address indexed _parent,
-                    address indexed _first,
-                    address indexed _second);
+    event ChainFork(uint indexed _parent,
+                    uint indexed _first,
+                    uint indexed _second);
     /**
      * @dev Triggered whenever `merge` is called.
      */
-    event ChainMerge(address indexed _first,
-                     address indexed _second,
-                     address indexed _child);
+    event ChainMerge(uint indexed _first,
+                     uint indexed _second,
+                     uint indexed _child);
  
     /* Short description of token */
     string public name;
@@ -41,13 +39,59 @@ contract TokenSupplyChain is Mortal {
     /* Fixed point position */
     uint8 public decimals;
 
-    /* Valid chain tracking */
-    AddressList.Data totalBalance;
-    mapping(address => AddressList.Data) balanceOf;
-    mapping(address => mapping(address => AddressList.Data)) allowanceOf;
+    /* Transaction */
+    struct Tx {
+        string  comment;
+        uint    stamp;
+        address from;
+        address to;
+    }
 
-    /* Use libraries */
-    using AddressList for AddressList.Data;
+    /* Linear transaction chain */
+    struct TxChain {
+        uint[] parent_id;
+        uint   value;
+        Tx[]   txs;
+    }
+
+    /* Transaction graph */
+    TxChain[] graph;
+    
+    /**
+     * @dev Take transaction chain value
+     * @param _chain_id is a supply chain id
+     * @return chain value
+     */
+    function txChainValue(uint _chain_id) constant returns (uint)
+    { return graph[_chain_id].value; }
+    
+    /**
+     * @dev Take transaction chain parent id list
+     * @param _chain_id is a supply chain id
+     * @return chain parent id list
+     */
+    function txChainParent(uint _chain_id) constant returns (uint[])
+    { return graph[_chain_id].parent_id; }
+
+    /**
+     * @dev Take transaction info
+     * @param _chain_id is supply chain id
+     * @param _tx_id is transaction id
+     * @return transaction info: comment, time stamp, source, destination
+     */
+    function txAt(uint _chain_id, uint _tx_id) constant
+        returns (string, uint, address, address)
+    {
+        var t = graph[_chain_id].txs[_tx_id];
+        return (t.comment, t.stamp, t.from, t.to);
+    }
+
+    mapping(uint => bool)                       public isValid; 
+    mapping(uint => address)                    public holder;
+    mapping(address => mapping(uint => bool))   public onBalance;
+    mapping(address =>
+            mapping(address =>
+                    mapping(uint => bool)))     public allowance;
 
     function TokenSupplyChain(string _name, string _symbol, uint8 _decimals) {
         name        = _name;
@@ -55,101 +99,34 @@ contract TokenSupplyChain is Mortal {
         decimals    = _decimals;
     }
 
+    /**
+     * @dev Make a new chain
+     * @param _value is a chain value
+     * @return true when all done
+     */
     function emission(uint _value) onlyOwner returns (bool) {
-        address[] memory noparent;
-        var chain = CreatorSupplyChain.create(noparent, _value);
-        totalBalance.append(chain);
-        balanceOf[owner].append(chain);
-        totalSupply += _value;
+        var chain_id = graph.length++;
+        graph[chain_id].value = _value;
+
+        isValid[chain_id] = true;
+        holder[chain_id]  = owner;
+        onBalance[owner][chain_id] = true;
+        totalSupply += graph[chain_id].value;
         return true;
     }
 
-    function burn(SupplyChain _chain) {
-        if (balanceOf[msg.sender].isContain[_chain]) {
-            totalBalance.remove(_chain);
-            balanceOf[msg.sender].remove(_chain);
-            totalSupply -= _chain.value();
-        } else throw;
-    }
-
     /**
-     * @dev Chain validation
-     * @param _chain is a supply chain item
-     * @return true when chain on token balance
-     */
-    function isValid(address _chain) constant returns (bool)
-    { return totalBalance.isContain[_chain]; }
-
-    /**
-     * @dev Take a first supply chain 
-     * @return first supply chain address
-     */
-    function first() constant returns (SupplyChain)
-    { return SupplyChain(totalBalance.first()); }
-    
-    /**
-     * @dev Take a next supply chain 
-     * @param _current is a current step
-     * @return next supply chain address
-     */
-    function next(address _current) constant returns (SupplyChain)
-    { return SupplyChain(totalBalance.next(_current)); }
-
-    /**
-     * @dev Account balance validation
-     * @param _account is any account address
-     * @param _chain is supply chain item
-     * @return true when chain on account balance
-     */
-    function onBalance(address _account, address _chain) constant returns (bool)
-    { return balanceOf[_account].isContain[_chain]; }
-
-    /**
-     * @dev Take a first supply chain from balance
-     * @param _account is any account address
-     * @return supply chain address
-     */
-    function balanceFirst(address _account) constant returns (SupplyChain)
-    { return SupplyChain(balanceOf[_account].first()); }
-    
-    /**
-     * @dev Take a next supply chain from balance
-     * @param _account is any account address
-     * @param _current is a current item of iteration
-     * @return supply chain address
-     */
-    function balanceNext(address _account, address _current) constant returns (SupplyChain)
-    { return SupplyChain(balanceOf[_account].next(_current)); }
-
-    /**
-     * @dev Allowance validation
-     * @param _from is a source address
-     * @param _to is a destination address
-     * @param _chain is a supply chain item
-     * @return true when chain approved
-     */
-    function allowance(address _from, address _to, address _chain) constant returns (bool) 
-    { return allowanceOf[_from][_to].isContain[_chain]; }
-
-    /**
-     * @dev Transfer chain and log transaction
-     * @param _to is a destination address
-     * @param _chain is a supply chain item
-     * @param _comment is a string transaction comment
+     * @dev Burn the chain
+     * @param _chain_id is a supply chain id
      * @return true when all done
      */
-    function transfer(address _to, SupplyChain _chain, string _comment) returns (bool) {
-        if (balanceOf[msg.sender].isContain[_chain]) {
-            if (_chain.txPush(_comment)) {
-                balanceOf[msg.sender].remove(_chain);
-                balanceOf[_to].append(_chain);
-
-                if (!balanceOf[msg.sender].isContain[_chain] &&
-                    balanceOf[_to].isContain[_chain]) throw;
-
-                Transfer(msg.sender, _to, _chain);
-                return true;
-            }
+    function burn(uint _chain_id) returns (bool) {
+        if (onBalance[msg.sender][_chain_id]) {
+            isValid[_chain_id] = false;
+            holder[_chain_id]  = 0;
+            onBalance[msg.sender][_chain_id] = false;
+            totalSupply -= graph[_chain_id].value;
+            return true;
         }
         return false;
     }
@@ -157,23 +134,51 @@ contract TokenSupplyChain is Mortal {
     /**
      * @dev Transfer chain and log transaction
      * @param _to is a destination address
-     * @param _chain is a supply chain item
+     * @param _chain_id is a supply chain id
+     * @param _comment is a string transaction comment
+     * @return true when all done
+     */
+    function transfer(address _to, uint _chain_id, string _comment) returns (bool) {
+        if (onBalance[msg.sender][_chain_id]) {
+            // Push transaction
+            graph[_chain_id].txs.push(
+                Tx({comment: _comment, stamp: now, from: msg.sender, to: _to}));
+
+            // Change chain holder
+            onBalance[msg.sender][_chain_id] = false;
+            onBalance[_to][_chain_id]        = true;
+            holder[_chain_id]                = _to;
+
+            // Event
+            Transfer(msg.sender, _to, _chain_id);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @dev Transfer chain and log transaction
+     * @param _to is a destination address
+     * @param _chain_id is a supply chain id
      * @param _comment is a string transaction comment
      * @return true when all done
      */
     function transferFrom(address _from, address _to,
-                          SupplyChain _chain, string _comment) returns (bool) {
-        if (allowanceOf[_from][msg.sender].isContain[_chain]) {
-            if (_chain.txPush(_comment)) {
-                balanceOf[_from].remove(_chain);
-                balanceOf[_to].append(_chain);
+                          uint _chain_id, string _comment) returns (bool) {
+        if (allowance[_from][msg.sender][_chain_id]
+            && onBalance[_from][_chain_id]) {
+            // Push transaction
+            graph[_chain_id].txs.push(
+                Tx({comment: _comment, stamp: now, from: msg.sender, to: _to}));
 
-                if (!balanceOf[_from].isContain[_chain] &&
-                    balanceOf[_to].isContain[_chain]) throw;
-                
-                Transfer(_from, _to, _chain);
-                return true;
-            }
+            // Chainge holder
+            onBalance[_from][_chain_id] = false;
+            onBalance[_to][_chain_id]   = true;
+            holder[_chain_id]           = _to;
+
+            // Event
+            Transfer(_from, _to, _chain_id);
+            return true;
         }
         return false;
     }
@@ -181,96 +186,84 @@ contract TokenSupplyChain is Mortal {
     /**
      * @dev Approve transfer chain
      * @param _to is a destination address
-     * @param _chain is a supply chain
+     * @param _chain_id is a supply chain
      * @return true when all done
      */
-    function approve(address _to, address _chain) returns (bool) {
-        if (balanceOf[msg.sender].isContain[_chain]) {
-            allowanceOf[msg.sender][_to].append(_chain);
-            if (allowanceOf[msg.sender][_to].isContain[_chain]) {
-                Approval(msg.sender, _to, _chain);
-                return true;
-            }
-        }
-        return false;
+    function approve(address _to, uint _chain_id) returns (bool) {
+        allowance[msg.sender][_to][_chain_id] = true; 
+        return allowance[msg.sender][_to][_chain_id];
     }
 
     /**
      * @dev Fork supply chain
-     * @param _chain is a supply chain item
+     * @param _chain_id is a supply chain item
      * @param _value is a forked value
      * @return pair of chains
      */
-    function fork(SupplyChain _chain, uint _value) returns (SupplyChain, SupplyChain) {
-        var senderBalance = balanceOf[msg.sender];
+    function fork(uint _chain_id, uint _value) returns (uint, uint) {
+        var chain = graph[_chain_id];
+        if (!onBalance[msg.sender][_chain_id]
+            || chain.value <= _value) throw;
 
-        if (!senderBalance.isContain[_chain]
-          || _value >= _chain.value()) throw; 
+        // Drop chain from token
+        holder[_chain_id]  = 0;
+        isValid[_chain_id] = false;
+        onBalance[msg.sender][_chain_id] = false;
 
-        totalBalance.remove(_chain);
-        senderBalance.remove(_chain);
+        // Fork
+        var residue = chain.value - _value; 
+        var first_id = graph.length++;
+        graph[first_id].parent_id = [_chain_id];
+        graph[first_id].value     = residue;
 
-        // Paranoid check
-        if (totalBalance.isContain[_chain]
-          || senderBalance.isContain[_chain]) throw;
-
-        uint residual = _chain.value() - _value;
-        address[] memory parent = new address[](1);
-        parent[0] = _chain;
-        var first  = CreatorSupplyChain.create(parent, residual);
-        var second = CreatorSupplyChain.create(parent, _value);
-
-        totalBalance.append(first);
-        totalBalance.append(second);
-        senderBalance.append(first);
-        senderBalance.append(second);
+        holder[first_id]  = msg.sender;
+        isValid[first_id] = true;
+        onBalance[msg.sender][first_id] = true;
         
-        // Paranoid check
-        if ( !totalBalance.isContain[first]
-          || !totalBalance.isContain[second]
-          || !senderBalance.isContain[first]
-          || !senderBalance.isContain[second]) throw;
+        var second_id = graph.length++;
+        graph[second_id].parent_id = [_chain_id];
+        graph[second_id].value     = _value;
+ 
+        holder[second_id]  = msg.sender;
+        isValid[second_id] = true;
+        onBalance[msg.sender][second_id] = true;
 
-        ChainFork(_chain, first, second);
-        return (first, second);
+        ChainFork(_chain_id, first_id, second_id);
+        return (first_id, second_id);
     }
 
     /**
      * @dev Merge supply chains
-     * @param _first is a supply chain item
-     * @param _second is a supply chain item
+     * @param _first_id is a supply chain item
+     * @param _second_id is a supply chain item
      * @return supply chain item
      */
-    function merge(SupplyChain _first, SupplyChain _second) returns (SupplyChain) {
-        var senderBalance = balanceOf[msg.sender];
+    function merge(uint _first_id, uint _second_id) returns (uint) {
+        if (!onBalance[msg.sender][_first_id]
+            || !onBalance[msg.sender][_second_id]) throw;
+        
+        // Drop chains
+        var first  = graph[_first_id];
+        var second = graph[_second_id];
+        
+        holder[_first_id]  = 0;
+        isValid[_first_id] = false;
+        onBalance[msg.sender][_first_id] = false;
+        
+        holder[_second_id]  = 0;
+        isValid[_second_id] = false;
+        onBalance[msg.sender][_second_id] = false;
 
-        if ( !senderBalance.isContain[_first]
-          || !senderBalance.isContain[_second]) throw;
+        // Merge
+        var chain_id = graph.length++;
+        graph[chain_id].parent_id = [_first_id, _second_id];
+        graph[chain_id].value     = first.value + second.value;
         
-        totalBalance.remove(_first);
-        totalBalance.remove(_second);
-        senderBalance.remove(_first);
-        senderBalance.remove(_second);
-        
-        // Paranoid check
-        if ( totalBalance.isContain[_first]
-          || totalBalance.isContain[_second]
-          || senderBalance.isContain[_first]
-          || senderBalance.isContain[_second]) throw;
-        
-        uint value = _first.value() + _second.value();
-        address[] memory parent = new address[](2);
-        parent[0] = _first; parent[1] = _second;
-        var chain = CreatorSupplyChain.create(parent, value);
-        
-        totalBalance.append(chain);
-        senderBalance.append(chain);
-        
-        // Paranoid check
-        if ( !totalBalance.isContain[chain]
-          || !senderBalance.isContain[chain]) throw;
+        holder[chain_id]  = msg.sender;
+        isValid[chain_id] = true;
+        onBalance[msg.sender][chain_id] = true;
 
-        ChainMerge(_first, _second, chain);
-        return chain;
+        ChainMerge(_first_id, _second_id, chain_id);
+        return chain_id;
     }
 }
