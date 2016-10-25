@@ -2,6 +2,7 @@
 // AIRA Builder for TokenEmissionACL contract
 //
 // Ethereum address:
+//  - Mainnet:
 //  - Testnet: 
 //
 
@@ -26,12 +27,26 @@ contract BuilderTokenEmissionACL is Builder {
     function create(string _name, string _symbol,
                     uint8 _decimals, uint256 _start_count,
                     address _acl_storage, string _emitent) returns (address) {
+        if (buildingCostWei > 0 && beneficiary != 0) {
+            // Too low value
+            if (msg.value < buildingCostWei) throw;
+            // Beneficiary send
+            if (!beneficiary.send(buildingCostWei)) throw;
+            // Refund
+            if (!msg.sender.send(msg.value - buildingCostWei)) throw;
+        } else {
+            // Refund all
+            if (msg.value > 0) {
+                if (!msg.sender.send(msg.value)) throw;
+            }
+        }
+ 
         var inst = CreatorTokenEmissionACL.create(_name, _symbol, _decimals,
                                                   _start_count, _acl_storage, _emitent);
+        getContractsOf[msg.sender].push(inst);
+        Builded(msg.sender, inst);
         inst.transfer(msg.sender, _start_count);
-        Owned(inst).delegate(msg.sender);
-        
-        deal(inst);
+        inst.delegate(msg.sender);
         return inst;
     }
 }

@@ -1,10 +1,10 @@
 pragma solidity ^0.4.2;
-import 'common/Owned.sol';
+import 'common/Mortal.sol';
 
 /**
  * @title Token contract represents any asset in digital economy
  */
-contract Token is Owned {
+contract Token is Mortal {
     event Transfer(address indexed _from,  address indexed _to,      uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 

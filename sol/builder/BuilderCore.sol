@@ -2,7 +2,8 @@
 // AIRA Builder for Core contract
 //
 // Ethereum address:
-//  - Testnet: 0x65db698e7a340bc73a60a7da2762feb33b0a312f
+//  - Mainnet:
+//  - Testnet: 
 //
 
 pragma solidity ^0.4.2;
@@ -19,11 +20,25 @@ contract BuilderCore is Builder {
      * @param _description is DAO description
      * @return address new contract
      */
-    function create(string _name, string _description) returns (address) {
+    function create(string _name, string _description) payable returns (address) {
+        if (buildingCostWei > 0 && beneficiary != 0) {
+            // Too low value
+            if (msg.value < buildingCostWei) throw;
+            // Beneficiary send
+            if (!beneficiary.send(buildingCostWei)) throw;
+            // Refund
+            if (!msg.sender.send(msg.value - buildingCostWei)) throw;
+        } else {
+            // Refund all
+            if (msg.value > 0) {
+                if (!msg.sender.send(msg.value)) throw;
+            }
+        }
+ 
         var inst = CreatorCore.create(_name, _description);
-        Owned(inst).delegate(msg.sender);
-        
-        deal(inst);
+        getContractsOf[msg.sender].push(inst);
+        Builded(msg.sender, inst);
+        inst.delegate(msg.sender);
         return inst;
     }
 }

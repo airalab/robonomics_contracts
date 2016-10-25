@@ -2,6 +2,7 @@
 // AIRA Builder for Offer contract
 //
 // Ethereum address:
+//  - Mainnet:
 //  - Testnet: 
 //
 
@@ -24,11 +25,25 @@ contract BuilderOffer is Builder {
      */
     function create(string _description, address _token, uint _value,
                     address _beneficiary, address _hard_offer) returns (address) {
+        if (buildingCostWei > 0 && beneficiary != 0) {
+            // Too low value
+            if (msg.value < buildingCostWei) throw;
+            // Beneficiary send
+            if (!beneficiary.send(buildingCostWei)) throw;
+            // Refund
+            if (!msg.sender.send(msg.value - buildingCostWei)) throw;
+        } else {
+            // Refund all
+            if (msg.value > 0) {
+                if (!msg.sender.send(msg.value)) throw;
+            }
+        }
+ 
         var inst = CreatorOffer.create(_description, _token, _value,
                                        _beneficiary, _hard_offer);
-        Owned(inst).delegate(msg.sender);
         getContractsOf[msg.sender].push(inst);
         Builded(msg.sender, inst);
+        inst.delegate(msg.sender);
         return inst;
     }
 }

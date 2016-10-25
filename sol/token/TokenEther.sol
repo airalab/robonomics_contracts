@@ -24,9 +24,10 @@ contract TokenEther is Token {
     /**
      * @dev This is the way to refill your token balance by ethers
      */
-    function refill() payable {
+    function refill() payable returns (bool) {
         balanceOf[msg.sender] += msg.value;
         totalSupply           += msg.value;
+        return true;
     }
 
     /**

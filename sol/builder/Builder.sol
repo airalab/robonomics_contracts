@@ -1,13 +1,27 @@
 pragma solidity ^0.4.2;
-import 'cashflow/CashFlow.sol';
-import 'cashflow/Proposal.sol';
-import 'token/TokenEther.sol';
-import './BuilderBase.sol';
+import 'common/Mortal.sol';
 
 /**
  * @title Builder based contract
  */
-contract Builder is BuilderBase {
+contract Builder is Mortal {
+    /**
+     * @dev this event emitted for every builded contract
+     */
+    event Builded(address indexed sender, address indexed instance);
+ 
+    /* Addresses builded contracts at sender */
+    mapping(address => address[]) public getContractsOf;
+ 
+    /**
+     * @dev Get last address
+     * @return last address contract
+     */
+    function getLastContract() constant returns (address) {
+        var sender_contracts = getContractsOf[msg.sender];
+        return sender_contracts[sender_contracts.length - 1];
+    }
+
     /* Building beneficiary */
     address public beneficiary;
 
@@ -37,21 +51,4 @@ contract Builder is BuilderBase {
      */
     function setSecurityCheck(string _uri) onlyOwner
     { securityCheckURI = _uri; }
- 
-    /**
-     * @dev Payment for builded contract and a request for release of shares
-     * @param _contract is address contract
-     * @notice Called after builded contract
-     */
-    function deal(address _contract) internal {
-        Builded(msg.sender, _contract);
-        getContractsOf[msg.sender].push(_contract);
-
-        if (buildingCostWei > 0 && beneficiary != 0) {
-            if (   msg.value < buildingCostWei
-               || !msg.sender.send(msg.value - buildingCostWei)
-               || !beneficiary.send(buildingCostWei)
-               ) throw;
-        }
-    }
 }

@@ -2,7 +2,8 @@
 // AIRA Builder for ShareSale contract
 //
 // Ethereum address:
-//  - Testnet: 0x56c58efbf174dc82b4311a68b84bdfd5db13a3db 
+//  - Mainnet:
+//  - Testnet: 
 //
 
 pragma solidity ^0.4.2;
@@ -23,10 +24,24 @@ contract BuilderShareSale is Builder {
      */
     function create(address _target, address _etherFund,
                     address _shares, uint _price_wei) returns (address) {
+        if (buildingCostWei > 0 && beneficiary != 0) {
+            // Too low value
+            if (msg.value < buildingCostWei) throw;
+            // Beneficiary send
+            if (!beneficiary.send(buildingCostWei)) throw;
+            // Refund
+            if (!msg.sender.send(msg.value - buildingCostWei)) throw;
+        } else {
+            // Refund all
+            if (msg.value > 0) {
+                if (!msg.sender.send(msg.value)) throw;
+            }
+        }
+ 
         var inst = CreatorShareSale.create(_target, _etherFund, _shares, _price_wei);
-        Owned(inst).delegate(msg.sender);
-        
-        deal(inst);
+        getContractsOf[msg.sender].push(inst);
+        Builded(msg.sender, inst);
+        inst.delegate(msg.sender);
         return inst;
     }
 }

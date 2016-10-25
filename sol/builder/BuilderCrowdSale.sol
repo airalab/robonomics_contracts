@@ -2,6 +2,8 @@
 // AIRA Builder for CrowdSale start contract
 //
 // Ethereum address:
+//  - Mainnet:
+//  - Testnet: 
 //
 
 pragma solidity ^0.4.2;
@@ -30,13 +32,27 @@ contract BuilderCrowdSale is Builder {
                     uint _start_time_sec, uint _duration_sec,
                     uint _start_price, uint _step, uint _period_sec,
                     uint _min_value, uint _end_value) returns (address) {
+        if (buildingCostWei > 0 && beneficiary != 0) {
+            // Too low value
+            if (msg.value < buildingCostWei) throw;
+            // Beneficiary send
+            if (!beneficiary.send(buildingCostWei)) throw;
+            // Refund
+            if (!msg.sender.send(msg.value - buildingCostWei)) throw;
+        } else {
+            // Refund all
+            if (msg.value > 0) {
+                if (!msg.sender.send(msg.value)) throw;
+            }
+        }
+ 
         var inst = CreatorCrowdSale.create(_target, _credits, _sale,
                                      _start_time_sec, _duration_sec,
                                      _start_price, _step, _period_sec,
                                      _min_value, _end_value);
-        Owned(inst).delegate(msg.sender);
-        
-        deal(inst);
+        getContractsOf[msg.sender].push(inst);
+        Builded(msg.sender, inst);
+        inst.delegate(msg.sender);
         return inst;
     }
 }

@@ -2,6 +2,7 @@
 // AIRA Builder for Shareholder contract
 //
 // Ethereum address:
+//  - Mainnet:
 //  - Testnet: 
 //
 
@@ -21,10 +22,24 @@ contract BuilderShareholder is Builder {
      * @return address new contract
      */
     function create(string _desc, address _shares, uint _count, address _recipient) returns (address) {
+        if (buildingCostWei > 0 && beneficiary != 0) {
+            // Too low value
+            if (msg.value < buildingCostWei) throw;
+            // Beneficiary send
+            if (!beneficiary.send(buildingCostWei)) throw;
+            // Refund
+            if (!msg.sender.send(msg.value - buildingCostWei)) throw;
+        } else {
+            // Refund all
+            if (msg.value > 0) {
+                if (!msg.sender.send(msg.value)) throw;
+            }
+        }
+ 
         var inst = CreatorShareholder.create(_desc, _shares, _count, _recipient);
-        Owned(inst).delegate(msg.sender);
-        
-        deal(inst);
+        getContractsOf[msg.sender].push(inst);
+        Builded(msg.sender, inst);
+        inst.delegate(msg.sender);
         return inst;
     }
 }

@@ -2,6 +2,7 @@
 // AIRA Builder for basic DAO contracts
 //
 // Ethereum address:
+//  - Mainnet:
 //  - Testnet: 
 //
 
@@ -12,7 +13,22 @@ import './Builder.sol';
 
 contract BuilderDAO is Builder {
     function create(string _dao_name, string _dao_description,
-                    string _shares_name, string _shares_symbol, uint _shares_count) {
+                    string _shares_name, string _shares_symbol,
+                    uint _shares_count) returns (address) {
+        if (buildingCostWei > 0 && beneficiary != 0) {
+            // Too low value
+            if (msg.value < buildingCostWei) throw;
+            // Beneficiary send
+            if (!beneficiary.send(buildingCostWei)) throw;
+            // Refund
+            if (!msg.sender.send(msg.value - buildingCostWei)) throw;
+        } else {
+            // Refund all
+            if (msg.value > 0) {
+                if (!msg.sender.send(msg.value)) throw;
+            }
+        }
+ 
         // DAO core
         var dao = CreatorCore.create(_dao_name, _dao_description);
 
@@ -25,9 +41,9 @@ contract BuilderDAO is Builder {
                 "github://airalab/core/token/TokenEmission.sol", true);
 
         // Delegate DAO to sender
+        getContractsOf[msg.sender].push(dao);
+        Builded(msg.sender, dao);
         dao.delegate(msg.sender);
-
-        // Notify
-        deal(dao);
+        return dao;
     }
 }
