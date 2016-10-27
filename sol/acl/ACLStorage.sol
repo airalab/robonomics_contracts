@@ -10,6 +10,12 @@ contract ACLStorage is Owned {
     // Group list
     string[] public group;
 
+    /**
+     * @dev Size of group array
+     */
+    function groupLength() constant returns (uint)
+    { return group.length; }
+
     // Group members list by SHA3 of group name
     mapping(bytes32 => AddressList.Data) members;
     using AddressList for AddressList.Data;
