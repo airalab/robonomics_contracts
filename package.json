@@ -4,7 +4,7 @@
   "description": "AIRALab DAO core",
   "dependencies": {
     "web3": "",
-    "solc": "0.4.2",
+    "solc": "0.4.3",
     "promise": "",
     "optimist": "",
     "hash-files": "",
