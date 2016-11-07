@@ -9,7 +9,7 @@ require('child_process').exec('git rev-parse HEAD', function (err, result) {
         version += ' (' + result.toString().slice(0, 8) + ')';
 });
 
-const mainsol  = __dirname + '/../sol';
+const mainsol  = __dirname + '/../contracts';
 const cachedir = __dirname + '/../.cache';
 const libsfile = __dirname + '/../.libs.json';
 

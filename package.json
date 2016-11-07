@@ -4,7 +4,7 @@
   "description": "AIRALab DAO core",
   "dependencies": {
     "web3": "",
-    "solc": "0.4.3",
+    "solc": "0.4.4",
     "promise": "",
     "optimist": "",
     "hash-files": "",
@@ -15,7 +15,9 @@
     "doc": "doc"
   },
   "main": "index.js",
-  "bin": { "aira_deploy": "./aira_deploy.sh" }, 
+  "bin": {
+    "aira_deploy": "./aira_deploy.sh"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -32,5 +34,9 @@
   "bugs": {
     "url": "https://github.com/airalab/core/issues"
   },
-  "homepage": "https://github.com/airalab/core#readme"
+  "homepage": "https://github.com/airalab/core#readme",
+  "devDependencies": {
+    "@digix/doxity": "^0.1.3",
+    "doxity": "^1.0.0"
+  }
 }
