@@ -8,7 +8,7 @@ contract Builder is Mortal {
     /**
      * @dev this event emitted for every builded contract
      */
-    event Builded(address indexed sender, address indexed instance);
+    event Builded(address indexed client, address indexed instance);
  
     /* Addresses builded contracts at sender */
     mapping(address => address[]) public getContractsOf;

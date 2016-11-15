@@ -26,33 +26,39 @@ contract BuilderCrowdSale is Builder {
      * @param _period_sec is a period of price step in seconds
      * @param _min_value is a minimal received value of credits for success finish
      * @param _end_value is a complete value of credits for success termination
+     * @param _client is a contract destination address (zero for sender)
      * @return address new contract
      */
     function create(address _target, address _credits, address _sale,
                     uint _start_time_sec, uint _duration_sec,
                     uint _start_price, uint _step, uint _period_sec,
-                    uint _min_value, uint _end_value) returns (address) {
+                    uint _min_value, uint _end_value, address _client) payable returns (address) {
         if (buildingCostWei > 0 && beneficiary != 0) {
             // Too low value
             if (msg.value < buildingCostWei) throw;
             // Beneficiary send
             if (!beneficiary.send(buildingCostWei)) throw;
             // Refund
-            if (!msg.sender.send(msg.value - buildingCostWei)) throw;
+            if (msg.value > buildingCostWei) {
+                if (!msg.sender.send(msg.value - buildingCostWei)) throw;
+            }
         } else {
             // Refund all
             if (msg.value > 0) {
                 if (!msg.sender.send(msg.value)) throw;
             }
         }
+
+        if (_client == 0)
+            _client = msg.sender;
  
         var inst = CreatorCrowdSale.create(_target, _credits, _sale,
                                      _start_time_sec, _duration_sec,
                                      _start_price, _step, _period_sec,
                                      _min_value, _end_value);
-        getContractsOf[msg.sender].push(inst);
-        Builded(msg.sender, inst);
-        inst.delegate(msg.sender);
+        getContractsOf[_client].push(inst);
+        Builded(_client, inst);
+        inst.delegate(_client);
         return inst;
     }
 }

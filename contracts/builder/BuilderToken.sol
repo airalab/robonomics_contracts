@@ -20,28 +20,34 @@ contract BuilderToken is Builder {
      * @param _symbol is symbol token
      * @param _decimals is fixed point position
      * @param _count is count of tokens exist
+     * @param _client is a contract destination address (zero for sender)
      * @return address new contract
      */
-    function create(string _name, string _symbol, uint8 _decimals, uint256 _count) returns (address) {
+    function create(string _name, string _symbol, uint8 _decimals, uint256 _count, address _client) payable returns (address) {
         if (buildingCostWei > 0 && beneficiary != 0) {
             // Too low value
             if (msg.value < buildingCostWei) throw;
             // Beneficiary send
             if (!beneficiary.send(buildingCostWei)) throw;
             // Refund
-            if (!msg.sender.send(msg.value - buildingCostWei)) throw;
+            if (msg.value > buildingCostWei) {
+                if (!msg.sender.send(msg.value - buildingCostWei)) throw;
+            }
         } else {
             // Refund all
             if (msg.value > 0) {
                 if (!msg.sender.send(msg.value)) throw;
             }
         }
+
+        if (_client == 0)
+            _client = msg.sender;
  
         var inst = CreatorToken.create(_name, _symbol, _decimals, _count);
-        getContractsOf[msg.sender].push(inst);
-        Builded(msg.sender, inst);
-        inst.transfer(msg.sender, _count);
-        inst.delegate(msg.sender);
+        getContractsOf[_client].push(inst);
+        Builded(_client, inst);
+        inst.transfer(_client, _count);
+        inst.delegate(_client);
         return inst;
     }
 }
