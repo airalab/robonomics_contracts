@@ -41,8 +41,8 @@ contract Association is Owned {
     }
 
     /* First time setup */
-    function Association(Token sharesAddress, uint minimumSharesToPassAVote, uint minutesForDebate) payable {
-        changeVotingRules(sharesAddress, minimumSharesToPassAVote, minutesForDebate);
+    function Association(address sharesAddress, uint minimumSharesToPassAVote, uint minutesForDebate) payable {
+        changeVotingRules(Token(sharesAddress), minimumSharesToPassAVote, minutesForDebate);
     }
 
     /*change rules*/
