@@ -1,4 +1,4 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.4;
 import 'lib/AddressList.sol';
 import 'token/TokenEmission.sol';
 import './MarketAgent.sol';

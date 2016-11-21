@@ -1,4 +1,4 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.4;
 import 'common/Modify.sol';
 import './Core.sol';
 

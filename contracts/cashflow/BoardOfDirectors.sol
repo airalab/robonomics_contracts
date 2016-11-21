@@ -1,4 +1,4 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.4;
 import 'creator/CreatorCoreModify.sol';
 import 'creator/CreatorVoting51.sol';
 import 'lib/Voting.sol';
