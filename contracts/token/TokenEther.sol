@@ -14,9 +14,9 @@ contract TokenEther is Token {
      * @param _value how many tokens withdraw from balance
      */
     function withdraw(uint _value) {
-        if (balanceOf[msg.sender] >= _value) {
-            balanceOf[msg.sender] -= _value;
-            totalSupply           -= _value;
+        if (balances[msg.sender] >= _value) {
+            balances[msg.sender] -= _value;
+            totalSupply          -= _value;
             if(!msg.sender.send(_value)) throw;
         }
     }
@@ -25,8 +25,8 @@ contract TokenEther is Token {
      * @dev This is the way to refill your token balance by ethers
      */
     function refill() payable returns (bool) {
-        balanceOf[msg.sender] += msg.value;
-        totalSupply           += msg.value;
+        balances[msg.sender] += msg.value;
+        totalSupply          += msg.value;
         return true;
     }
 
@@ -35,8 +35,8 @@ contract TokenEther is Token {
      *      a synonym for refill()
      */
     function () payable {
-        balanceOf[msg.sender] += msg.value;
-        totalSupply           += msg.value;
+        balances[msg.sender] += msg.value;
+        totalSupply          += msg.value;
     }
 
     /**

@@ -16,8 +16,8 @@ contract TokenEmission is Token {
         // Overflow check
         if (_value + totalSupply < totalSupply) throw;
 
-        totalSupply      += _value;
-        balanceOf[owner] += _value;
+        totalSupply     += _value;
+        balances[owner] += _value;
     }
  
     /**
@@ -26,8 +26,8 @@ contract TokenEmission is Token {
      * @notice sender balance will be decreased by `_value`
      */
     function burn(uint _value) {
-        if (balanceOf[msg.sender] >= _value) {
-            balanceOf[msg.sender] -= _value;
+        if (balances[msg.sender] >= _value) {
+            balances[msg.sender] -= _value;
             totalSupply      -= _value;
         }
     }

@@ -1,5 +1,4 @@
 pragma solidity ^0.4.4;
-import './CashFlow.sol';
 import 'token/TokenEther.sol';
 
 /**
@@ -50,7 +49,7 @@ contract ShareSale is Mortal {
      * @notice only full packet of shares can be saled
      */
     function () {
-        var value = shares.getBalance() * priceWei; 
+        var value = shares.balanceOf(this) * priceWei;
 
         if (  closed > 0 
            || msg.value < value
@@ -59,7 +58,7 @@ contract ShareSale is Mortal {
         etherFund.refill.value(value)();
 
         if (  !etherFund.transfer(target, value)
-           || !shares.transfer(msg.sender, shares.getBalance())
+           || !shares.transfer(msg.sender, shares.balanceOf(this))
            ) throw;
 
         closed = now;
@@ -67,7 +66,7 @@ contract ShareSale is Mortal {
 
     function kill() onlyOwner {
         // Save the shares
-        if (!shares.transfer(owner, shares.getBalance())) throw;
+        if (!shares.transfer(owner, shares.balanceOf(this))) throw;
 
         super.kill();
     }

@@ -22,7 +22,7 @@ contract TokenEmissionACL is TokenEmission, ACL {
         // Overflow check
         if (_value + totalSupply < totalSupply) throw;
 
-        totalSupply           += _value;
-        balanceOf[msg.sender] += _value;
+        totalSupply          += _value;
+        balances[msg.sender] += _value;
     }
 }

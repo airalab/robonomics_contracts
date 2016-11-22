@@ -17,34 +17,33 @@ contract Token is Mortal, ERC20 {
     uint8 public decimals;
     
     /* Token approvement system */
-    mapping(address => uint) public balanceOf;
-    mapping(address => mapping(address => uint)) public allowance;
+    mapping(address => uint) balances;
+    mapping(address => mapping(address => uint)) allowances;
  
     /**
-     * @return available balance of `sender` account (self balance)
+     * @dev Get balance of plain address
+     * @param _owner is a target address
+     * @return amount of tokens on balance
      */
-    function getBalance() constant returns (uint)
-    { return balanceOf[msg.sender]; }
+    function balanceOf(address _owner) constant returns (uint256)
+    { return balances[_owner]; }
  
     /**
-     * @dev This method returns non zero result when sender is approved by
-     *      argument address and target address have non zero self balance
-     * @param _address target address 
-     * @return available for `sender` balance of given address
+     * @dev Take allowed tokens
+     * @param _owner The address of the account owning tokens
+     * @param _spender The address of the account able to transfer the tokens
+     * @return Amount of remaining tokens allowed to spent
      */
-    function getBalance(address _address) constant returns (uint) {
-        return allowance[_address][msg.sender]
-             > balanceOf[_address] ? balanceOf[_address]
-                                   : allowance[_address][msg.sender];
-    }
- 
+    function allowance(address _owner, address _spender) constant returns (uint256)
+    { return allowances[_owner][_spender]; }
+
     /* Token constructor */
     function Token(string _name, string _symbol, uint8 _decimals, uint _count) {
-        name     = _name;
-        symbol   = _symbol;
-        decimals = _decimals;
-        totalSupply           = _count;
-        balanceOf[msg.sender] = _count;
+        name        = _name;
+        symbol      = _symbol;
+        decimals    = _decimals;
+        totalSupply = _count;
+        balances[msg.sender] = _count;
     }
  
     /**
@@ -55,9 +54,9 @@ contract Token is Mortal, ERC20 {
      * @return `true` when transfer done
      */
     function transfer(address _to, uint _value) returns (bool) {
-        if (balanceOf[msg.sender] >= _value) {
-            balanceOf[msg.sender] -= _value;
-            balanceOf[_to]        += _value;
+        if (balances[msg.sender] >= _value) {
+            balances[msg.sender] -= _value;
+            balances[_to]        += _value;
             Transfer(msg.sender, _to, _value);
             return true;
         }
@@ -72,14 +71,14 @@ contract Token is Mortal, ERC20 {
      * @notice from `_from` will be sended `_value` tokens to `_to`
      * @return `true` when transfer is done
      */
-    function transferFrom(address _from, address _to, uint _value) returns (bool) {
-        var avail = allowance[_from][msg.sender]
-                  > balanceOf[_from] ? balanceOf[_from]
-                                     : allowance[_from][msg.sender];
+    function transferFrom(address _from, address _to, uint256 _value) returns (bool) {
+        var avail = allowances[_from][msg.sender]
+                  > balances[_from] ? balances[_from]
+                                    : allowances[_from][msg.sender];
         if (avail >= _value) {
-            allowance[_from][msg.sender] -= _value;
-            balanceOf[_from] -= _value;
-            balanceOf[_to]   += _value;
+            allowances[_from][msg.sender] -= _value;
+            balances[_from] -= _value;
+            balances[_to]   += _value;
             Transfer(_from, _to, _value);
             return true;
         }
@@ -88,19 +87,19 @@ contract Token is Mortal, ERC20 {
 
     /**
      * @dev Give to target address ability for self token manipulation without sending
-     * @param _sender target address (future requester)
+     * @param _spender target address (future requester)
      * @param _value amount of token values for approving
      */
-    function approve(address _sender, uint _value) returns (bool) {
-        allowance[msg.sender][_sender] += _value;
-        Approval(msg.sender, _sender, _value);
+    function approve(address _spender, uint256 _value) returns (bool) {
+        allowances[msg.sender][_spender] += _value;
+        Approval(msg.sender, _spender, _value);
         return true;
     }
 
     /**
      * @dev Reset count of tokens approved for given address
-     * @param _address target address
+     * @param _spender target address (future requester)
      */
-    function unapprove(address _address)
-    { allowance[msg.sender][_address] = 0; }
+    function unapprove(address _spender)
+    { allowances[msg.sender][_spender] = 0; }
 }

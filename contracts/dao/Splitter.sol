@@ -75,7 +75,7 @@ contract Splitter is Mortal {
     function withdraw() onlyOwner {
         if (this.balance > 0) {
             token.refill.value(this.balance)();
-            var balance = token.getBalance();
+            var balance = token.balanceOf(this);
 
             /* XXX: possible DoS by block gas limit */
             for (var d = destination.first(); d != 0; d = destination.next(d)) {

@@ -2,7 +2,6 @@ pragma solidity ^0.4.4;
 import 'common/Mortal.sol';
 import 'common/FiniteTime.sol';
 import 'token/TokenEmission.sol';
-import './CashFlow.sol';
 
 contract CrowdSale is FiniteTime, Owned {
     address public target;
@@ -62,7 +61,7 @@ contract CrowdSale is FiniteTime, Owned {
 
         // Wnen now is end of time
         if (now > end_time) {
-            if (minValue < credits.getBalance())
+            if (minValue < credits.balanceOf(this))
                 // Minimal value funded
                 done();
             else
@@ -72,7 +71,7 @@ contract CrowdSale is FiniteTime, Owned {
         }
 
         // Funded maximal value
-        if (endValue < credits.getBalance()) {
+        if (endValue < credits.balanceOf(this)) {
             done();
             return;
         }
@@ -84,7 +83,10 @@ contract CrowdSale is FiniteTime, Owned {
         priceCalc();
         
         // Detect sender credits value
-        var value = credits.getBalance(msg.sender);
+        var value = credits.allowance(msg.sender, this)
+                  > credits.balanceOf(msg.sender)
+                  ? credits.balanceOf(msg.sender)
+                  : credits.allowance(msg.sender, this);
         if (value == 0) return;
 
         // Buy the
@@ -113,11 +115,11 @@ contract CrowdSale is FiniteTime, Owned {
      */
     function done() internal {
         // Refund owner unused
-        if (!sale.transfer(owner, sale.getBalance()))
+        if (!sale.transfer(owner, sale.balanceOf(this)))
             throw;
 
         // Transfer funded credits to target
-        if (!credits.transfer(target, credits.getBalance()))
+        if (!credits.transfer(target, credits.balanceOf(this)))
             throw;
 
         // Close the IPO
@@ -130,7 +132,7 @@ contract CrowdSale is FiniteTime, Owned {
      */
     function fail() internal {
         // Refund owner unused sale
-        if (!sale.transfer(owner, sale.getBalance()))
+        if (!sale.transfer(owner, sale.balanceOf(this)))
             throw;
 
         // Close the IPO
