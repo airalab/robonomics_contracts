@@ -1,13 +1,11 @@
 pragma solidity ^0.4.4;
 import 'common/Mortal.sol';
+import './ERC20.sol';
 
 /**
  * @title Token contract represents any asset in digital economy
  */
-contract Token is Mortal {
-    event Transfer(address indexed _from,  address indexed _to,      uint256 _value);
-    event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-
+contract Token is Mortal, ERC20 {
     /* Short description of token */
     string public name;
     string public symbol;
@@ -90,12 +88,13 @@ contract Token is Mortal {
 
     /**
      * @dev Give to target address ability for self token manipulation without sending
-     * @param _address target address
+     * @param _sender target address (future requester)
      * @param _value amount of token values for approving
      */
-    function approve(address _address, uint _value) {
-        allowance[msg.sender][_address] += _value;
-        Approval(msg.sender, _address, _value);
+    function approve(address _sender, uint _value) returns (bool) {
+        allowance[msg.sender][_sender] += _value;
+        Approval(msg.sender, _sender, _value);
+        return true;
     }
 
     /**
