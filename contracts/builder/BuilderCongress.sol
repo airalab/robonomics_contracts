@@ -1,5 +1,5 @@
 //
-// AIRA Builder for Ambix contract
+// AIRA Builder for Congress contract
 //
 // Ethereum address:
 //  - Mainnet:
@@ -7,19 +7,22 @@
 //
 
 pragma solidity ^0.4.4;
-import 'creator/CreatorAmbix.sol';
+import 'creator/CreatorCongress.sol';
 import './Builder.sol';
 
 /**
- * @title BuilderAmbix contract
+ * @title BuilderCongress contract
  */
-contract BuilderAmbix is Builder {
+contract BuilderCongress is Builder {
     /**
      * @dev Run script creation contract
-     * @param _client is a contract destination address (zero for sender)
      * @return address new contract
      */
-    function create(address _client) payable returns (address) {
+    function create(uint256 minimumQuorumForProposals,
+                    uint256 minutesForDebate,
+                    int256 marginOfVotesForMajority,
+                    address congressLeader,
+                    address _client) payable returns (address) {
         if (buildingCostWei > 0 && beneficiary != 0) {
             // Too low value
             if (msg.value < buildingCostWei) throw;
@@ -39,10 +42,12 @@ contract BuilderAmbix is Builder {
         if (_client == 0)
             _client = msg.sender;
  
-        var inst = CreatorAmbix.create();
+        var inst = CreatorCongress.create(minimumQuorumForProposals,
+                                          minutesForDebate,
+                                          marginOfVotesForMajority,
+                                          congressLeader);
         getContractsOf[_client].push(inst);
         Builded(_client, inst);
-        inst.delegate(_client);
         return inst;
     }
 }

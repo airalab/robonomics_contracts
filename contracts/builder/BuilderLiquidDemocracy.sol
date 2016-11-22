@@ -1,5 +1,5 @@
 //
-// AIRA Builder for Ambix contract
+// AIRA Builder for LiquidDemocracy contract
 //
 // Ethereum address:
 //  - Mainnet:
@@ -7,19 +7,21 @@
 //
 
 pragma solidity ^0.4.4;
-import 'creator/CreatorAmbix.sol';
+import 'creator/CreatorLiquidDemocracy.sol';
 import './Builder.sol';
 
 /**
- * @title BuilderAmbix contract
+ * @title BuilderLiquidDemocracy contract
  */
-contract BuilderAmbix is Builder {
+contract BuilderLiquidDemocracy is Builder {
     /**
      * @dev Run script creation contract
-     * @param _client is a contract destination address (zero for sender)
      * @return address new contract
      */
-    function create(address _client) payable returns (address) {
+    function create(address votingWeightToken,
+                    string forbiddenFunctionCall,
+                    uint256 percentLossInEachRound,
+                    address _client) payable returns (address) {
         if (buildingCostWei > 0 && beneficiary != 0) {
             // Too low value
             if (msg.value < buildingCostWei) throw;
@@ -39,10 +41,11 @@ contract BuilderAmbix is Builder {
         if (_client == 0)
             _client = msg.sender;
  
-        var inst = CreatorAmbix.create();
+        var inst = CreatorLiquidDemocracy.create(votingWeightToken,
+                                                 forbiddenFunctionCall,
+                                                 percentLossInEachRound);
         getContractsOf[_client].push(inst);
         Builded(_client, inst);
-        inst.delegate(_client);
         return inst;
     }
 }

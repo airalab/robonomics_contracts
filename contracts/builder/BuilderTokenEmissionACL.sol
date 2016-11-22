@@ -6,7 +6,7 @@
 //  - Testnet: 
 //
 
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.4;
 import 'creator/CreatorTokenEmissionACL.sol';
 import './Builder.sol';
 

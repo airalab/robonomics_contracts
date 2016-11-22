@@ -1,5 +1,5 @@
 //
-// AIRA Builder for Ambix contract
+// AIRA Builder for Association contract
 //
 // Ethereum address:
 //  - Mainnet:
@@ -7,19 +7,21 @@
 //
 
 pragma solidity ^0.4.4;
-import 'creator/CreatorAmbix.sol';
+import 'creator/CreatorAssociation.sol';
 import './Builder.sol';
 
 /**
- * @title BuilderAmbix contract
+ * @title BuilderAssociation contract
  */
-contract BuilderAmbix is Builder {
+contract BuilderAssociation is Builder {
     /**
      * @dev Run script creation contract
-     * @param _client is a contract destination address (zero for sender)
      * @return address new contract
      */
-    function create(address _client) payable returns (address) {
+    function create(address sharesAddress,
+                    uint256 minimumSharesToPassAVote,
+                    uint256 minutesForDebate,
+                    address _client) payable returns (address) {
         if (buildingCostWei > 0 && beneficiary != 0) {
             // Too low value
             if (msg.value < buildingCostWei) throw;
@@ -39,10 +41,12 @@ contract BuilderAmbix is Builder {
         if (_client == 0)
             _client = msg.sender;
  
-        var inst = CreatorAmbix.create();
+        var inst = CreatorAssociation.create(sharesAddress,
+                                             minimumSharesToPassAVote,
+                                             minutesForDebate);
+        inst.delegate(_client);
         getContractsOf[_client].push(inst);
         Builded(_client, inst);
-        inst.delegate(_client);
         return inst;
     }
 }

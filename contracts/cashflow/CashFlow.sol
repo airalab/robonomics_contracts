@@ -1,4 +1,4 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.4;
 import './Proposal.sol';
 import 'lib/AddressList.sol';
 import 'common/Mortal.sol';
