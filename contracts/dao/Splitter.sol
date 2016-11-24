@@ -1,48 +1,66 @@
 pragma solidity ^0.4.4;
-import 'common/Mortal.sol';
-import 'token/TokenEther.sol';
 
-contract Splitter is Mortal {
-    address[] public destination;
-    mapping(address => uint) public percent;
+contract Splitter {
+    struct Holder {
+        address account;
+        uint8   part;
+        uint    payout;
+    }
+
+    Holder[] holders;
+    mapping(address => uint) holderId;
+
+    function getHolder(uint _index) constant returns (address, uint8, uint) {
+        var holder = holders[_index];
+        return (holder.account, holder.part, holder.payout);
+    }
+
+    function Splitter(address[] _accounts, uint8[] _parts) {
+        if (_accounts.length != _parts.length) throw;
+
+        uint8 sum = 0;
+        for (uint i = 0; i < _accounts.length; ++i) {
+            // Append holder
+            holders.push(Holder(_accounts[i], _parts[i], 0));
+            // Indexing by address
+            holderId[_accounts[i]] = holders.length - 1;
+            // Sum part
+            sum += _parts[i];
+        }
+        // Check when parts correct
+        if (sum != 100) throw;
+    }
 
     /**
-     * @dev Append new destination address
-     * @param _destination is a destination address
+     * @dev Withdraw accumulated contract value according to ratio percent
      */
-    function append(address _destination) onlyOwner
-    { destination.push(_destination); }
+    function withdraw() {
+        var id = holderId[msg.sender];
+        if (holders[id].part == 0) throw;
 
-    /**
-     * @dev Set destination address and ratio
-     * @param _destination is a destination address
-     * @param _percent is a ratio in percent
-     */
-    function set(address _destination, uint _percent) onlyOwner
-    { percent[_destination] = _percent; }
+        // Total holder value
+        var value = totalReceived * holders[id].part / 100;
 
-    /**
-     * @dev Withdraw accumulated contract values, this method refill token balance
-     *      and transfer to destinations according to ratio percent
-     */
-    function withdraw() onlyOwner {
-        if (this.balance > 0) {
-            /* XXX: possible DoS by block gas limit */
-            for (uint i = 0; i < destination.length; ++i) {
-                var part = percent[destination[i]];
-                if (part > 0) {
-                    var value = this.balance * 100 / part;
-                    if (!destination[i].send(value)) throw;
-                }
-            }
+        // Check for payout
+        if (value > holders[id].payout) {
+            // Cacl payout diff
+            var out = value - holders[id].payout;
+            // Send difference
+            if (!holders[id].account.send(out)) throw;
+            holders[id].payout += out;
         }
     }
+
+    /* Total received money to contract */
+    uint public totalReceived = 0;
 
     /**
      * @dev Received log
      */
-    function () payable
-    { Received(msg.sender, msg.value); }
+    function () payable {
+        Received(msg.sender, msg.value);
+        totalReceived += msg.value;
+    }
 
     event Received(address indexed sender, uint indexed value);
 }
