@@ -57,13 +57,12 @@ contract Congress is Owned {
         uint minimumQuorumForProposals,
         uint minutesForDebate,
         int marginOfVotesForMajority, address congressLeader
-    ) payable {
+    ) {
         changeVotingRules(minimumQuorumForProposals, minutesForDebate, marginOfVotesForMajority);
-        if (congressLeader != 0) owner = congressLeader;
         // It’s necessary to add an empty first member
-        changeMembership(0, false, ''); 
-        // and let's add the founder, to save a step later       
-        changeMembership(owner, true, 'founder');        
+        changeMembership(0, false, ''); // and let's add the founder, to save a step later
+        if (congressLeader != 0)
+            changeMembership(congressLeader, true, 'founder');
     }
 
     /*make member*/
@@ -187,4 +186,6 @@ contract Congress is Owned {
         // Fire Events
         ProposalTallied(proposalNumber, p.currentResult, p.numberOfVotes, p.proposalPassed);
     }
+
+    function () payable {}
 }

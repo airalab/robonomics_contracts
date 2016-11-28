@@ -46,6 +46,13 @@ contract BuilderCongress is Builder {
                                           minutesForDebate,
                                           marginOfVotesForMajority,
                                           congressLeader);
+        if (congressLeader == 0) {
+            inst.changeMembership(_client, true, 'founder');
+            inst.delegate(_client);
+        } else {
+            inst.delegate(congressLeader);
+        }
+
         getContractsOf[_client].push(inst);
         Builded(_client, inst);
         return inst;
