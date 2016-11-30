@@ -1,0 +1,1 @@
+[{"constant":true,"inputs":[],"name":"emission","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_deal","type":"address"}],"name":"getEmission","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"inputs":[{"name":"_emission","type":"uint256"}],"type":"constructor"}]

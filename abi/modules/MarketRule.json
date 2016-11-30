@@ -1,0 +1,1 @@
+[{"constant":false,"inputs":[{"name":"_deal","type":"address"}],"name":"getEmission","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"}]
