@@ -148,4 +148,6 @@ contract Association is Owned {
         // Fire Events
         ProposalTallied(proposalNumber, result, quorum, p.proposalPassed);
     }
+
+    function () payable {}
 }

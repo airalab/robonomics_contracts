@@ -113,4 +113,6 @@ contract LiquidDemocracy {
 
         return currentWinner;
     }
+
+    function () payable {}
 }
