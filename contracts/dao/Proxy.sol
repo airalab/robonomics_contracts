@@ -119,7 +119,7 @@ contract Proxy is Owned {
 
         // Run transaction
         var c = queue[_index];
-        c.target.call.value(c.value)(c.transaction);
+        if (!c.target.call.value(c.value)(c.transaction)) throw;
         CallExecuted(_index, block.number);
     }
 
