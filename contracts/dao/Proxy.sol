@@ -1,8 +1,8 @@
 pragma solidity ^0.4.2;
-import 'common/Owned.sol';
+import 'common/Mortal.sol';
 import 'lib/SecurityRings.sol';
 
-contract Proxy is Owned {
+contract Proxy is Mortal {
     SecurityRings.Data rings;
     using SecurityRings for SecurityRings.Data;
 
@@ -44,9 +44,8 @@ contract Proxy is Owned {
      * @param _auth Default auth node
      * @param _ident Default user identifier
      */
-    function Proxy(address _auth, bytes32 _ident) {
-        rings.addRing(_auth, _ident);
-    }
+    function Proxy(address _auth, bytes32 _ident)
+    { rings.addRing(_auth, _ident); }
 
     struct Call {
         address target;
@@ -103,6 +102,8 @@ contract Proxy is Owned {
 
     /**
      * @dev Authorized call event
+     * @param index Position in call queue
+     * @param node Authorization node
      */
     event CallAuthorized(uint indexed index, address indexed node);
 
@@ -112,7 +113,8 @@ contract Proxy is Owned {
      * @notice This can take a lot of gas
      */
     function run(uint _index) onlyOwner {
-        if (!rings.isAuthorized(_index)) throw;
+        if (!rings.isAuthorized(_index)
+          || queue[_index].execBlock != 0) throw;
 
         // Store exec block
         queue[_index].execBlock = block.number;
@@ -125,6 +127,17 @@ contract Proxy is Owned {
 
     /**
      * @dev Executed call event
+     * @param index Position in call queue
+     * @param block_number Number of call execution block
      */
     event CallExecuted(uint indexed index, uint indexed block_number);
+
+    /**
+     * @dev Destroy contract
+     * @notice Contract should have empty balance before call it
+     */
+    function kill() onlyOwner {
+        if (this.balance > 0) throw;
+        super.kill();
+    }
 }
