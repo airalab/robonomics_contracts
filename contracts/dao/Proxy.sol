@@ -140,4 +140,19 @@ contract Proxy is Mortal {
         if (this.balance > 0) throw;
         super.kill();
     }
+
+    /**
+     * @dev Incoming payment event
+     * @param from Payment sender
+     * @param value Amount of received wei
+     */
+    event PaymentReceived(address indexed from, uint indexed value);
+
+    /**
+     * @dev Payable fallback method
+     */
+    function() payable {
+        if (msg.value > 0)
+            PaymentReceived(msg.sender, msg.value);
+    }
 }
