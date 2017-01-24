@@ -44,7 +44,8 @@ contract BuilderTokenEther is Builder {
         var inst = CreatorTokenEther.create(_name, _symbol);
         getContractsOf[_client].push(inst);
         Builded(_client, inst);
-        inst.delegate(_client);
+        inst.setOwner(_client);
+        inst.setHammer(_client);
         return inst;
     }
 }

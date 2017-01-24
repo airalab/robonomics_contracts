@@ -46,7 +46,8 @@ contract BuilderShareholder is Builder {
         var inst = CreatorShareholder.create(_desc, _shares, _count, _recipient);
         getContractsOf[_client].push(inst);
         Builded(_client, inst);
-        inst.delegate(_client);
+        inst.setOwner(_client);
+        inst.setHammer(_client);
         return inst;
     }
 }

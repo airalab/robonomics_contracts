@@ -58,7 +58,8 @@ contract BuilderCrowdSale is Builder {
                                      _min_value, _end_value);
         getContractsOf[_client].push(inst);
         Builded(_client, inst);
-        inst.delegate(_client);
+        inst.setOwner(_client);
+        inst.setHammer(_client);
         return inst;
     }
 }

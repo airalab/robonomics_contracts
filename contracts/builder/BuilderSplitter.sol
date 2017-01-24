@@ -44,6 +44,8 @@ contract BuilderSplitter is Builder {
         var inst = CreatorSplitter.create(_accounts, _parts);
         getContractsOf[_client].push(inst);
         Builded(_client, inst);
+        inst.setOwner(_client);
+        inst.setHammer(_client);
         return inst;
     }
 }

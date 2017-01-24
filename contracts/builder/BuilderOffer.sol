@@ -49,7 +49,8 @@ contract BuilderOffer is Builder {
                                        _beneficiary, _hard_offer);
         getContractsOf[_client].push(inst);
         Builded(_client, inst);
-        inst.delegate(_client);
+        inst.setOwner(_client);
+        inst.setHammer(_client);
         return inst;
     }
 }

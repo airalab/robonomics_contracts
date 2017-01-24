@@ -1,10 +1,10 @@
 pragma solidity ^0.4.4;
-import 'common/Mortal.sol';
+import 'common/Object.sol';
 
 /**
  * @title Builder based contract
  */
-contract Builder is Mortal {
+contract Builder is Object {
     /**
      * @dev this event emitted for every builded contract
      */

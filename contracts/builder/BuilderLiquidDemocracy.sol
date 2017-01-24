@@ -46,6 +46,8 @@ contract BuilderLiquidDemocracy is Builder {
                                                  percentLossInEachRound);
         getContractsOf[_client].push(inst);
         Builded(_client, inst);
+        inst.setOwner(_client);
+        inst.setHammer(_client);
         return inst;
     }
 }

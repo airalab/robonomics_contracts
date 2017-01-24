@@ -44,7 +44,8 @@ contract BuilderCore is Builder {
         var inst = CreatorCore.create(_name, _description);
         getContractsOf[_client].push(inst);
         Builded(_client, inst);
-        inst.delegate(_client);
+        inst.setOwner(_client);
+        inst.setHammer(_client);
         return inst;
     }
 }

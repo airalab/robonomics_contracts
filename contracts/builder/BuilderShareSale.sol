@@ -47,7 +47,8 @@ contract BuilderShareSale is Builder {
         var inst = CreatorShareSale.create(_target, _etherFund, _shares, _price_wei);
         getContractsOf[_client].push(inst);
         Builded(_client, inst);
-        inst.delegate(_client);
+        inst.setOwner(_client);
+        inst.setHammer(_client);
         return inst;
     }
 }

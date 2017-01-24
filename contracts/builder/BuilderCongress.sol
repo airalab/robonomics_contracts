@@ -48,9 +48,11 @@ contract BuilderCongress is Builder {
                                           congressLeader);
         if (congressLeader == 0) {
             inst.changeMembership(_client, true, 'founder');
-            inst.delegate(_client);
+            inst.setOwner(_client);
+            inst.setHammer(_client);
         } else {
-            inst.delegate(congressLeader);
+            inst.setOwner(congressLeader);
+            inst.setHammer(congressLeader);
         }
 
         getContractsOf[_client].push(inst);

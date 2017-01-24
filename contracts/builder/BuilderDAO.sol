@@ -36,7 +36,8 @@ contract BuilderDAO is Builder {
  
         var shares = CreatorTokenEmission.create(_shares_name, _shares_symbol, 0, _shares_count);
         shares.transfer(_client, _shares_count);
-        shares.delegate(_client);
+        shares.setOwner(_client);
+        shares.setHammer(_client);
 
         var dao = CreatorCore.create(_dao_name, _dao_description);
         // Append shares module
@@ -46,7 +47,8 @@ contract BuilderDAO is Builder {
         // Delegate DAO to sender
         getContractsOf[_client].push(dao);
         Builded(_client, dao);
-        dao.delegate(_client);
+        dao.setOwner(_client);
+        dao.setHammer(_client);
         return dao;
     }
 }

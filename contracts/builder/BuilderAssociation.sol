@@ -44,9 +44,10 @@ contract BuilderAssociation is Builder {
         var inst = CreatorAssociation.create(sharesAddress,
                                              minimumSharesToPassAVote,
                                              minutesForDebate);
-        inst.delegate(_client);
         getContractsOf[_client].push(inst);
         Builded(_client, inst);
+        inst.setOwner(_client);
+        inst.setHammer(_client);
         return inst;
     }
 }

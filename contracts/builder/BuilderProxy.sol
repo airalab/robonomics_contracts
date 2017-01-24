@@ -20,7 +20,7 @@ contract BuilderProxy is Builder {
      * @param _client Proxy owner address
      * @return address new contract
      */
-    function create(bytes32 _ident, address _client) payable returns (address) {
+    function create(bytes32 _ident, address _safe, address _client) payable returns (address) {
         if (buildingCostWei > 0 && beneficiary != 0) {
             // Too low value
             if (msg.value < buildingCostWei) throw;
@@ -40,10 +40,11 @@ contract BuilderProxy is Builder {
         if (_client == 0)
             _client = msg.sender;
  
-        var inst = CreatorProxy.create(_client, _ident);
+        var inst = CreatorProxy.create(_client, _ident, _safe);
         getContractsOf[_client].push(inst);
         Builded(_client, inst);
-        inst.delegate(_client);
+        inst.setOwner(_client);
+        inst.setHammer(_client);
         return inst;
     }
 }

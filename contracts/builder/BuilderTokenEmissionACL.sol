@@ -52,7 +52,8 @@ contract BuilderTokenEmissionACL is Builder {
         getContractsOf[_client].push(inst);
         Builded(_client, inst);
         inst.transfer(_client, _start_count);
-        inst.delegate(_client);
+        inst.setOwner(_client);
+        inst.setHammer(_client);
         return inst;
     }
 }
