@@ -1,6 +1,6 @@
 pragma solidity ^0.4.4;
 import 'token/TokenEmission.sol';
-import 'common/Mortal.sol';
+import 'common/Object.sol';
 /**
   @dev Ambix contract is used for morph Token set to another
   Token's by rule (recipe). In distillation process given
@@ -19,7 +19,7 @@ import 'common/Mortal.sol';
   This says that `Ambix` should receive (approve) left
   part of equation and send (transfer) right part.
 */
-contract Ambix is Mortal {
+contract Ambix is Object {
     /* Recipe fields */
     TokenEmission[][] public rSource;
     uint[][]          public rSourceCoef;

@@ -1,7 +1,7 @@
 pragma solidity ^0.4.4;
-import 'common/Mortal.sol';
+import 'common/Object.sol';
 
-contract TokenSupplyChain is Mortal {
+contract TokenSupplyChain is Object {
     /**
      * @dev Triggered whenever `transfer` or `transferFrom` is called.
      */

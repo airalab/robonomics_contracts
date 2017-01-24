@@ -1,9 +1,9 @@
 pragma solidity ^0.4.4;
-import 'common/Mortal.sol';
+import 'common/Object.sol';
 import 'common/FiniteTime.sol';
 import 'token/TokenEmission.sol';
 
-contract CrowdSale is FiniteTime, Owned {
+contract CrowdSale is FiniteTime, Object {
     address public target;
     Token   public credits;
     Token   public sale;

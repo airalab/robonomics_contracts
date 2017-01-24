@@ -1,6 +1,6 @@
 {
   "name": "aira-core",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "AIRALab DAO core",
   "dependencies": {
     "web3": "0.17.0-beta",

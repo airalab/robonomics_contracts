@@ -1,8 +1,8 @@
 pragma solidity ^0.4.4;
-import 'common/Mortal.sol';
+import 'common/Object.sol';
 import 'token/Token.sol';
 
-contract Offer is Mortal {
+contract Offer is Object {
     string  public description;
     address public beneficiary;
     address public hardOffer; 

@@ -38,9 +38,4 @@ contract TokenEther is Token {
         balances[msg.sender] += msg.value;
         totalSupply          += msg.value;
     }
-
-    /**
-     * @dev By security issues token that holds ethers can not be killed
-     */
-    function kill() onlyOwner { throw; }
 }

@@ -1,8 +1,8 @@
 pragma solidity ^0.4.4;
-import 'common/Owned.sol';
+import 'common/Object.sol';
 import 'lib/AddressList.sol';
 
-contract Proposal is Owned {
+contract Proposal is Object {
     // Constructor
     function Proposal(address _destination, uint _targetValue, string _description) {
         destination = _destination;

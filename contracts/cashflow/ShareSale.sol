@@ -1,10 +1,11 @@
 pragma solidity ^0.4.4;
+import 'common/Object.sol';
 import 'token/TokenEther.sol';
 
 /**
  * @title Contract for direct sale shares for cashflow 
  */
-contract ShareSale is Mortal {
+contract ShareSale is Object {
     // Assigned shares contract
     Token public shares;
 
@@ -64,10 +65,10 @@ contract ShareSale is Mortal {
         closed = now;
     }
 
-    function kill() onlyOwner {
+    function destroy() onlyHammer {
         // Save the shares
         if (!shares.transfer(owner, shares.balanceOf(this))) throw;
 
-        super.kill();
+        super.destroy();
     }
 }

@@ -1,7 +1,8 @@
 pragma solidity ^0.4.4;
 import 'token/Token.sol';
+import 'common/Object.sol';
 
-contract LiquidDemocracy {
+contract LiquidDemocracy is Object {
     Token public votingToken;
     bool  underExecution;
     address public appointee;

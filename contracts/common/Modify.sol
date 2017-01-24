@@ -1,5 +1,5 @@
 pragma solidity ^0.4.4;
-import './Mortal.sol';
+import './Object.sol';
 
 /**
  * @title Owned contract modificator
@@ -9,7 +9,7 @@ import './Mortal.sol';
  *          - (optional) setup `Modify` contract
  *          - delegate owned contract to `Modify` and `run()` modification
  */
-contract Modify is Mortal {
+contract Modify is Object {
     Owned public target;
 
     /**
@@ -27,7 +27,7 @@ contract Modify is Mortal {
         if (target.owner() != address(this)) throw;
 
         modify();
-        target.delegate(msg.sender);
+        target.setOwner(msg.sender);
     }
 
     function modify() internal;

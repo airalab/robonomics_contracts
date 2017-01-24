@@ -1,4 +1,5 @@
 pragma solidity ^0.4.4;
+
 /**
  * @title Contract for object that have an owner
  */
@@ -9,15 +10,10 @@ contract Owned {
     address public owner;
 
     /**
-     * @dev Store owner on creation
-     */
-    function Owned() { owner = msg.sender; }
-
-    /**
      * @dev Delegate contract to another person
-     * @param _owner is another person address
+     * @param _owner New owner address 
      */
-    function delegate(address _owner) onlyOwner
+    function setOwner(address _owner) onlyOwner
     { owner = _owner; }
 
     /**

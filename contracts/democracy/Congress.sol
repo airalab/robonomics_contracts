@@ -1,7 +1,7 @@
 pragma solidity ^0.4.4;
-import 'common/Owned.sol';
+import 'common/Object.sol';
 
-contract Congress is Owned {
+contract Congress is Object {
     /* Contract Variables and events */
     uint public minimumQuorum;
     uint public debatingPeriodInMinutes;

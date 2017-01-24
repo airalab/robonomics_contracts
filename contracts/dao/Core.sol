@@ -1,6 +1,6 @@
 pragma solidity ^0.4.4;
 import 'lib/AddressMap.sol';
-import 'common/Mortal.sol';
+import 'common/Object.sol';
 
 /**
  * @title The DAO core contract basicaly describe the organisation and contain:
@@ -8,7 +8,7 @@ import 'common/Mortal.sol';
  *          infrastructure nodes,
  *          contract templates
  */
-contract Core is Mortal {
+contract Core is Object {
     /* Short description */
     string  public name;
     string  public description;

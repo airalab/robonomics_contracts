@@ -1,12 +1,12 @@
 pragma solidity ^0.4.4;
 import 'lib/AddressMap.sol';
-import 'common/Mortal.sol';
+import 'common/Object.sol';
 import './Knowledge.sol';
 
 /**
  * @title Contract for access to knowledges by index or term name
  */
-contract KnowledgeStorage is Mortal {
+contract KnowledgeStorage is Object {
     /* The knowledge base */
     AddressMap.Data knowledges;
 

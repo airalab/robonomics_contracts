@@ -1,8 +1,8 @@
 pragma solidity ^0.4.2;
-import 'common/Mortal.sol';
+import 'common/Object.sol';
 import 'lib/SecurityRings.sol';
 
-contract Proxy is Mortal {
+contract Proxy is Object {
     SecurityRings.Data rings;
     using SecurityRings for SecurityRings.Data;
 
@@ -43,9 +43,12 @@ contract Proxy is Mortal {
      * @dev Proxy constructor
      * @param _auth Default auth node
      * @param _ident Default user identifier
+     * @param _safe Ring0 safety address
      */
-    function Proxy(address _auth, bytes32 _ident)
-    { rings.addRing(_auth, _ident); }
+    function Proxy(address _auth, bytes32 _ident, address _safe) {
+        rings.addRing(_auth, _ident);
+        rings.addGate(0, _safe, bytes32("safe"));
+    }
 
     struct Call {
         address target;
@@ -76,7 +79,7 @@ contract Proxy is Mortal {
      * @param _value Transaction value in wei
      * @param _transaction Transaction data
      */
-    function request(address _target, uint _value, bytes _transaction) onlyOwner {
+    function request(address _target, uint _value, bytes _transaction) {
         var rid = rings.newAction();
         rings.authorized[rid][msg.sender] = true;
         queue.push(Call(_target, _value, _transaction, 0));
@@ -112,7 +115,7 @@ contract Proxy is Mortal {
      * @param _index Call in queue position
      * @notice This can take a lot of gas
      */
-    function run(uint _index) onlyOwner {
+    function run(uint _index) {
         if (!rings.isAuthorized(_index)
           || queue[_index].execBlock != 0) throw;
 
@@ -133,13 +136,10 @@ contract Proxy is Mortal {
     event CallExecuted(uint indexed index, uint indexed block_number);
 
     /**
-     * @dev Destroy contract
-     * @notice Contract should have empty balance before call it
+     * @dev Payable fallback method
      */
-    function kill() onlyOwner {
-        if (this.balance > 0) throw;
-        super.kill();
-    }
+    function() payable
+    { PaymentReceived(msg.sender, msg.value); }
 
     /**
      * @dev Incoming payment event
@@ -147,12 +147,4 @@ contract Proxy is Mortal {
      * @param value Amount of received wei
      */
     event PaymentReceived(address indexed from, uint indexed value);
-
-    /**
-     * @dev Payable fallback method
-     */
-    function() payable {
-        if (msg.value > 0)
-            PaymentReceived(msg.sender, msg.value);
-    }
 }

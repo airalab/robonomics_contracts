@@ -1,7 +1,8 @@
 pragma solidity ^0.4.4;
 import 'token/Token.sol';
+import 'common/Object.sol';
 
-contract TokenSelling is Mortal {
+contract TokenSelling is Object {
     Token public token;
     uint  public price_wei;
 

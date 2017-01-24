@@ -1,10 +1,10 @@
 pragma solidity ^0.4.4;
-import 'common/Owned.sol';
+import 'common/Object.sol';
 
 /**
  * Knowledge is a generic declaration of object or process
  */
-contract Knowledge is Owned {
+contract Knowledge is Object {
     /* Knowledge can have a type described below */
     int8 constant OBJECT  = 1;
     int8 constant PROCESS = 2;

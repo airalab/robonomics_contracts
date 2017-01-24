@@ -1,9 +1,9 @@
 pragma solidity ^0.4.4;
-import 'common/Owned.sol';
+import 'common/Object.sol';
 import 'token/Token.sol';
 
 /* The democracy contract itself */
-contract Association is Owned {
+contract Association is Object {
     /* Contract Variables and events */
     uint public minimumQuorum;
     uint public debatingPeriodInMinutes;

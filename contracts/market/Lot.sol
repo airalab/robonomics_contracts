@@ -1,12 +1,12 @@
 pragma solidity ^0.4.4;
-import 'common/Mortal.sol';
+import 'common/Object.sol';
 import 'token/Token.sol';
 
 /**
  * @title Token lot for market
  *        presents available deal based on token transfers
  */
-contract Lot is Mortal {
+contract Lot is Object {
     /* Operational tokens */
     Token public sale;
     Token public buy;

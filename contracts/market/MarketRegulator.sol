@@ -9,7 +9,7 @@ import './Market.sol';
  *        this contract creates market and `credits` token
  *        for market trade
  */
-contract MarketRegulator is Owned {
+contract MarketRegulator is Object {
     /* The self market */
     Market public market;
 

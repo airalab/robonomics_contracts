@@ -1,6 +1,7 @@
 pragma solidity ^0.4.4;
+import 'common/Object.sol';
 
-contract Splitter {
+contract Splitter is Object {
     struct Holder {
         address account;
         uint8   part;

@@ -1,5 +1,5 @@
 pragma solidity ^0.4.4;
-import 'common/Owned.sol'; 
+import 'common/Object.sol'; 
 import 'token/Token.sol'; 
 
 contract ProposalDoneReceiver {
@@ -9,7 +9,7 @@ contract ProposalDoneReceiver {
 /**
  * @dev The 51% voting
  */
-contract Voting51 is Owned {
+contract Voting51 is Object {
     Token                public voting_token;
     ProposalDoneReceiver public receiver;
 

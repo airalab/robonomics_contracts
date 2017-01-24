@@ -13,7 +13,7 @@ contract BoardOfDirectorsFund {
     }
 }
 
-contract BoardOfDirectors is Owned, ProposalDoneReceiver {
+contract BoardOfDirectors is Object, ProposalDoneReceiver {
     Core     public dao_core;
     Token    public shares;
     Token    public credits;
@@ -114,7 +114,7 @@ contract BoardOfDirectors is Owned, ProposalDoneReceiver {
         var proposal = voting.proposal_target(_index);
         if (typeOf[proposal] == ProposalType.CoreModify) {
             // DAO Core modification
-            dao_core.delegate(proposal);
+            dao_core.setOwner(proposal);
             Modify(proposal).run();
         } else {
             if (typeOf[proposal] == ProposalType.Fund) {

@@ -1,10 +1,11 @@
 pragma solidity ^0.4.4;
 import './MarketRule.sol';
+import 'common/Object.sol';
 
 /**
  * @title The constant market rule, return constant emission value for every deal
  */
-contract MarketRuleConstant is MarketRule {
+contract MarketRuleConstant is Object, MarketRule {
     uint public emission;
 
     function MarketRuleConstant(uint _emission)

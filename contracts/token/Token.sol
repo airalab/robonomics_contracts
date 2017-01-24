@@ -1,11 +1,11 @@
 pragma solidity ^0.4.4;
-import 'common/Mortal.sol';
+import 'common/Object.sol';
 import './ERC20.sol';
 
 /**
  * @title Token contract represents any asset in digital economy
  */
-contract Token is Mortal, ERC20 {
+contract Token is Object, ERC20 {
     /* Short description of token */
     string public name;
     string public symbol;

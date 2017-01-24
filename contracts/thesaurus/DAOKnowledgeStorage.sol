@@ -3,7 +3,7 @@ import 'thesaurus/KnowledgeStorage.sol';
 import 'token/Token.sol';
 import 'lib/Voting.sol';
 
-contract DAOKnowledgeStorage is Mortal {
+contract DAOKnowledgeStorage is Object {
     /* Operating agent storage with thesaurus */
     KnowledgeStorage public thesaurus;
 

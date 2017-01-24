@@ -1,12 +1,12 @@
 pragma solidity ^0.4.4;
-import 'common/Owned.sol';
+import 'common/Object.sol';
 import 'lib/AddressList.sol';
 
 /**
  * @title ACL storage contract
  * @dev this contract used for store and manage access groups and its members
  */
-contract ACLStorage is Owned {
+contract ACLStorage is Object {
     // Group list
     string[] public group;
 
