@@ -3,36 +3,32 @@ import 'token/Token.sol';
 import 'common/Object.sol';
 
 contract TokenSelling is Object {
-    Token public token;
-    uint  public price_wei;
+    mapping(address => uint) public priceWei;
 
     /**
      * @dev Price setter
-     * @param _price_wei New price
+     * @param _token Token selector
+     * @param _price New price
      */
-    function setPrice(uint _price_wei) onlyOwner
-    { price_wei = _price_wei; }
+    function setPrice(Token _token, uint _price) onlyOwner
+    { priceWei[_token] = _price; }
 
     /**
-     * @dev Contract constructor
-     * @param _token Sale token
-     * @param _price_wei Static price
+     * @dev Withraw trade balance
      */
-    function TokenSelling(address _token, uint _price_wei) {
-        token = Token(_token);
-        price_wei = _price_wei;
-    }
+    function withdraw() onlyOwner
+    { if (!msg.sender.send(this.balance)) throw; }
 
     /**
      * @dev Sale token by static price
      */
-    function buy() payable returns (bool) {
+    function buy(Token _token) payable returns (bool) {
         // Check self balance
-        var value_token = msg.value / price_wei;
-        if (value_token > token.balanceOf(this)) throw;
+        var value_token = msg.value / priceWei[_token];
+        if (value_token > _token.balanceOf(this)) throw;
 
         // Transfer tokens
-        if (!token.transfer(msg.sender, value_token)) throw;
+        if (!_token.transfer(msg.sender, value_token)) throw;
         return true;
     }
 }
