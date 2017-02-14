@@ -44,10 +44,16 @@ contract Market is Object {
     // Reverse from order to ask index
     mapping(uint => uint) public orderAskOf;
 
+    function asksLen() constant returns (uint)
+    { return asks.length; }
+
     // MinHeap of current bids
     uint[] public bids;
     // Reverse from order to bid index
     mapping(uint => uint) public orderBidOf;
+    
+    function bidsLen() constant returns (uint)
+    { return bids.length; }
 
     function insertAsk(uint _id) internal {
         asks.push(_id);
@@ -229,14 +235,14 @@ contract Market is Object {
     function marketSell(address _agent, uint _value) internal returns (bool) {
         uint quote_value = 0;
 
-        for (;;) {
+        while (_value > 0) {
             // Check of empty bids
             if (asks.length == 0) throw;
 
             // Get asks head
             var o = orders[asks[0]];
 
-            if (o.value >= _value) {
+            if (o.value > _value) {
                 // Makret top is large
                 quote_value = o.price * _value / (10 ** decimals);
                 if (!quote.transfer(msg.sender, quote_value)) throw;
@@ -260,14 +266,14 @@ contract Market is Object {
     function marketBuy(address _agent, uint _value) internal returns (bool) {
         uint quote_value = 0;
 
-        for (;;) {
+        while (_value > 0) {
             // Check of empty bids
             if (bids.length == 0) throw;
 
             // Get bids head
             var o = orders[bids[0]];
 
-            if (o.value >= _value) {
+            if (o.value > _value) {
                 // Makret top is large
                 quote_value = o.price * _value / (10 ** decimals);
                 if (!quote.transferFrom(msg.sender, o.agent, quote_value)) throw;

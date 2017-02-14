@@ -40,11 +40,4 @@ contract MarketRegulator is Object {
      * @return `MarketAgent` instance
      */
     function sign() returns (MarketAgent);
-
-    /**
-     * @dev Deal notify callback, this called by market agent 
-     *      after call deal of `Lot`
-     * @param _lot is deal description
-     */
-    function notifyDeal(Lot _lot) onlyAgents;
 }

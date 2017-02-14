@@ -49,7 +49,7 @@ contract ShareSale is Object {
      *      by price, setted by owner.
      * @notice only full packet of shares can be saled
      */
-    function () {
+    function () payable {
         var value = shares.balanceOf(this) * priceWei;
 
         if (  closed > 0 
