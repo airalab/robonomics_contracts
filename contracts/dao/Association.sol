@@ -1,19 +1,23 @@
 pragma solidity ^0.4.4;
 import 'common/Object.sol';
-import 'token/ERC20.sol';
+import 'common/Observer.sol';
+import './DAOToken.sol';
 
 /* The democracy contract itself */
-contract Association is Object {
+contract Association is Object, Observer {
     /* Contract Variables and events */
     uint        public minimumQuorum;
     uint        public debatingPeriodInMinutes;
     Proposal[]  public proposals;
     uint        public numProposals;
-    ERC20       public daoTokenAddress;
+    DAOToken    public daoTokenAddress;
+
+    // Map of addresses and proposal voted on by this address
+    mapping(address => uint[]) public votingOf;
 
     event ProposalAdded(uint proposalID, address recipient, uint amount, string description);
     event Voted(uint proposalID, bool position, address voter);
-    event ProposalTallied(uint proposalID, int result, uint quorum, bool active);
+    event ProposalTallied(uint proposalID, uint quorum, bool active);
     event ChangeOfRules(uint minimumQuorum, uint debatingPeriodInMinutes, address daoTokenAddress);
 
     struct Proposal {
@@ -23,10 +27,11 @@ contract Association is Object {
         uint    votingDeadline;
         bool    executed;
         bool    proposalPassed;
-        uint    numberOfVotes;
         bytes32 proposalHash;
-        Vote[]  votes;
+        uint    yea;
+        uint    nay;
         mapping(address => bool) voted;
+        mapping(address => bool) supportsProposal;
     }
 
     struct Vote {
@@ -42,12 +47,12 @@ contract Association is Object {
 
     /* First time setup */
     function Association(address tokenAddress, uint minimumSharesToPassAVote, uint minutesForDebate) payable {
-        changeVotingRules(ERC20(tokenAddress), minimumSharesToPassAVote, minutesForDebate);
+        changeVotingRules(DAOToken(tokenAddress), minimumSharesToPassAVote, minutesForDebate);
     }
 
     /*change rules*/
-    function changeVotingRules(ERC20 tokenAddress, uint minimumSharesToPassAVote, uint minutesForDebate) onlyOwner {
-        daoTokenAddress = ERC20(tokenAddress);
+    function changeVotingRules(DAOToken tokenAddress, uint minimumSharesToPassAVote, uint minutesForDebate) onlyOwner {
+        daoTokenAddress = tokenAddress;
         if (minimumSharesToPassAVote == 0 ) minimumSharesToPassAVote = 1;
         minimumQuorum = minimumSharesToPassAVote;
         debatingPeriodInMinutes = minutesForDebate;
@@ -57,7 +62,7 @@ contract Association is Object {
     /* Function to create a new proposal */
     function newProposal(
         address beneficiary,
-        uint etherAmount,
+        uint weiAmount,
         string JobDescription,
         bytes transactionBytecode
     )
@@ -67,14 +72,13 @@ contract Association is Object {
         proposalID = proposals.length++;
         Proposal p = proposals[proposalID];
         p.recipient = beneficiary;
-        p.amount = etherAmount;
+        p.amount = weiAmount;
         p.description = JobDescription;
-        p.proposalHash = sha3(beneficiary, etherAmount, transactionBytecode);
+        p.proposalHash = sha3(beneficiary, weiAmount, transactionBytecode);
         p.votingDeadline = now + debatingPeriodInMinutes * 1 minutes;
         p.executed = false;
         p.proposalPassed = false;
-        p.numberOfVotes = 0;
-        ProposalAdded(proposalID, beneficiary, etherAmount, JobDescription);
+        ProposalAdded(proposalID, beneficiary, weiAmount, JobDescription);
         numProposals = proposalID+1;
     }
 
@@ -95,16 +99,44 @@ contract Association is Object {
     /* */
     function vote(uint proposalNumber, bool supportsProposal)
         onlyShareholders
-        returns (uint voteID)
     {
         Proposal p = proposals[proposalNumber];
         if (p.voted[msg.sender] == true) throw;
 
-        voteID = p.votes.length++;
-        p.votes[voteID] = Vote({inSupport: supportsProposal, voter: msg.sender});
-        p.voted[msg.sender] = true;
-        p.numberOfVotes = voteID +1;
+        p.voted[msg.sender]            = true;
+        p.supportsProposal[msg.sender] = supportsProposal;
+        if (supportsProposal) {
+            p.yea += daoTokenAddress.balanceOf(msg.sender);
+        } else {
+            p.nay += daoTokenAddress.balanceOf(msg.sender);
+        }
+
+        votingOf[msg.sender].push(proposalNumber);
         Voted(proposalNumber,  supportsProposal, msg.sender);
+    }
+
+    function unVote(uint proposalNumber) {
+        Proposal p = proposals[proposalNumber];
+        if (!p.voted[msg.sender]) throw;
+
+        if (now < p.votingDeadline) {
+            if (p.supportsProposal[msg.sender]) {
+                p.yea -= daoTokenAddress.balanceOf(msg.sender);
+            } else {
+                p.nay -= daoTokenAddress.balanceOf(msg.sender);
+            }
+            p.voted[msg.sender] = false;
+        }
+
+        var voting = votingOf[msg.sender];
+        if (voting.length > 1) {
+            uint i = 0;
+            while (proposalNumber != voting[i++]) {}
+            voting[i] = voting[voting.length - 1];
+            voting.length -= 1;
+        } else {
+            voting.length = 0;
+        }
     }
 
     function executeProposal(uint proposalNumber, bytes transactionBytecode) returns (int result) {
@@ -115,38 +147,36 @@ contract Association is Object {
             ||  p.proposalHash != sha3(p.recipient, p.amount, transactionBytecode)) /* Does the transaction code match the proposal? */
             throw;
 
-        /* tally the votes */
-        uint quorum = 0;
-        uint yea = 0;
-        uint nay = 0;
-
-        for (uint i = 0; i <  p.votes.length; ++i) {
-            Vote v = p.votes[i];
-            uint voteWeight = daoTokenAddress.balanceOf(v.voter);
-            quorum += voteWeight;
-            if (v.inSupport) {
-                yea += voteWeight;
-            } else {
-                nay += voteWeight;
-            }
-        }
+        var quorum = p.yea + p.nay;
 
         /* execute result */
         if (quorum <= minimumQuorum) {
             /* Not enough significant voters */
             throw;
-        } else if (yea > nay ) {
+        } else if (p.yea > p.nay ) {
             /* has quorum and was approved */
             p.executed = true;
-            if (!p.recipient.call.value(p.amount * 1 ether)(transactionBytecode)) {
-                throw;
-            }
+            if (!p.recipient.call.value(p.amount)(transactionBytecode)) throw;
             p.proposalPassed = true;
         } else {
             p.proposalPassed = false;
         }
         // Fire Events
-        ProposalTallied(proposalNumber, result, quorum, p.proposalPassed);
+        ProposalTallied(proposalNumber, quorum, p.proposalPassed);
+    }
+
+    /**
+     * @dev Observer interface
+     */
+    function eventHandle(uint _event, bytes32[] _data) returns (bool) {
+        if (msg.sender != address(daoTokenAddress)) throw;
+
+        if (_event == 0x10) { // TRANSFER_EVENT
+            address from = address(_data[0]);
+            address to   = address(_data[1]);
+            if (votingOf[from].length > 0 || votingOf[to].length > 0)
+                throw;
+        }
     }
 
     function () payable {}
