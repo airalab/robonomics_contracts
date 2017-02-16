@@ -180,17 +180,7 @@ contract Market is Object {
     }
 
     // Orders of all time
-    Order[] orders;
-
-    /**
-     * @dev Order getter
-     * @param _id Order id
-     */
-    function order(uint _id)
-            constant returns (OrderKind, address, uint, uint, uint, uint) {
-        var o = orders[_id];
-        return (o.kind, o.agent, o.price, o.value, o.startValue, o.stamp);
-    }
+    Order[] public orders;
 
     /**
      * @dev Event emitted when order is opened

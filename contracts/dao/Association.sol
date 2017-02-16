@@ -1,32 +1,32 @@
 pragma solidity ^0.4.4;
 import 'common/Object.sol';
-import 'token/Token.sol';
+import 'token/ERC20.sol';
 
 /* The democracy contract itself */
 contract Association is Object {
     /* Contract Variables and events */
-    uint public minimumQuorum;
-    uint public debatingPeriodInMinutes;
-    Proposal[] public proposals;
-    uint public numProposals;
-    Token public sharesTokenAddress;
+    uint        public minimumQuorum;
+    uint        public debatingPeriodInMinutes;
+    Proposal[]  public proposals;
+    uint        public numProposals;
+    ERC20       public daoTokenAddress;
 
     event ProposalAdded(uint proposalID, address recipient, uint amount, string description);
     event Voted(uint proposalID, bool position, address voter);
     event ProposalTallied(uint proposalID, int result, uint quorum, bool active);
-    event ChangeOfRules(uint minimumQuorum, uint debatingPeriodInMinutes, address sharesTokenAddress);
+    event ChangeOfRules(uint minimumQuorum, uint debatingPeriodInMinutes, address daoTokenAddress);
 
     struct Proposal {
         address recipient;
-        uint amount;
-        string description;
-        uint votingDeadline;
-        bool executed;
-        bool proposalPassed;
-        uint numberOfVotes;
+        uint    amount;
+        string  description;
+        uint    votingDeadline;
+        bool    executed;
+        bool    proposalPassed;
+        uint    numberOfVotes;
         bytes32 proposalHash;
-        Vote[] votes;
-        mapping (address => bool) voted;
+        Vote[]  votes;
+        mapping(address => bool) voted;
     }
 
     struct Vote {
@@ -36,22 +36,22 @@ contract Association is Object {
 
     /* modifier that allows only shareholders to vote and create new proposals */
     modifier onlyShareholders {
-        if (sharesTokenAddress.balanceOf(msg.sender) == 0) throw;
+        if (daoTokenAddress.balanceOf(msg.sender) == 0) throw;
         _;
     }
 
     /* First time setup */
-    function Association(address sharesAddress, uint minimumSharesToPassAVote, uint minutesForDebate) payable {
-        changeVotingRules(Token(sharesAddress), minimumSharesToPassAVote, minutesForDebate);
+    function Association(address tokenAddress, uint minimumSharesToPassAVote, uint minutesForDebate) payable {
+        changeVotingRules(ERC20(tokenAddress), minimumSharesToPassAVote, minutesForDebate);
     }
 
     /*change rules*/
-    function changeVotingRules(Token sharesAddress, uint minimumSharesToPassAVote, uint minutesForDebate) onlyOwner {
-        sharesTokenAddress = Token(sharesAddress);
+    function changeVotingRules(ERC20 tokenAddress, uint minimumSharesToPassAVote, uint minutesForDebate) onlyOwner {
+        daoTokenAddress = ERC20(tokenAddress);
         if (minimumSharesToPassAVote == 0 ) minimumSharesToPassAVote = 1;
         minimumQuorum = minimumSharesToPassAVote;
         debatingPeriodInMinutes = minutesForDebate;
-        ChangeOfRules(minimumQuorum, debatingPeriodInMinutes, sharesTokenAddress);
+        ChangeOfRules(minimumQuorum, debatingPeriodInMinutes, daoTokenAddress);
     }
 
     /* Function to create a new proposal */
@@ -122,7 +122,7 @@ contract Association is Object {
 
         for (uint i = 0; i <  p.votes.length; ++i) {
             Vote v = p.votes[i];
-            uint voteWeight = sharesTokenAddress.balanceOf(v.voter);
+            uint voteWeight = daoTokenAddress.balanceOf(v.voter);
             quorum += voteWeight;
             if (v.inSupport) {
                 yea += voteWeight;
