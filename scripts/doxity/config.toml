@@ -1,6 +1,6 @@
-linkPrefix = ""
+linkPrefix = "/core/docs"
 compiler = "0.4.10-develop.2017.2.17+commit.7bdc4dda.Linux.g++"
-name = "core-docs"
+name = "core"
 license = "BSD-3-Clause"
 version = "0.1.0"
 description = "Airalab core contracts documentation"
