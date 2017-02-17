@@ -101,29 +101,31 @@ contract Association is Object, Observer {
         onlyShareholders
     {
         Proposal p = proposals[proposalNumber];
-        if (p.voted[msg.sender] == true) throw;
+        var balance = daoTokenAddress.balanceOf(msg.sender);
+        if (p.voted[msg.sender] == true || balance == 0) throw;
 
         p.voted[msg.sender]            = true;
         p.supportsProposal[msg.sender] = supportsProposal;
         if (supportsProposal) {
-            p.yea += daoTokenAddress.balanceOf(msg.sender);
+            p.yea += balance;
         } else {
-            p.nay += daoTokenAddress.balanceOf(msg.sender);
+            p.nay += balance;
         }
 
         votingOf[msg.sender].push(proposalNumber);
-        Voted(proposalNumber,  supportsProposal, msg.sender);
+        Voted(proposalNumber, supportsProposal, msg.sender);
     }
 
     function unVote(uint proposalNumber) {
         Proposal p = proposals[proposalNumber];
-        if (!p.voted[msg.sender]) throw;
+        var balance = daoTokenAddress.balanceOf(msg.sender);
+        if (!p.voted[msg.sender] || balance == 0) throw;
 
         if (now < p.votingDeadline) {
             if (p.supportsProposal[msg.sender]) {
-                p.yea -= daoTokenAddress.balanceOf(msg.sender);
+                p.yea -= balance;
             } else {
-                p.nay -= daoTokenAddress.balanceOf(msg.sender);
+                p.nay -= balance;
             }
             p.voted[msg.sender] = false;
         }
@@ -177,6 +179,7 @@ contract Association is Object, Observer {
             if (votingOf[from].length > 0 || votingOf[to].length > 0)
                 throw;
         }
+        return true;
     }
 
     function () payable {}

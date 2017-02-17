@@ -17,6 +17,8 @@ contract DAOToken is TokenEmission, TokenObservable {
      * @param _association Association address
      */
     function setAssociation(Association _association) onlyOwner {
+        if (address(daoAssociation) != 0) throw;
+
         addObserver(TRANSFER_EVENT, _association);
         daoAssociation = _association;
     }
@@ -29,6 +31,8 @@ contract DAOToken is TokenEmission, TokenObservable {
      * @param _fund DAO reward fund 
      */
     function setRewardFund(RewardFund _fund) onlyOwner {
+        if (address(daoRewardFund) != 0) throw;
+
         addObserver(TRANSFER_EVENT, _fund);
         daoRewardFund = _fund;
     }

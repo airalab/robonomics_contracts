@@ -13,7 +13,7 @@ contract Observer {
 
 contract Observable {
     mapping(uint => Observer[]) private _observers;
-    
+
     /**
      * @dev Notify observers 
      * @param _event Event type
