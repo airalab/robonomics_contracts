@@ -1,0 +1,20 @@
+{
+  "name": "core",
+  "version": "0.6.0",
+  "description": "Airalab core contracts documentation",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/airalab/core.git"
+  },
+  "keywords": [
+    "Ethereum",
+    "Solidity",
+    "smart-contract"
+  ],
+  "author": "Airalab",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/airalab/core/issues"
+  },
+  "homepage": "https://github.com/airalab/core#readme"
+}
