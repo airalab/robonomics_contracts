@@ -5,10 +5,11 @@ node_js:
 - "6"
 
 install:
-- npm install -g aira-deploy
+- npm install -g aira-deploy testrpc
 
 script:
-- aira-deploy --abigen
+- aira-deploy --abi
+- testrpc >/dev/null & (sleep 5 && node tests/daofund_test.js && node tests/association_test.js)
 
 cache:
   directories:
