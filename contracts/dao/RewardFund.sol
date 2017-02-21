@@ -18,10 +18,14 @@ contract RewardFund is TokenEther, Observer {
         uint    stamp;
     }
 
-    // List of received reward payments
+    /**
+     * @dev List of received reward payments
+     */
     Reward[] public rewards;
 
-    // Minimal incoming reward value
+    /**
+     * @dev Minimal incoming reward value
+     */
     uint public minimalReward;
 
     /**
@@ -30,10 +34,19 @@ contract RewardFund is TokenEther, Observer {
     function rewardsLength() constant returns (uint)
     { return rewards.length; }
 
-    // Pointer to holder next reward,
-    // is equal to rewards.length if no reward available
+    /**
+     * @dev Pointer to holder next reward,
+     *      is equal to rewards.length if no reward available
+     */
     mapping(address => uint) public nextReward;
 
+    /**
+     * @dev Reward fund construction
+     * @param _name Fund token name
+     * @param _symbol Fund token symbol 
+     * @param _dao_token DAO token address
+     * @param _min Minimal reward value in wei
+     */
     function RewardFund(string _name, string _symbol, address _dao_token, uint _min)
             TokenEther(_name, _symbol) {
         daoToken = DAOToken(_dao_token);
@@ -42,6 +55,7 @@ contract RewardFund is TokenEther, Observer {
 
     /**
      * @dev Refill reward fund
+     * @notice Payment should be greater than minimal reward
      */
     function putReward() payable {
         if (msg.value < minimalReward) throw;
@@ -52,14 +66,9 @@ contract RewardFund is TokenEther, Observer {
     }
 
     /**
-     * @dev Get reward for sender account
-     */
-    function getReward()
-    { getReward(msg.sender, daoToken.balanceOf(msg.sender), daoToken.totalSupply()); }
-
-    /**
-     * @dev Get multiple rewards for sender account,
-     * @notice Possible out of gas with big _count
+     * @dev Get rewards for sender account,
+     * @param _count Count of rewards to payout
+     * @notice Possible out of gas with big _count value
      */
     function getRewards(uint _count) {
         var accountShares = daoToken.balanceOf(msg.sender);
@@ -68,15 +77,11 @@ contract RewardFund is TokenEther, Observer {
             getReward(msg.sender, accountShares, daoShares);
     }
 
-    /**
-     * @dev Get reward for account
-     * @param _account Target account
-     */
-    function getReward(address _account, uint accountShares, uint daoShares)
+    function getReward(address _account, uint _accountShares, uint _daoShares)
             internal returns (bool) {
         if (nextReward[_account] < rewards.length) {
             var reward         = rewards[nextReward[_account]];
-            uint accountReward = reward.value * accountShares / daoShares;
+            uint accountReward = reward.value * _accountShares / _daoShares;
             if (accountReward > 0) {
                 if (balances[this] < accountReward) throw;
 
@@ -98,17 +103,10 @@ contract RewardFund is TokenEther, Observer {
         if (_event == 0x10) { // TRANSFER_EVENT
             address from = address(_data[0]);
             address to   = address(_data[1]);
-            var daoShares = daoToken.totalSupply();
 
-            // Make rewards for token sender
-            var fromShares = daoToken.balanceOf(from);
-            while (nextReward[from] < rewards.length)
-                if (!getReward(from, fromShares, daoShares)) throw;
-
-            // Make rewards for token receiver
-            var toShares = daoToken.balanceOf(to);
-            while (nextReward[to] < rewards.length)
-                if (!getReward(to, toShares, daoShares)) throw;
+            // Check for the all rewards is payed
+            if (nextReward[from] < rewards.length
+                || nextReward[to] < rewards.length) throw;
         }
 
         return true;
