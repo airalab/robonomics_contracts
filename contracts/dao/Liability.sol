@@ -4,7 +4,7 @@ import 'common/Object.sol';
 import 'token/ERC20.sol';
 
 /**
- * @title Liability contract
+ * @title Core liability contract
  */
 contract Liability is Object {
     /**
@@ -47,15 +47,11 @@ contract Liability is Object {
     bytes32 public resultHash;
 
     /**
-     * @dev Publish liability result
-     * @notice Only promisor can call it
+     * @dev Result handler
      * @param _resultHash 256bit hash of result
      * @return `true` if is ok
      */
-    function publish(bytes32 _resultHash) returns (bool) {
-        // Only promisor can publish the results
-        if (msg.sender != promisor) throw;
-
+    function resultHash(bytes32 _resultHash) internal returns (bool) {
         // Result notification
         resultHash = _resultHash;
         Result(_resultHash);
@@ -64,7 +60,19 @@ contract Liability is Object {
         if (!token.transfer(owner, token.balanceOf(this))) throw;
         return true;
     }
-    
+
+    /**
+     * @dev Publish liability result hash
+     * @notice Only promisor can call it
+     * @param _resultHash 256bit hash of result
+     * @return `true` if is ok
+     */
+    function publishHash(bytes32 _resultHash) returns (bool) {
+        // Only promisor can publish the results
+        if (msg.sender != promisor) throw;
+        return resultHash(_resultHash);
+    }
+
     /**
      * @dev Process liability payment
      * @notice Tokens should be transfered before call it
