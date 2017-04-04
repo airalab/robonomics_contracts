@@ -1,12 +1,11 @@
 pragma solidity ^0.4.4;
-
 import 'token/TokenEmission.sol';
 import 'token/Recipient.sol';
 
 /**
  * @title Crowdfunding contract
  */
-contract CrowdFunding is Object, Recipient {
+contract Crowdfunding is Object, Recipient {
     /**
      * @dev Target fund account address
      */
@@ -127,7 +126,7 @@ contract CrowdFunding is Object, Recipient {
      * @param _reductionValue Bounty reduction value
      * @notice this contract should be owner of bounty token
      */
-    function CrowdFunding(
+    function Crowdfunding(
         address _fund,
         address _bounty,
         string  _reference,
