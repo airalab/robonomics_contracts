@@ -33,6 +33,8 @@ contract LiabilityMarket is Object, MarketHeap {
 
     Order[] public orders;
 
+    mapping(address => uint[]) public ordersOf;
+
     event OpenAskOrder(uint256 indexed order);
     event OpenBidOrder(uint256 indexed order);
     event CloseAskOrder(uint256 indexed order);
@@ -61,6 +63,7 @@ contract LiabilityMarket is Object, MarketHeap {
         orders[id].beneficiary.push(msg.sender);
         orders[id].promisee.push(_promisee); 
 
+        ordersOf[msg.sender].push(id);
         OpenBidOrder(id);
     }
 
@@ -83,6 +86,7 @@ contract LiabilityMarket is Object, MarketHeap {
         if (!token.transferFrom(msg.sender, this, _price))
             throw;
 
+        ordersOf[msg.sender].push(id);
         OpenAskOrder(id);
     }
 
