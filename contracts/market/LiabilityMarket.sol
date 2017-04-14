@@ -4,6 +4,10 @@ import 'common/Object.sol';
 import 'token/ERC20.sol';
 import './MarketHeap.sol';
 
+contract BuilderLiability {
+    function create(address, address, address, uint) returns (Liability);
+}
+
 /**
  * @title Liability marketplace
  */
@@ -11,17 +15,20 @@ contract LiabilityMarket is Object, MarketHeap {
     // Market name
     string public name;
 
-    // Market token
-    ERC20 public token;
+    // Token
+    ERC20 constant token
+        = ERC20(0);
+
+    // Liability builder contract
+    BuilderLiability constant builder
+        = BuilderLiability(0);
 
     /**
      * @dev Market constructor
      * @param _name Market name
-     * @param _token Makret token
      */
-    function LiabilityMarket(string _name, address _token) {
-        name  = _name;
-        token = ERC20(_token);
+    function LiabilityMarket(string _name) {
+        name = _name;
         // Put empty oreder with zero index
         orders[orders.length++].closed = true;
     }
@@ -170,7 +177,7 @@ contract LiabilityMarket is Object, MarketHeap {
         address _promisor,
         uint256 _price
     ) internal returns (bool) {
-        var l = new Liability(_promisor, _promisee, token, _price);
+        var l = builder.create(_promisor, _promisee, token, _price);
         l.setOwner(_beneficiary);
 
         if (!token.transfer(l, _price)) throw;
