@@ -31,8 +31,21 @@ contract LiabilityMarket is Object, MarketHeap {
         bool      closed;
     }
 
-    Order[] public orders;
+    Order[] orders;
 
+    /**
+     * @dev Get order by index
+     * @param _i Order index
+     * @return Order fields
+     */
+    function getOrder(uint256 _i) constant returns (address[], address[], address, bool) {
+        var o = orders[_i];
+        return (o.beneficiary, o.promisee, o.promisor, o.closed);
+    }
+
+    /**
+     * @dev Get account order ids
+     */
     mapping(address => uint[]) public ordersOf;
 
     event OpenAskOrder(uint256 indexed order);
