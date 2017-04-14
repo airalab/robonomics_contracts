@@ -22,6 +22,8 @@ contract LiabilityMarket is Object, MarketHeap {
     function LiabilityMarket(string _name, address _token) {
         name  = _name;
         token = ERC20(_token);
+        // Put empty oreder with zero index
+        orders[orders.length++].closed = true;
     }
 
     struct Order {
