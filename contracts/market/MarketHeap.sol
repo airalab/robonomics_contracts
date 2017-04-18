@@ -73,7 +73,8 @@ contract MarketHeap {
         id = asks[_i];
         asks[_i] = asks[asks.length - 1];
         orderAskOf[asks[_i]] = _i;
-        --asks.length;
+
+        if (--asks.length == 0) return;
 
         // Heapity of MaxHeap
         var max = _i;
@@ -132,7 +133,8 @@ contract MarketHeap {
         id = bids[_i];
         bids[_i] = bids[bids.length - 1];
         orderBidOf[bids[_i]] = _i;
-        --bids.length;
+
+        if (--bids.length == 0) return;
 
         // Heapity of MinHeap
         var min = _i;
