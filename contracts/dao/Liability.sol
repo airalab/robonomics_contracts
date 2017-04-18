@@ -28,11 +28,11 @@ contract Liability is Object {
      */
     function Liability(address _promisor,
                        address _promisee,
-                       ERC20 _token,
+                       address _token,
                        uint256 _cost) {
         promisor = _promisor;
         promisee = _promisee;
-        token = _token;
+        token = ERC20(_token);
         cost = _cost;
     }
 
