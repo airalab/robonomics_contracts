@@ -16,7 +16,7 @@ contract Liability is Object {
     ERC20   public token;
     uint256 public cost;
     
-    uint public constant gasbase = 100000;
+    uint public constant gasbase = 500000;
     uint public gasprice;
 
     /**
