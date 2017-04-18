@@ -63,13 +63,13 @@ contract Liability is Object {
 
     /**
      * @dev Publish liability result hash
-     * @notice Only promisor can call it
+     * @notice Only promisee can call it
      * @param _resultHash 256bit hash of result
      * @return `true` if is ok
      */
     function publishHash(bytes32 _resultHash) returns (bool) {
-        // Only promisor can publish the results
-        if (msg.sender != promisor) throw;
+        // Only promisee can publish the results
+        if (msg.sender != promisee) throw;
         return resultHash(_resultHash);
     }
 
@@ -85,8 +85,8 @@ contract Liability is Object {
         if (token.balanceOf(this) < cost
           || msg.value < gasprice * gasbase) throw;
 
-        // Send promisor gas expenses
-        if (!promisor.send(msg.value)) throw;
+        // Send promisee gas expenses
+        if (!promisee.send(msg.value)) throw;
         
         return true;
     }
