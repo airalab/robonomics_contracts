@@ -46,11 +46,13 @@ contract MarketHeap {
      * @param _id Order ident
      */
     function putAsk(uint256 _id) internal {
+        orderAskOf[_id] = asks.length;
         asks.push(_id);
 
         var i = asks.length - 1;
         var parent = (i - 1) / 2;
-        while (i > 0 && priceOf[asks[i]] > priceOf[asks[parent]]) {
+        while (i > 0 && parent < i
+                && priceOf[asks[i]] > priceOf[asks[parent]]) {
             var temp = asks[i];
             asks[i] = asks[parent];
             asks[parent] = temp;
@@ -74,11 +76,11 @@ contract MarketHeap {
         --asks.length;
 
         // Heapity of MaxHeap
+        var max = _i;
         for (;;) {
             var left  = 2 * _i + 1;
             var right = 2 * _i + 2;
 
-            var max = _i;
             var maxPrice = priceOf[asks[max]];
 
             if (left < asks.length && priceOf[asks[left]] > maxPrice) {
@@ -103,11 +105,13 @@ contract MarketHeap {
      * @param _id Order ident
      */
     function putBid(uint256 _id) internal {
+        orderBidOf[_id] = bids.length;
         bids.push(_id);
 
         var i = bids.length - 1;
         var parent = (i - 1) / 2;
-        while (i > 0 && priceOf[bids[i]] < priceOf[bids[parent]]) {
+        while (i > 0 && parent < i
+                && priceOf[bids[i]] < priceOf[bids[parent]]) {
             var temp = bids[i];
             bids[i] = bids[parent];
             bids[parent] = temp;
@@ -131,12 +135,12 @@ contract MarketHeap {
         --bids.length;
 
         // Heapity of MinHeap
+        var min = _i;
         for (;;) {
             var left  = 2 * _i + 1;
             var right = 2 * _i + 2;
 
-            var min      = _i;
-            var minPrice = priceOf[bids[_i]];
+            var minPrice = priceOf[bids[min]];
 
             if (left < bids.length && priceOf[bids[left]] < minPrice) {
                 min = left;

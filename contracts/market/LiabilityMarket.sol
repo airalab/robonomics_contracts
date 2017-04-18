@@ -142,6 +142,7 @@ contract LiabilityMarket is Object, MarketHeap {
                           o.promisor,
                           priceOf[_id])) throw;
 
+        o.closed = true;
         CloseAskOrder(_id);
     }
 
@@ -164,6 +165,7 @@ contract LiabilityMarket is Object, MarketHeap {
                           o.promisor,
                           priceOf[_id])) throw;
 
+        o.closed = true;
         CloseBidOrder(_id);
     }
 
