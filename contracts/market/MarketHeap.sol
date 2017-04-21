@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.9;
 
 /**
  * @title Min/Max heap based market order price sorter
@@ -81,12 +81,18 @@ contract MarketHeap {
         for (;;) {
             var left  = 2 * _i + 1;
             var right = 2 * _i + 2;
+            var parent = (_i - 1) / 2;
 
             var maxPrice = priceOf[asks[max]];
 
-            if (left < asks.length && priceOf[asks[left]] > maxPrice) {
+            if (parent < _i && priceOf[asks[parent]] < maxPrice) {
+                // Price of parent should be bigger than item, other - swap
+                max = parent;
+            } else if (left < asks.length && priceOf[asks[left]] > maxPrice) {
+                // Price of child should be lower than item, other - swap
                 max = left;
             } else if (right < asks.length && priceOf[asks[right]] > maxPrice) {
+                // Price of child should be lower than item, other - swap
                 max = right;
             } else break;
 
@@ -141,12 +147,18 @@ contract MarketHeap {
         for (;;) {
             var left  = 2 * _i + 1;
             var right = 2 * _i + 2;
+            var parent = (_i - 1) / 2;
 
             var minPrice = priceOf[bids[min]];
 
-            if (left < bids.length && priceOf[bids[left]] < minPrice) {
+            if (parent < _i && priceOf[bids[parent]] > minPrice) {
+                // Price of parent should be lower than item, other - swap
+                min = parent;
+            } else if (left < bids.length && priceOf[bids[left]] < minPrice) {
+                // Price of child should be bigger than item, other - swap
                 min = left;
             } else if (right < bids.length && priceOf[bids[right]] < minPrice) {
+                // Price of child should be bigger than item, other - swap
                 min = right;
             } else break;
 
