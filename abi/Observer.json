@@ -1,0 +1,1 @@
+[{"constant":false,"inputs":[{"name":"_event","type":"uint256"},{"name":"_data","type":"bytes32[]"}],"name":"eventHandle","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"}]

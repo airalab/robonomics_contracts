@@ -8,13 +8,8 @@ contract Splitter is Object {
         uint    payout;
     }
 
-    Holder[] holders;
-    mapping(address => uint) holderId;
-
-    function getHolder(uint _index) constant returns (address, uint8, uint) {
-        var holder = holders[_index];
-        return (holder.account, holder.part, holder.payout);
-    }
+    Holder[] public holders;
+    mapping(address => uint) public holderId;
 
     function Splitter(address[] _accounts, uint8[] _parts) {
         if (_accounts.length != _parts.length) throw;
