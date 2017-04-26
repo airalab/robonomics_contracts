@@ -66,11 +66,12 @@ contract LiabilityMarket is Object, MarketHeap {
 
     /**
      * @dev Make a limit order to sell liability
-     * @param _promisee Liability beneficiary
+     * @param _beneficiary Liability beneficiary
+     * @param _promisee Liability promisee
      * @param _price Liability price
      * @notice Sender is promisee of liability
      */
-    function limitSell(address _promisee, uint256 _price) {
+    function limitSell(address _beneficiary, address _promisee, uint256 _price) {
         var id = orders.length++;
 
         // Store price
@@ -78,7 +79,7 @@ contract LiabilityMarket is Object, MarketHeap {
         // Append bid
         putBid(id);
         // Store template
-        orders[id].beneficiary.push(msg.sender);
+        orders[id].beneficiary.push(_beneficiary);
         orders[id].promisee.push(_promisee); 
 
         ordersOf[msg.sender].push(id);
@@ -111,16 +112,17 @@ contract LiabilityMarket is Object, MarketHeap {
     /**
      * @dev Sell liability
      * @param _id Order index 
+     * @param _beneficiary Benificiary candidate
      * @param _promisee Promisee candidate
      */
-    function sellAt(uint256 _id, address _promisee) {
+    function sellAt(uint256 _id, address _beneficiary, address _promisee) {
         var order = orders[_id];
         if (_id >= orders.length || order.closed) throw;
 
-        order.beneficiary.push(msg.sender);
+        order.beneficiary.push(_beneficiary);
         order.promisee.push(_promisee);
 
-        AskOrderCandidates(_id, msg.sender, _promisee);
+        AskOrderCandidates(_id, _beneficiary, _promisee);
     }
 
     /**
