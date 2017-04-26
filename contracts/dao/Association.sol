@@ -176,6 +176,8 @@ contract Association is Object, Observer {
         if (_event == 0x10) { // TRANSFER_EVENT
             address from = address(_data[0]);
             address to   = address(_data[1]);
+
+            // Check for no voting process is active
             if (votingOf[from].length > 0 || votingOf[to].length > 0)
                 throw;
         }
