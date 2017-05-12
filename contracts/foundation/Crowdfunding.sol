@@ -104,9 +104,8 @@ contract Crowdfunding is Object, Recipient {
      * @dev Crowdfunding success checks
      */
     modifier onlySuccess {
-        bool isSuccess = block.number > config.stopBlock
-                      && totalFunded  > config.minValue
-                      || totalFunded >= config.maxValue;
+        bool isSuccess = totalFunded >= config.minValue
+                      && block.number > config.stopBlock;
         if (!isSuccess) throw;
         _;
     }
