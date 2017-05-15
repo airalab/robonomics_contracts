@@ -83,7 +83,7 @@ contract Crowdfunding is Object, Recipient {
      * @dev Crowdfunding running checks
      */
     modifier onlyRunning {
-        bool isRunning = totalFunded  < config.maxValue
+        bool isRunning = totalFunded + msg.value < config.maxValue
                       && block.number > config.startBlock
                       && block.number < config.stopBlock;
         if (!isRunning) throw;
