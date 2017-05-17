@@ -83,9 +83,9 @@ contract Crowdfunding is Object, Recipient {
      * @dev Crowdfunding running checks
      */
     modifier onlyRunning {
-        bool isRunning = totalFunded + msg.value < config.maxValue
-                      && block.number > config.startBlock
-                      && block.number < config.stopBlock;
+        bool isRunning = totalFunded + msg.value <= config.maxValue
+                      && block.number >= config.startBlock
+                      && block.number <= config.stopBlock;
         if (!isRunning) throw;
         _;
     }
@@ -162,6 +162,8 @@ contract Crowdfunding is Object, Recipient {
         donations[msg.sender] += msg.value;
 
         var bountyVal = bountyValue(msg.value, block.number);
+        if (bountyVal == 0) throw;
+
         bounty.emission(bountyVal);
         bounty.transfer(msg.sender, bountyVal);
     }
