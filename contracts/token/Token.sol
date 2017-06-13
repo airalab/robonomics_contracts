@@ -11,15 +11,24 @@ contract Token is Object, ERC20 {
     string public symbol;
 
     /* Total count of tokens exist */
-    uint public totalSupply;
+    uint256 public totalSupply;
 
     /* Fixed point position */
     uint8 public decimals;
-    
+
     /* Token approvement system */
-    mapping(address => uint) balances;
-    mapping(address => mapping(address => uint)) allowances;
- 
+    mapping(address => uint256) balances;
+    mapping(address => mapping(address => uint256)) allowances;
+
+    /* Token constructor */
+    function Token(string _name, string _symbol, uint8 _decimals, uint256 _count) {
+        name        = _name;
+        symbol      = _symbol;
+        decimals    = _decimals;
+        totalSupply = _count;
+        balances[msg.sender] = _count;
+    }
+
     /**
      * @dev Get balance of plain address
      * @param _owner is a target address
@@ -27,7 +36,7 @@ contract Token is Object, ERC20 {
      */
     function balanceOf(address _owner) constant returns (uint256)
     { return balances[_owner]; }
- 
+
     /**
      * @dev Take allowed tokens
      * @param _owner The address of the account owning tokens
@@ -37,15 +46,6 @@ contract Token is Object, ERC20 {
     function allowance(address _owner, address _spender) constant returns (uint256)
     { return allowances[_owner][_spender]; }
 
-    /* Token constructor */
-    function Token(string _name, string _symbol, uint8 _decimals, uint _count) {
-        name        = _name;
-        symbol      = _symbol;
-        decimals    = _decimals;
-        totalSupply = _count;
-        balances[msg.sender] = _count;
-    }
- 
     /**
      * @dev Transfer self tokens to given address
      * @param _to destination address
@@ -53,7 +53,7 @@ contract Token is Object, ERC20 {
      * @notice `_value` tokens will be sended to `_to`
      * @return `true` when transfer done
      */
-    function transfer(address _to, uint _value) returns (bool) {
+    function transfer(address _to, uint256 _value) returns (bool) {
         if (balances[msg.sender] >= _value) {
             balances[msg.sender] -= _value;
             balances[_to]        += _value;
@@ -67,7 +67,7 @@ contract Token is Object, ERC20 {
      * @dev Transfer with approvement mechainsm
      * @param _from source address, `_value` tokens shold be approved for `sender`
      * @param _to destination address
-     * @param _value amount of token values to send 
+     * @param _value amount of token values to send
      * @notice from `_from` will be sended `_value` tokens to `_to`
      * @return `true` when transfer is done
      */
