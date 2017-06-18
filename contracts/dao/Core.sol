@@ -1,5 +1,4 @@
 pragma solidity ^0.4.4;
-import 'lib/AddressMap.sol';
 import 'common/Object.sol';
 
 /**
@@ -20,7 +19,9 @@ contract Core is Object {
     event ModuleReplaced(address indexed from, address indexed to);
 
     /* Modules map */
-    AddressMap.Data modules;
+    address[] public modules;
+    mapping(bytes32 => uint256) public indexOf;
+    mapping(address => string)  public getName;
 
     /* Module constant mapping */ 
     mapping(bytes32 => bool) is_constant;
@@ -31,11 +32,6 @@ contract Core is Object {
      */
     mapping(address => string) public abiOf;
 
-
-    /* Using libraries */
-    using AddressList for AddressList.Data;
-    using AddressMap for AddressMap.Data;
- 
     /**
      * @dev DAO constructor
      * @param _name is a DAO name
@@ -45,6 +41,7 @@ contract Core is Object {
         name         = _name;
         description  = _description;
         founder      = msg.sender;
+        modules.push(0);
     }
 
     /**
@@ -53,14 +50,14 @@ contract Core is Object {
      * @return `true` wnen core contains module
      */
     function contains(address _module) constant returns (bool)
-    { return modules.items.contains(_module); }
+    { return indexOf[sha3(getName[_module])] != 0; }
 
     /**
      * @dev Modules counter
      * @return count of modules in core
      */
     function size() constant returns (uint)
-    { return modules.size(); }
+    { return modules.length - 1; }
  
     /**
      * @dev Check for module have permanent name
@@ -76,22 +73,14 @@ contract Core is Object {
      * @return module address
      */
     function get(string _name) constant returns (address)
-    { return modules.get(_name); }
-
-    /**
-     * @dev Get module name by address
-     * @param _module is a module address
-     * @return module name
-     */
-    function getName(address _module) constant returns (string)
-    { return modules.keyOf[_module]; }
+    { return modules[indexOf[sha3(_name)]]; }
 
     /**
      * @dev Get first module
      * @return first address
      */
     function first() constant returns (address)
-    { return modules.items.head; }
+    { return modules[1]; }
 
     /**
      * @dev Get next module
@@ -99,7 +88,7 @@ contract Core is Object {
      * @return next address
      */
     function next(address _current) constant returns (address)
-    { return modules.items.next(_current); }
+    { return modules[indexOf[sha3(getName[_current])] + 1]; }
 
     /**
      * @dev Set new module for given name
@@ -112,14 +101,19 @@ contract Core is Object {
         if (isConstant(_name)) throw;
 
         // Notify
-        if (modules.get(_name) != 0)
-            ModuleReplaced(modules.get(_name), _module);
-        else
+        var replace = indexOf[sha3(_name)];
+        if (replace != 0) {
+            ModuleReplaced(modules[replace], _module);
+            getName[modules[replace]] = _name;
+            indexOf[sha3(_name)] = replace;
+            modules[replace] = _module;
+        } else {
             ModuleAdded(_module);
+            indexOf[sha3(_name)] = modules.length;
+            getName[_module] = _name;
+            modules.push(_module);
+        }
  
-        // Set module in the map
-        modules.set(_name, _module);
-
         // Register module abi
         abiOf[_module] = _abi;
 
@@ -134,10 +128,19 @@ contract Core is Object {
     function remove(string _name) onlyOwner {
         if (isConstant(_name)) throw;
 
-        // Notify
-        ModuleRemoved(modules.get(_name));
+        var index = indexOf[sha3(_name)];
+        if (index > 0 && index < modules.length) {
+            if (index < modules.length - 1) {
+                var last = modules[modules.length - 1];
+                modules[index] = last;
+                indexOf[sha3(getName[last])] = index;
+            }
 
-        // Remove module
-        modules.remove(_name);
+            --modules.length;
+            indexOf[sha3(_name)] = 0;
+
+            // Notify
+            ModuleRemoved(modules[index]);
+        } else throw;
     }
 }
