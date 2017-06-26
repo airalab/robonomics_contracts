@@ -10,9 +10,6 @@ contract Token is Object, ERC20 {
     string public name;
     string public symbol;
 
-    /* Total count of tokens exist */
-    uint256 public totalSupply;
-
     /* Fixed point position */
     uint8 public decimals;
 
