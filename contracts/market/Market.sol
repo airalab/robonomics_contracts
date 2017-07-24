@@ -61,10 +61,15 @@ contract Market is Object, MarketHeap {
     event OrderOpened(uint indexed order, address indexed agent);
 
     /**
+     * @dev Event emitted by any partial shipment of order
+     */
+    event OrderPartial(uint indexed order, address indexed agent);
+
+    /**
      * @dev Event emitted when order is closed
      */
-    event OrderClosed(uint indexed order);
- 
+    event OrderClosed(uint indexed order, address indexed agent);
+
     /**
      * @dev Open limit order
      * @param _kind Order kind: sell or buy
@@ -115,6 +120,7 @@ contract Market is Object, MarketHeap {
                 if (!base.transferFrom(msg.sender, o.agent, o.value)) throw;
 
                 o.value -= _value;
+                OrderPartial(id, msg.sender);
                 break;
             } else {
                 // Market top is small
@@ -123,7 +129,7 @@ contract Market is Object, MarketHeap {
                 if (!base.transferFrom(msg.sender, o.agent, o.value)) throw;
 
                 _value -= o.value;
-                OrderClosed(getAsk(0));
+                OrderClosed(getAsk(0), msg.sender);
             }
         }
         return true;
@@ -147,6 +153,7 @@ contract Market is Object, MarketHeap {
                 if (!base.transfer(msg.sender, _value)) throw;
 
                 o.value -= _value;
+                OrderPartial(id, msg.sender);
                 break;
             } else {
                 // Market top is small
@@ -155,7 +162,7 @@ contract Market is Object, MarketHeap {
                 if (!base.transfer(msg.sender, o.value)) throw;
 
                 _value -= o.value;
-                OrderClosed(getBid(0));
+                OrderClosed(getBid(0), msg.sender);
             }
         }
 
