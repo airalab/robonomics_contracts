@@ -1,100 +1,124 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.9;
 
+import './LiabilityStandard.sol';
+import 'token/Recipient.sol';
 import 'common/Object.sol';
-import 'token/ERC20.sol';
 
-/**
- * @title Core liability contract
- */
-contract Liability is Object {
+contract Liability is LiabilityStandard, Recipient, Object {
     /**
-     * Params
+     * @dev Liability constructor
      */
-    address public promisor;
-    address public promisee;
-
-    ERC20   public token;
-    uint256 public cost;
-    
-    uint public constant gasbase = 500000;
-    uint public gasprice;
-
-    /**
-     * @dev Create liability contract
-     * @param _promisor Promisor account
-     * @param _promisee Promisee account
-     * @param _token Payment token contract
-     * @param _cost Liability cost
-     */
-    function Liability(address _promisor,
-                       address _promisee,
-                       address _token,
-                       uint256 _cost) {
-        promisor = _promisor;
-        promisee = _promisee;
-        token = ERC20(_token);
-        cost = _cost;
+    function Liability(address _promisee, address _promisor, address _beneficiary) {
+        promisee    = _promisee;
+        promisor    = _promisor;
+        beneficiary = _beneficiary;
     }
 
     /**
-     * @dev Emitted for every received result hash
+     * @dev Turn off fallback
      */
-    event Result(bytes32 indexed hash);
+    function () payable { throw; }
 
     /**
-     * @dev Current result hash
+     * @dev Receive approved ERC20 tokens
+     * @param _from Spender address
+     * @param _value Transaction value
+     * @param _token ERC20 token contract address
+     * @param _extraData Custom additional data
      */
-    bytes32 public resultHash;
+    function receiveApproval(address _from, uint256 _value,
+                             ERC20 _token, bytes _extraData) {
+        if (_token != token) throw;
+        super.receiveApproval(_from, _value, _token, _extraData);
+    }
 
     /**
-     * @dev Result handler
-     * @param _resultHash 256bit hash of result
-     * @return `true` if is ok
+     * @dev Signature storage.
+     *      It is boolean flag mapping from signed hash and signer address.
      */
-    function resultHash(bytes32 _resultHash) internal returns (bool) {
+    mapping(bytes32 => mapping(address => bool)) public hashSigned;
+
+    /**
+     * @dev Simple hash signatures checker.
+     * @param _hash Signed hash.
+     * @return Verification status.
+     */
+    function isSigned(bytes32 _hash) constant returns (bool)
+    { return hashSigned[_hash][promisee] && hashSigned[_hash][promisor]; }
+
+    /**
+     * @dev Sign objective multihash with execution cost. 
+     * @param _objective Production objective multihash.
+     * @param _cost Promise execution cost in protocol token.
+     * @param _v Signature V param
+     * @param _r Signature R param
+     * @param _s Signature S param
+     * @notice Signature is eth.sign(address, sha3(objective, cost))
+     */
+    function signObjective(
+        bytes   _objective,
+        uint256 _cost,
+        uint8   _v,
+        bytes32 _r,
+        bytes32 _s
+    ) returns (
+        bool success
+    ) {
+        // Objective notification
+        Objective(_objective, _cost);
+
+        // Signature processing
+        var _hash   = sha3(_objective, _cost);
+        var _sender = ecrecover(_hash, _v, _r, _s);
+        hashSigned[_hash][_sender] = true;
+
+        // Provision guard
+        if (_sender == promisee && token.balanceOf(this) < cost)
+            throw;
+
+        // Objectivisation of proposals
+        if (isSigned(_hash)) {
+            objective = _objective;
+            cost      = _cost;
+        }
+
+        return true;
+    }
+
+    /**
+     * @dev Sign result multihash.
+     * @param _result Production result multihash.
+     * @param _v Signature V param
+     * @param _r Signature R param
+     * @param _s Signature S param
+     * @notice Signature is eth.sign(address, sha3(sha3(objective, cost), result))
+     */
+    function signResult(
+        bytes   _result,
+        uint8   _v,
+        bytes32 _r,
+        bytes32 _s
+    ) returns (
+        bool success
+    ) {
         // Result notification
-        resultHash = _resultHash;
-        Result(_resultHash);
+        Result(_result);
 
-        // Transfer beneficiar reward
-        if (!token.transfer(owner, token.balanceOf(this))) throw;
+        // Signature processing
+        var _hash   = sha3(sha3(objective, cost), _result);
+        var _sender = ecrecover(_hash, _v, _r, _s);
+        hashSigned[_hash][_sender] = true;
+
+        // Result handling
+        if (isSigned(_hash)) {
+            result = _result;
+
+            if (!token.transfer(beneficiary, cost)) throw;
+
+            var refund = token.balanceOf(this) - cost;
+            if (!token.transfer(promisee, refund)) throw;
+        }
+
         return true;
     }
-
-    /**
-     * @dev Publish liability result hash
-     * @notice Only promisee can call it
-     * @param _resultHash 256bit hash of result
-     * @return `true` if is ok
-     */
-    function publishHash(bytes32 _resultHash) returns (bool) {
-        // Only promisee can publish the results
-        if (msg.sender != promisee) throw;
-        return resultHash(_resultHash);
-    }
-
-    /**
-     * @dev Process liability payment
-     * @notice Tokens should be transfered before call it
-     */
-    function payment(uint _gasprice) payable returns (bool) {
-        // Store gas price
-        gasprice = _gasprice;
-
-        // Check payment
-        if (token.balanceOf(this) < cost
-          || msg.value < gasprice * gasbase) throw;
-
-        // Send promisee gas expenses
-        if (!promisee.send(msg.value)) throw;
-        
-        return true;
-    }
-    
-    /**
-     * @dev External owned account oriented payment
-     * @notice Tokens should be transfered before send ethers
-     */
-    function () payable
-    { if (!payment(tx.gasprice)) throw; }
 }

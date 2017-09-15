@@ -1,5 +1,7 @@
 pragma solidity ^0.4.9;
 
+import 'token/ERC20.sol';
+
 /**
  * @title The liability standard contract.
  */
@@ -30,19 +32,17 @@ contract LiabilityStandard {
     uint256 public cost;
 
     /**
-     * @dev Current objective hash of promise. 
-     *      sha3(objective, cost)
+     * @dev Current objective multihash of promise.
      */
     bytes public objective;
 
     /**
-     * @dev Current results hash of promise.
-     *      sha3(objective, cost, result)
+     * @dev Current results multihash of promise.
      */
     bytes public result;
     
     /**
-     * @dev Broadcast new objective hash of liability. 
+     * @dev Broadcast new objective multihash of liability.
      */
     event Objective(bytes objective, uint256 indexed cost);
 
@@ -52,7 +52,7 @@ contract LiabilityStandard {
     event Result(bytes result); 
 
     /**
-     * @dev Sign objective multihash with execution cost. 
+     * @dev Sign objective multihash with execution cost.
      * @param objective Production objective multihash.
      * @param cost Promise execution cost in protocol token.
      * @param v Signature V param
