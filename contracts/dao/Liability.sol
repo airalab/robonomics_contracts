@@ -113,9 +113,8 @@ contract Liability is LiabilityStandard, Recipient, Object {
         if (isSigned(_hash)) {
             result = _result;
 
-            if (!token.transfer(beneficiary, cost)) throw;
-
             var refund = token.balanceOf(this) - cost;
+            if (!token.transfer(beneficiary, cost)) throw;
             if (!token.transfer(promisee, refund)) throw;
         }
 
