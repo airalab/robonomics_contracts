@@ -1,4 +1,5 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.16;
+
 import 'token/Token.sol';
 import 'common/Object.sol';
 
@@ -52,20 +53,15 @@ contract LiquidDemocracy is Object {
     }
 
     function execute(address target, uint valueInEther, bytes32 bytecode) {
-        if (msg.sender != appointee                                 // If caller is the current appointee,
-            || underExecution //                                    // if the call is being executed,
-            || bytes4(bytecode) == bytes4(sha3(forbiddenFunction))  // and it's not trying to do the forbidden function
-            || numberOfDelegationRounds < 4 )                       // and delegation has been calculated enough
-            throw;
+        require(msg.sender == appointee                             // If caller is the current appointee,
+            && !underExecution //                                   // if the call is being executed,
+            && bytes4(bytecode) != bytes4(sha3(forbiddenFunction))  // and it's not trying to do the forbidden function
+            && numberOfDelegationRounds > 3 );                      // and delegation has been calculated enough
 
         underExecution = true;
 
-        if (!target.call.value(valueInEther * 1 ether)(bytecode)) { // Then execute the command.
-            throw;
-        }
-        else {
-          underExecution = false;
-        }
+        require(target.call.value(valueInEther * 1 ether)(bytecode)); // Then execute the command.
+        underExecution = false;
     }
 
     function calculateVotes() returns (address winner) {

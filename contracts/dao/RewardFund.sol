@@ -1,4 +1,5 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.16;
+
 import 'token/TokenObservable.sol';
 import 'token/TokenEther.sol';
 import './DAOToken.sol';
@@ -58,7 +59,7 @@ contract RewardFund is TokenEther, Observer {
      * @notice Payment should be greater than minimal reward
      */
     function putReward() payable {
-        if (msg.value < minimalReward) throw;
+        require(msg.value >= minimalReward);
 
         totalSupply    += msg.value;
         balances[this] += msg.value;
@@ -98,7 +99,7 @@ contract RewardFund is TokenEther, Observer {
      * @dev Observer interface
      */
     function eventHandle(uint _event, bytes32[] _data) returns (bool) {
-        if (msg.sender != address(daoToken)) throw;
+        require(msg.sender == address(daoToken));
 
         if (_event == 0x10) { // TRANSFER_EVENT
             address from = address(_data[0]);

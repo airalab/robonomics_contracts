@@ -1,4 +1,5 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.16;
+
 import 'common/Owned.sol';
 import 'common/Destroyable.sol';
 

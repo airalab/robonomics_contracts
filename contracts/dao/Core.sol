@@ -1,4 +1,5 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.16;
+
 import 'common/Object.sol';
 
 /**
@@ -98,7 +99,7 @@ contract Core is Object {
      * @param _constant have a `true` value when you create permanent name of module
      */
     function set(string _name, address _module, string _abi, bool _constant) onlyOwner {
-        if (isConstant(_name)) throw;
+        require(!is_constant[sha3(_name)]);
 
         // Notify
         var replace = indexOf[sha3(_name)];
@@ -126,7 +127,7 @@ contract Core is Object {
      * @param _name module name
      */
     function remove(string _name) onlyOwner {
-        if (isConstant(_name)) throw;
+        require(!is_constant[sha3(_name)]);
 
         var index = indexOf[sha3(_name)];
         if (index > 0 && index < modules.length) {

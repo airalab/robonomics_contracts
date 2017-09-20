@@ -1,4 +1,5 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.16;
+
 import 'common/Object.sol';
 import 'common/Observer.sol';
 import './DAOToken.sol';
@@ -41,7 +42,7 @@ contract Association is Object, Observer {
 
     /* modifier that allows only shareholders to vote and create new proposals */
     modifier onlyShareholders {
-        if (daoTokenAddress.balanceOf(msg.sender) == 0) throw;
+        require(daoTokenAddress.balanceOf(msg.sender) != 0);
         _;
     }
 
@@ -102,7 +103,7 @@ contract Association is Object, Observer {
     {
         Proposal p = proposals[proposalNumber];
         var balance = daoTokenAddress.balanceOf(msg.sender);
-        if (p.voted[msg.sender] == true || balance == 0) throw;
+        require(p.voted[msg.sender] != true && balance != 0);
 
         p.voted[msg.sender]            = true;
         p.supportsProposal[msg.sender] = supportsProposal;
@@ -119,7 +120,7 @@ contract Association is Object, Observer {
     function unVote(uint proposalNumber) {
         Proposal p = proposals[proposalNumber];
         var balance = daoTokenAddress.balanceOf(msg.sender);
-        if (!p.voted[msg.sender] || balance == 0) throw;
+        require(p.voted[msg.sender] && balance != 0);
 
         if (now < p.votingDeadline) {
             if (p.supportsProposal[msg.sender]) {
@@ -144,25 +145,28 @@ contract Association is Object, Observer {
     function executeProposal(uint proposalNumber, bytes transactionBytecode) returns (int result) {
         Proposal p = proposals[proposalNumber];
         /* Check if the proposal can be executed */
-        if (now < p.votingDeadline  /* has the voting deadline arrived? */
-            ||  p.executed        /* has it been already executed? */
-            ||  p.proposalHash != sha3(p.recipient, p.amount, transactionBytecode)) /* Does the transaction code match the proposal? */
-            throw;
+        require(
+           /* has the voting deadline arrived? */
+           now > p.votingDeadline
+           /* has it been already executed? */
+        && !p.executed
+           /* Does the transaction code match the proposal? */
+        && p.proposalHash == sha3(p.recipient, p.amount, transactionBytecode));
 
         var quorum = p.yea + p.nay;
 
         /* execute result */
-        if (quorum <= minimumQuorum) {
-            /* Not enough significant voters */
-            throw;
-        } else if (p.yea > p.nay ) {
+        require (quorum > minimumQuorum); /* Not enough significant voters */
+
+        if (p.yea > p.nay ) {
             /* has quorum and was approved */
             p.executed = true;
-            if (!p.recipient.call.value(p.amount)(transactionBytecode)) throw;
+            require(p.recipient.call.value(p.amount)(transactionBytecode));
             p.proposalPassed = true;
         } else {
             p.proposalPassed = false;
         }
+
         // Fire Events
         ProposalTallied(proposalNumber, quorum, p.proposalPassed);
     }
@@ -171,15 +175,14 @@ contract Association is Object, Observer {
      * @dev Observer interface
      */
     function eventHandle(uint _event, bytes32[] _data) returns (bool) {
-        if (msg.sender != address(daoTokenAddress)) throw;
+        require(msg.sender == address(daoTokenAddress));
 
         if (_event == 0x10) { // TRANSFER_EVENT
             address from = address(_data[0]);
             address to   = address(_data[1]);
 
             // Check for no voting process is active
-            if (votingOf[from].length > 0 || votingOf[to].length > 0)
-                throw;
+            require(votingOf[from].length == 0 && votingOf[to].length == 0);
         }
         return true;
     }

@@ -1,4 +1,5 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.16;
+
 import 'common/Object.sol';
 import 'token/Token.sol';
 
@@ -36,9 +37,9 @@ contract Offer is Object {
     }
 
     function accept() {
-        if (closed > 0) throw;
-        if (hardOffer != 0 && msg.sender != hardOffer) throw;
-        if (!token.transferFrom(msg.sender, beneficiary, value)) throw;
+        require(!closed);
+        require(hardOffer == 0 || msg.sender == hardOffer);
+        require(token.transferFrom(msg.sender, beneficiary, value));
         signer[msg.sender] = true;
         closed = now;
     }

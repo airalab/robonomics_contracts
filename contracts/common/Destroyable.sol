@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.16;
 
 /**
  * @title Common pattern for destroyable contracts 
@@ -18,10 +18,10 @@ contract Destroyable {
      * @notice Only hammer can call it 
      */
     function destroy() onlyHammer
-    { suicide(msg.sender); }
+    { selfdestroy(msg.sender); }
 
     /**
      * @dev Hammer check modifier
      */
-    modifier onlyHammer { if (msg.sender != hammer) throw; _; }
+    modifier onlyHammer { require(msg.sender == hammer); _; }
 }

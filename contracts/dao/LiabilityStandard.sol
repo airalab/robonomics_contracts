@@ -1,4 +1,4 @@
-pragma solidity ^0.4.9;
+pragma solidity ^0.4.16;
 
 /**
  * @title The liability standard contract.

@@ -1,4 +1,5 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.16;
+
 import './Object.sol';
 
 /**
@@ -24,7 +25,7 @@ contract Modify is Object {
      * @notice the `target` should be delegated to this first
      */
     function run() onlyOwner {
-        if (target.owner() != address(this)) throw;
+        require(target.owner() == address(this));
 
         modify();
         target.setOwner(msg.sender);

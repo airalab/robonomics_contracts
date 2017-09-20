@@ -1,4 +1,5 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.16;
+
 import './Offer.sol';
 
 contract Shareholder is Offer {
@@ -20,9 +21,9 @@ contract Shareholder is Offer {
      * @notice Call to this method you agree to get shares from my owner
      */
     function accept() {
-        if (msg.sender != beneficiary
-         || closed > 0
-         || !token.transferFrom(owner, beneficiary, value)) throw;
+        require(msg.sender == beneficiary);
+        require(closed == 0);
+        require(token.transferFrom(owner, beneficiary, value));
         closed = now;
     }
 }

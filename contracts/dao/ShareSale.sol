@@ -1,4 +1,5 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.16;
+
 import 'common/Object.sol';
 import 'token/TokenEther.sol';
 
@@ -52,22 +53,20 @@ contract ShareSale is Object {
     function () payable {
         var value = shares.balanceOf(this) * priceWei;
 
-        if (  closed > 0 
-           || msg.value < value
-           || !msg.sender.send(msg.value - value)) throw;
+        require(closed == 0);
+        require(msg.value >= value);
+        msg.sender.transfer(msg.value - value);
 
-        etherFund.refill.value(value)();
-
-        if (  !etherFund.transfer(target, value)
-           || !shares.transfer(msg.sender, shares.balanceOf(this))
-           ) throw;
+        require(etherFund.refill.value(value)());
+        require(etherFund.transfer(target, value));
+        require(shares.transfer(msg.sender, shares.balanceOf(this)));
 
         closed = now;
     }
 
     function destroy() onlyHammer {
         // Save the shares
-        if (!shares.transfer(owner, shares.balanceOf(this))) throw;
+        require(shares.transfer(owner, shares.balanceOf(this)));
 
         super.destroy();
     }

@@ -1,4 +1,5 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.16;
+
 import 'common/Object.sol';
 
 contract Splitter is Object {
@@ -32,7 +33,7 @@ contract Splitter is Object {
      */
     function withdraw() {
         var id = holderId[msg.sender];
-        if (holders[id].part == 0) throw;
+        require(holders[id].part != 0);
 
         // Total holder value
         var value = totalReceived * holders[id].part / 100;
@@ -42,7 +43,7 @@ contract Splitter is Object {
             // Cacl payout diff
             var out = value - holders[id].payout;
             // Send difference
-            if (!holders[id].account.send(out)) throw;
+            holders[id].account.transfer(out);
             holders[id].payout += out;
         }
     }

@@ -1,4 +1,5 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.16;
+
 import 'common/Object.sol';
 import 'lib/SecurityRings.sol';
 
@@ -97,7 +98,7 @@ contract Proxy is Object {
      * @param _index Call in queue position
      */
     function authorize(uint _index) {
-        if (_index >= rings.authorized.length) throw;
+        require(_index < rings.authorized.length);
 
         rings.authorized[_index][msg.sender] = true;
         CallAuthorized(_index, msg.sender);
@@ -116,15 +117,14 @@ contract Proxy is Object {
      * @notice This can take a lot of gas
      */
     function run(uint _index) {
-        if (!rings.isAuthorized(_index)
-          || queue[_index].execBlock != 0) throw;
+        require(rings.isAuthorized(_index) && queue[_index].execBlock == 0);
 
         // Store exec block
         queue[_index].execBlock = block.number;
 
         // Run transaction
         var c = queue[_index];
-        if (!c.target.call.value(c.value)(c.transaction)) throw;
+        require(c.target.call.value(c.value)(c.transaction));
         CallExecuted(_index, block.number);
     }
 

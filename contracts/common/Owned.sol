@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.16;
 
 /**
  * @title Contract for object that have an owner
@@ -19,5 +19,5 @@ contract Owned {
     /**
      * @dev Owner check modifier
      */
-    modifier onlyOwner { if (msg.sender != owner) throw; _; }
+    modifier onlyOwner { require(msg.sender == owner); _; }
 }

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.9;
+pragma solidity ^0.4.16;
 
 import './LiabilityStandard.sol';
 import 'common/Object.sol';
@@ -65,8 +65,7 @@ contract Liability is LiabilityStandard, Object {
         hashSigned[_hash][_sender] = true;
 
         // Provision guard
-        if (_sender == promisee && this.balance < cost)
-            throw;
+        require(_sender != promisee || this.balance >= cost);
 
         // Objectivisation of proposals
         if (isSigned(_hash)) {
@@ -105,9 +104,9 @@ contract Liability is LiabilityStandard, Object {
         if (isSigned(_hash)) {
             result = _result;
 
-            if (!beneficiary.send(cost)) throw;
+            beneficiary.transfer(cost);
             if (this.balance > 0)
-                if (!promisee.send(this.balance)) throw;
+                promisee.transfer(this.balance);
         }
 
         return true;
