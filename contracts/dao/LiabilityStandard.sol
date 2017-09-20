@@ -1,7 +1,5 @@
 pragma solidity ^0.4.9;
 
-import 'token/ERC20.sol';
-
 /**
  * @title The liability standard contract.
  */
@@ -20,11 +18,6 @@ contract LiabilityStandard {
      * @dev A person who derives advantage from promise.
      */
     address public beneficiary;
-
-    /**
-     * @dev Protocol token address. 
-     */
-    ERC20   public token;
 
     /**
      * @dev Contract execution cost.
@@ -60,7 +53,7 @@ contract LiabilityStandard {
      * @param s Signature S param
      * @notice Signature is eth.sign(address, sha3(objective, cost))
      */
-    function signObjective(bytes objective, uint256 cost, uint8 v, bytes32 r, bytes32 s) returns (bool success);
+    function signObjective(bytes objective, uint256 cost, uint8 v, bytes32 r, bytes32 s) payable returns (bool success);
 
     /**
      * @dev Sign result multihash.

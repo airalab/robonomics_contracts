@@ -1,36 +1,25 @@
 pragma solidity ^0.4.9;
 
 import './LiabilityStandard.sol';
-import 'token/Recipient.sol';
 import 'common/Object.sol';
 
-contract Liability is LiabilityStandard, Recipient, Object {
+contract Liability is LiabilityStandard, Object {
     /**
-     * @dev Liability constructor
+     * @dev Liability constructor.
+     * @param _promisee A person to whom a promise is made.
+     * @param _promisor A person who makes a promise.
+     * @param _beneficiary A person who derives advantage from promise.
      */
-    function Liability(address _promisee, address _promisor, address _beneficiary) {
+    function Liability(address _promisee, address _promisor, address _beneficiary) payable {
         promisee    = _promisee;
         promisor    = _promisor;
         beneficiary = _beneficiary;
     }
 
     /**
-     * @dev Turn off fallback
+     * @dev I can receive payments.
      */
-    function () payable { throw; }
-
-    /**
-     * @dev Receive approved ERC20 tokens
-     * @param _from Spender address
-     * @param _value Transaction value
-     * @param _token ERC20 token contract address
-     * @param _extraData Custom additional data
-     */
-    function receiveApproval(address _from, uint256 _value,
-                             ERC20 _token, bytes _extraData) {
-        if (_token != token) throw;
-        super.receiveApproval(_from, _value, _token, _extraData);
-    }
+    function () payable {}
 
     /**
      * @dev Signature storage.
@@ -50,9 +39,9 @@ contract Liability is LiabilityStandard, Recipient, Object {
      * @dev Sign objective multihash with execution cost. 
      * @param _objective Production objective multihash.
      * @param _cost Promise execution cost in protocol token.
-     * @param _v Signature V param
-     * @param _r Signature R param
-     * @param _s Signature S param
+     * @param _v Signature V param.
+     * @param _r Signature R param.
+     * @param _s Signature S param.
      * @notice Signature is eth.sign(address, sha3(objective, cost))
      */
     function signObjective(
@@ -61,7 +50,10 @@ contract Liability is LiabilityStandard, Recipient, Object {
         uint8   _v,
         bytes32 _r,
         bytes32 _s
-    ) returns (
+    )
+      payable
+      returns
+    (
         bool success
     ) {
         // Objective notification
@@ -73,7 +65,7 @@ contract Liability is LiabilityStandard, Recipient, Object {
         hashSigned[_hash][_sender] = true;
 
         // Provision guard
-        if (_sender == promisee && token.balanceOf(this) < cost)
+        if (_sender == promisee && this.balance < cost)
             throw;
 
         // Objectivisation of proposals
@@ -88,9 +80,9 @@ contract Liability is LiabilityStandard, Recipient, Object {
     /**
      * @dev Sign result multihash.
      * @param _result Production result multihash.
-     * @param _v Signature V param
-     * @param _r Signature R param
-     * @param _s Signature S param
+     * @param _v Signature V param.
+     * @param _r Signature R param.
+     * @param _s Signature S param.
      * @notice Signature is eth.sign(address, sha3(sha3(objective, cost), result))
      */
     function signResult(
@@ -113,9 +105,9 @@ contract Liability is LiabilityStandard, Recipient, Object {
         if (isSigned(_hash)) {
             result = _result;
 
-            var refund = token.balanceOf(this) - cost;
-            if (!token.transfer(beneficiary, cost)) throw;
-            if (!token.transfer(promisee, refund)) throw;
+            if (!beneficiary.send(cost)) throw;
+            if (this.balance > 0)
+                if (!promisee.send(this.balance)) throw;
         }
 
         return true;
