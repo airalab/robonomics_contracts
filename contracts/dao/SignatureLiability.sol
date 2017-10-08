@@ -3,17 +3,15 @@ pragma solidity ^0.4.9;
 import './LiabilityStandard.sol';
 import 'common/Object.sol';
 
-contract Liability is LiabilityStandard, Object {
+contract SignatureLiability is LiabilityStandard, Object {
     /**
      * @dev Liability constructor.
      * @param _promisee A person to whom a promise is made.
      * @param _promisor A person who makes a promise.
-     * @param _beneficiary A person who derives advantage from promise.
      */
-    function Liability(address _promisee, address _promisor, address _beneficiary) payable {
+    function SignatureLiability(address _promisee, address _promisor) payable {
         promisee    = _promisee;
         promisor    = _promisor;
-        beneficiary = _beneficiary;
     }
 
     /**
@@ -105,7 +103,7 @@ contract Liability is LiabilityStandard, Object {
         if (isSigned(_hash)) {
             result = _result;
 
-            if (!beneficiary.send(cost)) throw;
+            if (!promisor.send(cost)) throw;
             if (this.balance > 0)
                 if (!promisee.send(this.balance)) throw;
         }
