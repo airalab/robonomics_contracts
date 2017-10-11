@@ -32,7 +32,7 @@ contract LiabilityStandard {
     /**
      * @dev Broadcast new objective multihash of liability.
      */
-    event Objective(bytes objective, uint256 indexed cost);
+    event Objective(bytes objective);
 
     /**
      * @dev Broadcast new production multihash of liability.

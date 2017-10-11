@@ -34,17 +34,15 @@ contract SignatureLiability is LiabilityStandard, Object {
     { return hashSigned[_hash][promisee] && hashSigned[_hash][promisor]; }
 
     /**
-     * @dev Sign objective multihash with execution cost. 
+     * @dev Sign objective multihash.
      * @param _objective Production objective multihash.
-     * @param _cost Promise execution cost in protocol token.
      * @param _v Signature V param.
      * @param _r Signature R param.
      * @param _s Signature S param.
-     * @notice Signature is eth.sign(address, sha3(objective, cost))
+     * @notice Signature is eth.sign(address, sha3(objective))
      */
     function signObjective(
         bytes   _objective,
-        uint256 _cost,
         uint8   _v,
         bytes32 _r,
         bytes32 _s
@@ -55,22 +53,20 @@ contract SignatureLiability is LiabilityStandard, Object {
         bool success
     ) {
         // Objective notification
-        Objective(_objective, _cost);
+        Objective(_objective);
 
         // Signature processing
-        var _hash   = sha3(_objective, _cost);
+        var _hash   = sha3(_objective);
         var _sender = ecrecover(_hash, _v, _r, _s);
         hashSigned[_hash][_sender] = true;
 
         // Provision guard
-        if (_sender == promisee && this.balance < cost)
+        if (_sender == promisee)
             throw;
 
         // Objectivisation of proposals
-        if (isSigned(_hash)) {
+        if (isSigned(_hash))
             objective = _objective;
-            cost      = _cost;
-        }
 
         return true;
     }
@@ -81,7 +77,7 @@ contract SignatureLiability is LiabilityStandard, Object {
      * @param _v Signature V param.
      * @param _r Signature R param.
      * @param _s Signature S param.
-     * @notice Signature is eth.sign(address, sha3(sha3(objective, cost), result))
+     * @notice Signature is eth.sign(address, sha3(sha3(objective), result))
      */
     function signResult(
         bytes   _result,
@@ -95,7 +91,7 @@ contract SignatureLiability is LiabilityStandard, Object {
         Result(_result);
 
         // Signature processing
-        var _hash   = sha3(sha3(objective, cost), _result);
+        var _hash   = sha3(sha3(objective), _result);
         var _sender = ecrecover(_hash, _v, _r, _s);
         hashSigned[_hash][_sender] = true;
 
@@ -103,9 +99,7 @@ contract SignatureLiability is LiabilityStandard, Object {
         if (isSigned(_hash)) {
             result = _result;
 
-            if (!promisor.send(cost)) throw;
-            if (this.balance > 0)
-                if (!promisee.send(this.balance)) throw;
+            if (!promisor.send(this.balance)) throw;
         }
 
         return true;

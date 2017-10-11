@@ -32,14 +32,12 @@ contract RobotLiability is MinerLiabilityValidator, Object {
     /**
      * @dev Set objective of this liability 
      * @param _objective Objective data hash
-     * @param _cost Liability execution cost
      */
-    function setObjective(bytes _objective, uint256 _cost) payable onlyPromisee returns (bool success) {
-        if (this.balance < _cost || objective.length > 0) throw;
+    function setObjective(bytes _objective) payable onlyPromisee returns (bool success) {
+        if (objective.length > 0) throw;
 
-        Objective(_objective, _cost);
+        Objective(_objective);
         objective = _objective;
-        cost = _cost;
 
         return true;
     }
@@ -59,13 +57,10 @@ contract RobotLiability is MinerLiabilityValidator, Object {
         return true;
     }
 
-    function confirmed() internal {
-        if (!promisor.send(cost)) throw;
-        if (!promisee.send(this.balance)) throw;
-    }
+    function confirmed() internal
+    { if (!promisor.send(this.balance)) throw; }
 
-    function rejected() internal {
-        if (!promisee.send(this.balance)) throw;
-    }
+    function rejected() internal
+    { if (!promisee.send(this.balance)) throw; }
 
 }
