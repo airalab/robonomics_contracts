@@ -11,14 +11,12 @@ contract RobotLiability is MinerLiabilityValidator, Object {
      */
     function RobotLiability(
         bytes   _validation_model,
-        uint256 _confirmation_count,
         address _promisee,
         address _promisor
     ) payable {
         promisee = _promisee;
         promisor = _promisor;
-        validationModel   = _validation_model;
-        confirmationCount = _confirmation_count;
+        validationModel = _validation_model;
     }
 
     /**
@@ -26,14 +24,12 @@ contract RobotLiability is MinerLiabilityValidator, Object {
      */
     function () payable {}
 
-    modifier onlyPromisee { if (msg.sender != promisee) throw; _; }
-    modifier onlyPromisor { if (msg.sender != promisor) throw; _; }
-
     /**
      * @dev Set objective of this liability 
      * @param _objective Objective data hash
      */
-    function setObjective(bytes _objective) payable onlyPromisee returns (bool success) {
+    function setObjective(bytes _objective) payable returns (bool success) {
+        if (msg.sender != promisee) throw;
         if (objective.length > 0) throw;
 
         Objective(_objective);
@@ -46,13 +42,15 @@ contract RobotLiability is MinerLiabilityValidator, Object {
      * @dev Set result of this liability
      * @param _result Result data hash
      */
-    function setResult(bytes _result) onlyPromisor returns (bool success) {
+    function setResult(bytes _result) returns (bool success) {
+        if (msg.sender != promisor) throw;
+        if (objective.length == 0) throw;
         if (result.length > 0) throw;
         
         Result(_result);
         result = _result;
 
-        validationReady();
+        ValidationReady();
 
         return true;
     }

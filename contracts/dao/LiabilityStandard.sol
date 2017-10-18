@@ -15,11 +15,6 @@ contract LiabilityStandard {
     address public promisee;
 
     /**
-     * @dev Contract execution cost.
-     */
-    uint256 public cost;
-
-    /**
      * @dev Current objective multihash of promise.
      */
     bytes public objective;
