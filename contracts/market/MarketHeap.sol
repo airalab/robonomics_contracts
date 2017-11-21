@@ -17,7 +17,7 @@ contract MarketHeap {
     /**
      * @dev Length of asks array
      */
-    function asksLength() constant returns (uint256)
+    function asksLength() public view returns (uint256)
     { return asks.length; }
 
     /**
@@ -33,7 +33,7 @@ contract MarketHeap {
     /**
      * @dev Length of bids array
      */
-    function bidsLength() constant returns (uint256)
+    function bidsLength() public view returns (uint256)
     { return bids.length; }
 
     /**

@@ -8,7 +8,7 @@ import 'common/Object.sol';
 contract MarketRuleConstant is Object, MarketRule {
     uint public emission;
 
-    function MarketRuleConstant(uint _emission)
+    function MarketRuleConstant(uint _emission) public
     { emission = _emission; }
 
     /**
@@ -16,6 +16,6 @@ contract MarketRuleConstant is Object, MarketRule {
      * @param _deal lot address
      * @return count of emission token value
      */
-    function getEmission(Lot _deal) returns (uint)
+    function getEmission(Lot _deal) public returns (uint)
     { return emission; }
 }

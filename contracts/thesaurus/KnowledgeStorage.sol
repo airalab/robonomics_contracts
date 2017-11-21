@@ -18,7 +18,7 @@ contract KnowledgeStorage is Object {
      * @dev Get first knowledge
      * @return first knowledge of list
      */
-    function first() constant returns (Knowledge)
+    function first() public view returns (Knowledge)
     { return Knowledge(knowledges.items.head); }
 
     /**
@@ -26,7 +26,7 @@ contract KnowledgeStorage is Object {
      * @param _current is a current knowledge
      * @return next knowledge
      */
-    function next(Knowledge _current) constant returns (Knowledge)
+    function next(Knowledge _current) public view returns (Knowledge)
     { return Knowledge(knowledges.items.next(_current)); }
 
     /**
@@ -34,7 +34,7 @@ contract KnowledgeStorage is Object {
      * @param _name is a knowledge name
      * @return knowledge address
      */
-    function get(string _name) constant returns (Knowledge)
+    function get(string _name) public view returns (Knowledge)
     { return Knowledge(knowledges.get(_name)); }
 
     /**
@@ -42,7 +42,7 @@ contract KnowledgeStorage is Object {
      * @param _knowledge is a knowledge address
      * @return knowledge name
      */
-    function getName(Knowledge _knowledge) constant returns (string)
+    function getName(Knowledge _knowledge) public view returns (string)
     { return knowledges.keyOf[_knowledge]; }
 
     /**
@@ -51,6 +51,6 @@ contract KnowledgeStorage is Object {
      * @param _name knowledge name
      * @param _knowledge knowledge address
      */
-    function set(string _name, Knowledge _knowledge) onlyOwner
+    function set(string _name, Knowledge _knowledge) public onlyOwner
     { knowledges.set(_name, _knowledge); }
 }

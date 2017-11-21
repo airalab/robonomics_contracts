@@ -26,7 +26,7 @@ contract Market is Object, MarketHeap {
      * @param _quote Market quote token
      * @param _decimals Price precision in decimal point
      */
-    function Market(string _name, address _base, address _quote, uint _decimals) {
+    function Market(string _name, address _base, address _quote, uint _decimals) public {
         name     = _name;
         base     = ERC20(_base);
         quote    = ERC20(_quote);
@@ -76,12 +76,12 @@ contract Market is Object, MarketHeap {
      * @param _value Base unit value
      * @param _price Base unit price (multiplied by 10^decimals)
      */
-    function orderLimit(OrderKind _kind, uint _value, uint _price) returns (bool) {
+    function orderLimit(OrderKind _kind, uint _value, uint _price) public returns (bool) {
         var id = orders.length;
 
         if (_kind == OrderKind.Sell) {
 
-            if (!base.transferFrom(msg.sender, this, _value)) throw;
+            require (base.transferFrom(msg.sender, this, _value));
 
             orders.push(Order(OrderKind.Sell, msg.sender, _value, _value, now));
             priceOf[orders.length-1] = _price;
@@ -90,13 +90,13 @@ contract Market is Object, MarketHeap {
         } else if (_kind == OrderKind.Buy) {
 
             var quote_value = _price * _value / (10 ** decimals);
-            if (!quote.transferFrom(msg.sender, this, quote_value)) throw;
+            require (quote.transferFrom(msg.sender, this, quote_value));
 
             orders.push(Order(OrderKind.Buy, msg.sender, _value, _value, now));
             priceOf[orders.length-1] = _price;
             putAsk(id);
 
-        } else throw;
+        } else revert();
 
         OrderOpened(id, msg.sender);
         return true;
@@ -107,7 +107,7 @@ contract Market is Object, MarketHeap {
 
         while (_value > 0) {
             // Check of empty bids
-            if (asks.length == 0) throw;
+            require (asks.length != 0);
 
             // Get asks head
             var id = asks[0];
@@ -116,8 +116,8 @@ contract Market is Object, MarketHeap {
             if (o.value > _value) {
                 // Makret top is large
                 quote_value = priceOf[id] * _value / (10 ** decimals);
-                if (!quote.transfer(msg.sender, quote_value)) throw;
-                if (!base.transferFrom(msg.sender, o.agent, o.value)) throw;
+                require (quote.transfer(msg.sender, quote_value));
+                require (base.transferFrom(msg.sender, o.agent, o.value));
 
                 o.value -= _value;
                 OrderPartial(id, msg.sender);
@@ -125,8 +125,8 @@ contract Market is Object, MarketHeap {
             } else {
                 // Market top is small
                 quote_value = priceOf[id] * o.value / (10 ** decimals);
-                if (!quote.transfer(msg.sender, quote_value)) throw;
-                if (!base.transferFrom(msg.sender, o.agent, o.value)) throw;
+                require (quote.transfer(msg.sender, quote_value));
+                require (base.transferFrom(msg.sender, o.agent, o.value));
 
                 _value -= o.value;
                 OrderClosed(getAsk(0), msg.sender);
@@ -140,7 +140,7 @@ contract Market is Object, MarketHeap {
 
         while (_value > 0) {
             // Check of empty bids
-            if (bids.length == 0) throw;
+            require (bids.length != 0);
 
             // Get bids head
             var id = bids[0];
@@ -149,8 +149,8 @@ contract Market is Object, MarketHeap {
             if (o.value > _value) {
                 // Makret top is large
                 quote_value = priceOf[id] * _value / (10 ** decimals);
-                if (!quote.transferFrom(msg.sender, o.agent, quote_value)) throw;
-                if (!base.transfer(msg.sender, _value)) throw;
+                require (quote.transferFrom(msg.sender, o.agent, quote_value));
+                require (base.transfer(msg.sender, _value));
 
                 o.value -= _value;
                 OrderPartial(id, msg.sender);
@@ -158,8 +158,8 @@ contract Market is Object, MarketHeap {
             } else {
                 // Market top is small
                 quote_value = priceOf[id] * o.value / (10 ** decimals);
-                if (!quote.transferFrom(msg.sender, o.agent, quote_value)) throw;
-                if (!base.transfer(msg.sender, o.value)) throw;
+                require (quote.transferFrom(msg.sender, o.agent, quote_value));
+                require (base.transfer(msg.sender, o.value));
 
                 _value -= o.value;
                 OrderClosed(getBid(0), msg.sender);
@@ -174,16 +174,16 @@ contract Market is Object, MarketHeap {
      * @param _kind Order kind: sell or buy
      * @param _value Base unit value
      */
-    function orderMarket(OrderKind _kind, uint _value) returns (bool) {
+    function orderMarket(OrderKind _kind, uint _value) public returns (bool) {
         if (_kind == OrderKind.Sell) {
 
-            if (!marketSell(msg.sender, _value)) throw;
+            require (marketSell(msg.sender, _value));
 
         } else if (_kind == OrderKind.Buy) {
 
-            if (!marketBuy(msg.sender, _value)) throw;
+            require (marketBuy(msg.sender, _value));
 
-        } else throw;
+        } else revert();
 
         return true;
     }

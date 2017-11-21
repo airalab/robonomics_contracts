@@ -10,25 +10,25 @@ contract TokenSelling is Object {
      * @param _token Token selector
      * @param _price New price
      */
-    function setPrice(Token _token, uint _price) onlyOwner
+    function setPrice(Token _token, uint _price) public onlyOwner
     { priceWei[_token] = _price; }
 
     /**
      * @dev Withraw trade balance
      */
-    function withdraw() onlyOwner
-    { if (!msg.sender.send(this.balance)) throw; }
+    function withdraw() public onlyOwner
+    { require (msg.sender.send(this.balance)); }
 
     /**
      * @dev Sale token by static price
      */
-    function buy(Token _token) payable returns (bool) {
+    function buy(Token _token) public payable returns (bool) {
         // Check self balance
         var value_token = msg.value / priceWei[_token];
-        if (value_token > _token.balanceOf(this)) throw;
+        require (value_token <= _token.balanceOf(this));
 
         // Transfer tokens
-        if (!_token.transfer(msg.sender, value_token)) throw;
+        require (_token.transfer(msg.sender, value_token));
         return true;
     }
 }

@@ -6,5 +6,5 @@ contract TestCase {
 
     /** @dev This method contains single check
      *       and returns true when all is OK */
-    function run() returns (bool);
+    function run() public returns (bool);
 }

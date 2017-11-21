@@ -9,16 +9,16 @@ contract InvestorSupply is Object {
     mapping(bytes32 => uint256) supplyOf;
     mapping(bytes32 => mapping(address => uint256)) accountSupplyOf;
 
-    function supply(string _market) view returns (uint256)
+    function supply(string _market) public view returns (uint256)
     { return supplyOf[keccak256(market)]; }
 
-    function refill(string _market, uint256 _value) {
+    function refill(string _market, uint256 _value) public {
         require(utility.transferFrom(msg.sender, this, _value));
         supplyOf[keccak256(market)] += _value;
         accountSupplyOf[keccak256(market)][msg.sender] += _value; 
     }
 
-    function withdraw(string _market, uint256 _value) {
+    function withdraw(string _market, uint256 _value) public {
         require(accountSupplyOf[keccak256(market)][msg.sender] >= _value); 
         supplyOf[keccak256(market)] -= _value;
         accountSupplyOf[keccak256(market)][msg.sender] -= _value; 

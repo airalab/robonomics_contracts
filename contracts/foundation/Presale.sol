@@ -13,7 +13,7 @@ contract Presale is Object {
      * @param _bounty Bount value by donation
      * @param _donation Donation value
      */
-    function Presale(address _token, uint256 _bounty, uint256 _donation) {
+    function Presale(address _token, uint256 _bounty, uint256 _donation) public {
         token    = ERC20(_token);
         bounty   = _bounty;
         donation = _donation;
@@ -22,17 +22,17 @@ contract Presale is Object {
     /**
      * @dev Cancel presale contract by owner, bounty refunded to owner
      */
-    function cancel() onlyOwner {
-        if (!token.transfer(owner, bounty)) throw;
+    function cancel() public onlyOwner {
+        require (token.transfer(owner, bounty));
     }
 
     /**
     * @dev Accept presale contract,
     *      bounty transfered to sender - donation to owner
     */
-    function () payable {
-        if (msg.value != donation) throw;
-        if (!token.transfer(msg.sender, bounty)) throw;
-        if (!owner.send(msg.value)) throw;
+    function () public payable {
+        require (msg.value == donation);
+        require (token.transfer(msg.sender, bounty));
+        require (owner.send(msg.value));
     }
 }

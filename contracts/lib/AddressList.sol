@@ -12,10 +12,10 @@ library AddressList {
         mapping(address => address) prevOf;
     }
 
-    function first(Data storage _data) constant returns (address)
+    function first(Data storage _data) public view returns (address)
     { return _data.head; }
 
-    function last(Data storage _data) constant returns (address)
+    function last(Data storage _data) public view returns (address)
     { return _data.tail; }
 
     /**
@@ -24,7 +24,7 @@ library AddressList {
      * @param _item is an element
      * @return `true` when element in list
      */
-    function contains(Data storage _data, address _item) constant returns (bool)
+    function contains(Data storage _data, address _item) public view returns (bool)
     { return _data.isContain[_item]; }
 
     /**
@@ -33,7 +33,7 @@ library AddressList {
      * @param _item is current element of list
      * @return next elemen of list
      */
-    function next(Data storage _data, address _item) constant returns (address)
+    function next(Data storage _data, address _item) public view returns (address)
     { return _data.nextOf[_item]; }
 
     /**
@@ -42,7 +42,7 @@ library AddressList {
      * @param _item is current element of list
      * @return previous element of list 
      */
-    function prev(Data storage _data, address _item) constant returns (address)
+    function prev(Data storage _data, address _item) public view returns (address)
     { return _data.prevOf[_item]; }
 
     /**
@@ -50,7 +50,7 @@ library AddressList {
      * @param _data is list storage ref
      * @param _item is a new list element  
      */
-    function append(Data storage _data, address _item)
+    function append(Data storage _data, address _item) public
     { append(_data, _item, _data.tail); }
 
     /**
@@ -60,15 +60,15 @@ library AddressList {
      * @param _to is a item element before new 
      * @notice gas usage < 100000
      */
-    function append(Data storage _data, address _item, address _to) {
+    function append(Data storage _data, address _item, address _to) public {
         // Unable to contain double element
-        if (_data.isContain[_item]) throw;
+        require (!_data.isContain[_item]);
 
         // Empty list
         if (_data.head == 0) {
             _data.head = _data.tail = _item;
         } else {
-            if (!_data.isContain[_to]) throw;
+            require (_data.isContain[_to]);
  
             var nextTo = _data.nextOf[_to];
             if (nextTo != 0) {
@@ -90,7 +90,7 @@ library AddressList {
      * @param _data is list storage ref
      * @param _item is a new list element  
      */
-    function prepend(Data storage _data, address _item)
+    function prepend(Data storage _data, address _item) public
     { prepend(_data, _item, _data.head); }
 
     /**
@@ -99,15 +99,15 @@ library AddressList {
      * @param _item is a new list element  
      * @param _to is a item element before new 
      */
-    function prepend(Data storage _data, address _item, address _to) {
+    function prepend(Data storage _data, address _item, address _to) public {
         // Unable to contain double element
-        if (_data.isContain[_item]) throw;
+        require (!_data.isContain[_item]);
 
         // Empty list
         if (_data.head == 0) {
             _data.head = _data.tail = _item;
         } else {
-            if (!_data.isContain[_to]) throw;
+            require (_data.isContain[_to]);
  
             var prevTo = _data.prevOf[_to];
             if (prevTo != 0) {
@@ -129,8 +129,8 @@ library AddressList {
      * @param _data is list storage ref
      * @param _item is a removed list element
      */
-    function remove(Data storage _data, address _item) {
-        if (!_data.isContain[_item]) throw;
+    function remove(Data storage _data, address _item) public {
+        require (_data.isContain[_item]);
 
         var elemPrev = _data.prevOf[_item];
         var elemNext = _data.nextOf[_item];
@@ -157,8 +157,8 @@ library AddressList {
      * @param _from is old element
      * @param _to is a new element
      */
-    function replace(Data storage _data, address _from, address _to) {
-        if (!_data.isContain[_from]) throw;
+    function replace(Data storage _data, address _from, address _to) public {
+        require (_data.isContain[_from]);
 
         var elemPrev = _data.prevOf[_from];
         var elemNext = _data.nextOf[_from];
@@ -186,8 +186,8 @@ library AddressList {
      * @param _a is a first element
      * @param _b is a second element
      */
-    function swap(Data storage _data, address _a, address _b) {
-        if (!_data.isContain[_a] || !_data.isContain[_b]) throw; 
+    function swap(Data storage _data, address _a, address _b) public {
+        if (!_data.isContain[_a] || !_data.isContain[_b]) revert(); 
 
         var prevA = _data.prevOf[_a];
 

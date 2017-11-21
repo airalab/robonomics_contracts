@@ -8,12 +8,12 @@ import './Knowledge.sol';
  */
 contract KObject is Knowledge {
     /* Object constructor */
-    function KObject() Knowledge(OBJECT) {}
+    function KObject() public Knowledge(OBJECT) {}
 
     /* List of object property names */
     string[] public propertyList;
 
-    function propertyLength() constant returns (uint)
+    function propertyLength() public view returns (uint)
     { return propertyList.length; }
 
     /* Hash name to value mapping */
@@ -27,7 +27,7 @@ contract KObject is Knowledge {
      * @param _name name of property
      * @param _value property value
      */
-    function insertProperty(string _name, string _value) onlyOwner {
+    function insertProperty(string _name, string _value) public onlyOwner {
         var nameHash = sha3(_name);
         // Check for inserting new property
         if (propertyHashOf[nameHash] == 0)
@@ -42,19 +42,19 @@ contract KObject is Knowledge {
      * @dev Get property by name
      * @param _name property name
      */
-    function getProperty(string _name) constant returns (string)
+    function getProperty(string _name) public view returns (string)
     { return propertyValueOf[sha3(_name)]; }
 
     /* Described object can be consist of some another objects */
     address[] public componentList;
 
-    function componentLength() constant returns (uint)
+    function componentLength() public view returns (uint)
     { return componentList.length; }
 
-    function appendComponent(KObject _component) onlyOwner
+    function appendComponent(KObject _component) public onlyOwner
     { componentList.push(_component); }
     
-    function getComponent(uint _index) returns (KObject)
+    function getComponent(uint _index) public returns (KObject)
     { return KObject(componentList[_index]); }
 
     /**
@@ -63,7 +63,7 @@ contract KObject is Knowledge {
      * - equal properties
      * - equal components
      */
-    function isEqual(Knowledge _to) constant returns (bool) {
+    function isEqual(Knowledge _to) public view returns (bool) {
         if (knowledgeType != _to.knowledgeType())
             return false; 
 
@@ -71,7 +71,7 @@ contract KObject is Knowledge {
         return isEqualProperties(object) && isEqualComponents(object);
     }
 
-    function isEqualProperties(KObject _to) constant returns (bool) {
+    function isEqualProperties(KObject _to) public view returns (bool) {
         // Count of properties in equal objects should be same
         if (propertyList.length != _to.propertyLength())
             return false;
@@ -88,7 +88,7 @@ contract KObject is Knowledge {
         return true;
     }
 
-    function isEqualComponents(KObject _to) constant returns (bool) {
+    function isEqualComponents(KObject _to) public view returns (bool) {
         // Count of components in equal objects should be same
         if (componentList.length != _to.componentLength())
             return false;

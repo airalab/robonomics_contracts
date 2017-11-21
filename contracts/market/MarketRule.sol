@@ -10,5 +10,5 @@ contract MarketRule {
      * @param _deal lot address
      * @return count of emission token value
      */
-    function getEmission(Lot _deal) returns (uint);
+    function getEmission(Lot _deal) public returns (uint);
 }
