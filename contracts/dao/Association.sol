@@ -72,7 +72,7 @@ contract Association is Object, Observer {
         returns (uint proposalID)
     {
         proposalID = proposals.length++;
-        Proposal p = proposals[proposalID];
+        Proposal storage p = proposals[proposalID];
         p.recipient = beneficiary;
         p.amount = weiAmount;
         p.description = JobDescription;
@@ -95,7 +95,7 @@ contract Association is Object, Observer {
         view
         returns (bool codeChecksOut)
     {
-        Proposal p = proposals[proposalNumber];
+        Proposal storage p = proposals[proposalNumber];
         return p.proposalHash == sha3(beneficiary, etherAmount, transactionBytecode);
     }
 
@@ -104,7 +104,7 @@ contract Association is Object, Observer {
         public
         onlyShareholders
     {
-        Proposal p = proposals[proposalNumber];
+        Proposal storage p = proposals[proposalNumber];
         var balance = daoTokenAddress.balanceOf(msg.sender);
         require(p.voted[msg.sender] != true && balance != 0);
 
@@ -121,7 +121,7 @@ contract Association is Object, Observer {
     }
 
     function unVote(uint proposalNumber) public {
-        Proposal p = proposals[proposalNumber];
+        Proposal storage p = proposals[proposalNumber];
         var balance = daoTokenAddress.balanceOf(msg.sender);
         require(p.voted[msg.sender] && balance != 0);
 
@@ -146,7 +146,7 @@ contract Association is Object, Observer {
     }
 
     function executeProposal(uint proposalNumber, bytes transactionBytecode) public {
-        Proposal p = proposals[proposalNumber];
+        Proposal storage p = proposals[proposalNumber];
         /* Check if the proposal can be executed */
         require(
            /* has the voting deadline arrived? */

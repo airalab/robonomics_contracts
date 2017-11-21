@@ -3,7 +3,7 @@ import 'common/Object.sol';
 import 'token/Token.sol'; 
 
 contract ProposalDoneReceiver {
-    function proposalDone(uint _index);
+    function proposalDone(uint _index) public;
 }
 
 /**
@@ -31,7 +31,7 @@ contract Voting51 is Object {
      * @param _voting_token is a token used for voting actions
      * @param _receiver is a receiver for proposal done actions
      */
-    function Voting51(address _voting_token, address _receiver) {
+    function Voting51(address _voting_token, address _receiver) public {
         voting_token = Token(_voting_token);
         receiver     = ProposalDoneReceiver(_receiver);
     }
@@ -45,7 +45,7 @@ contract Voting51 is Object {
      * @notice only voters (accounts with positive voting token balance) can call it
      */
     function proposal(address _target, string _description,
-                      uint _start_time, uint _duration_sec) onlyOwner {
+                      uint _start_time, uint _duration_sec) public onlyOwner {
         description[proposal_target.length] = _description;
         start_time[proposal_target.length]  = _start_time;
         end_time[proposal_target.length]    = _start_time + _duration_sec;
@@ -58,10 +58,10 @@ contract Voting51 is Object {
      * @param _count is how amount of `voting_token` used
      * @notice `voting_token` should be approved for voting
      */
-    function vote(uint _count) {
+    function vote(uint _count) public {
         // Check for no proposal exist
         if (proposal_target[current_proposal] == 0
-         || now < start_time[current_proposal]) throw;
+         || now < start_time[current_proposal]) revert();
 
         // Check for end of voting time
         if (now > end_time[current_proposal]) {
@@ -70,7 +70,7 @@ contract Voting51 is Object {
         }
 
         // Thransfer token
-        if (!voting_token.transferFrom(msg.sender, this, _count)) throw;
+        require (voting_token.transferFrom(msg.sender, this, _count));
 
         // Increment values
         total_value[current_proposal]             += _count;
@@ -89,9 +89,9 @@ contract Voting51 is Object {
      * @param _proposal is a proposal id
      * @param _count is how amount of tokens should be refunded
      */
-    function refund(uint _proposal, uint _count) {
-        if (voter_value[_proposal][msg.sender] < _count) throw;
-        if (!voting_token.transfer(msg.sender, _count)) throw;
+    function refund(uint _proposal, uint _count) public {
+        require (voter_value[_proposal][msg.sender] >= _count);
+        require (voting_token.transfer(msg.sender, _count));
         voter_value[_proposal][msg.sender] -= _count;
     }
 }

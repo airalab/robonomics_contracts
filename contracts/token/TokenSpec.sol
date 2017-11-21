@@ -21,7 +21,7 @@ contract TokenSpec is TokenEmission {
      * @param _spec is a knowledge which present single token value 
      */
     function TokenSpec(string _name, string _symbol, uint8 _decimals,
-                       uint _count, address _spec)
+                       uint _count, address _spec) public
              TokenEmission(_name, _symbol, _decimals, _count) {
         specification = Knowledge(_spec);
     }

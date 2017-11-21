@@ -68,7 +68,7 @@ contract LiquidDemocracy is Object {
         address currentWinner = appointee;
         uint currentMax = 0;
         uint weight = 0;
-        DelegatedVote v = delegatedVotes[0];
+        DelegatedVote storage v = delegatedVotes[0];
 
         if (now > lastWeightCalculation + 90 minutes) {
             numberOfDelegationRounds = 0;

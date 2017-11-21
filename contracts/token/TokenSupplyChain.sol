@@ -62,7 +62,7 @@ contract TokenSupplyChain is Object {
      * @param _chain_id is a supply chain id
      * @return chain value
      */
-    function txChainValue(uint _chain_id) constant returns (uint)
+    function txChainValue(uint _chain_id) public view returns (uint)
     { return graph[_chain_id].value; }
     
     /**
@@ -70,7 +70,7 @@ contract TokenSupplyChain is Object {
      * @param _chain_id is a supply chain id
      * @return chain parent id list
      */
-    function txChainParent(uint _chain_id) constant returns (uint[])
+    function txChainParent(uint _chain_id) public view returns (uint[])
     { return graph[_chain_id].parent_id; }
 
     /**
@@ -79,7 +79,7 @@ contract TokenSupplyChain is Object {
      * @param _tx_id is transaction id
      * @return transaction info: comment, time stamp, source, destination
      */
-    function txAt(uint _chain_id, uint _tx_id) constant
+    function txAt(uint _chain_id, uint _tx_id) public view
         returns (string, uint, address, address)
     {
         var t = graph[_chain_id].txs[_tx_id];
@@ -93,7 +93,7 @@ contract TokenSupplyChain is Object {
             mapping(address =>
                     mapping(uint => bool)))     public allowance;
 
-    function TokenSupplyChain(string _name, string _symbol, uint8 _decimals) {
+    function TokenSupplyChain(string _name, string _symbol, uint8 _decimals) public {
         name        = _name;
         symbol      = _symbol;
         decimals    = _decimals;
@@ -104,7 +104,7 @@ contract TokenSupplyChain is Object {
      * @param _value is a chain value
      * @return true when all done
      */
-    function emission(uint _value) onlyOwner returns (bool) {
+    function emission(uint _value) public onlyOwner returns (bool) {
         var chain_id = graph.length++;
         graph[chain_id].value = _value;
 
@@ -120,7 +120,7 @@ contract TokenSupplyChain is Object {
      * @param _chain_id is a supply chain id
      * @return true when all done
      */
-    function burn(uint _chain_id) returns (bool) {
+    function burn(uint _chain_id) public returns (bool) {
         if (onBalance[msg.sender][_chain_id]) {
             isValid[_chain_id] = false;
             holder[_chain_id]  = 0;
@@ -138,7 +138,7 @@ contract TokenSupplyChain is Object {
      * @param _comment is a string transaction comment
      * @return true when all done
      */
-    function transfer(address _to, uint _chain_id, string _comment) returns (bool) {
+    function transfer(address _to, uint _chain_id, string _comment) public returns (bool) {
         if (onBalance[msg.sender][_chain_id]) {
             // Push transaction
             graph[_chain_id].txs.push(
@@ -164,7 +164,7 @@ contract TokenSupplyChain is Object {
      * @return true when all done
      */
     function transferFrom(address _from, address _to,
-                          uint _chain_id, string _comment) returns (bool) {
+                          uint _chain_id, string _comment) public returns (bool) {
         if (allowance[_from][msg.sender][_chain_id]
             && onBalance[_from][_chain_id]) {
             // Push transaction
@@ -189,7 +189,7 @@ contract TokenSupplyChain is Object {
      * @param _chain_id is a supply chain
      * @return true when all done
      */
-    function approve(address _to, uint _chain_id) returns (bool) {
+    function approve(address _to, uint _chain_id) public returns (bool) {
         allowance[msg.sender][_to][_chain_id] = true; 
         return allowance[msg.sender][_to][_chain_id];
     }
@@ -200,10 +200,10 @@ contract TokenSupplyChain is Object {
      * @param _value is a forked value
      * @return pair of chains
      */
-    function fork(uint _chain_id, uint _value) returns (uint, uint) {
+    function fork(uint _chain_id, uint _value) public returns (uint, uint) {
         var chain = graph[_chain_id];
         if (!onBalance[msg.sender][_chain_id]
-            || chain.value <= _value) throw;
+            || chain.value <= _value) revert();
 
         // Drop chain from token
         holder[_chain_id]  = 0;
@@ -238,9 +238,9 @@ contract TokenSupplyChain is Object {
      * @param _second_id is a supply chain item
      * @return supply chain item
      */
-    function merge(uint _first_id, uint _second_id) returns (uint) {
+    function merge(uint _first_id, uint _second_id) public returns (uint) {
         if (!onBalance[msg.sender][_first_id]
-            || !onBalance[msg.sender][_second_id]) throw;
+            || !onBalance[msg.sender][_second_id]) revert();
         
         // Drop chains
         var first  = graph[_first_id];

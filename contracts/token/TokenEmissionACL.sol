@@ -5,7 +5,7 @@ import 'acl/ACL.sol';
 contract TokenEmissionACL is TokenEmission, ACL {
     function TokenEmissionACL(string _name, string _symbol, uint8 _decimals,
                               uint _start_count,
-                              address _acl_storage, string _emitent_group)
+                              address _acl_storage, string _emitent_group) public
              TokenEmission(_name, _symbol, _decimals, _start_count) {
         acl          = ACLStorage(_acl_storage);
         emitentGroup = _emitent_group;
@@ -18,9 +18,9 @@ contract TokenEmissionACL is TokenEmission, ACL {
      * @param _value amount of token values to emit
      * @notice owner balance will be increased by `_value`
      */
-    function emission(uint _value) onlyGroup(emitentGroup) {
+    function emission(uint _value) public onlyGroup(emitentGroup) {
         // Overflow check
-        if (_value + totalSupply < totalSupply) throw;
+        if (_value + totalSupply < totalSupply) revert();
 
         totalSupply          += _value;
         balances[msg.sender] += _value;
