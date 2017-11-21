@@ -3,7 +3,7 @@ pragma solidity ^0.4.9;
 import './LiabilityStandard.sol';
 
 contract LiabilityValidator is LiabilityStandard {
-    bytes public validationModel;
+    bytes public model;
 
     event ValidationReady();
     event Confirmed();

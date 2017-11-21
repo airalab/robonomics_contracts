@@ -10,13 +10,13 @@ contract RobotLiability is MinerLiabilityValidator, Object {
      * @param _promisor A person who makes a promise.
      */
     function RobotLiability(
-        bytes   _validation_model,
+        bytes   _model,
         address _promisee,
         address _promisor
     ) payable {
         promisee = _promisee;
         promisor = _promisor;
-        validationModel = _validation_model;
+        model    = _model;
     }
 
     /**
