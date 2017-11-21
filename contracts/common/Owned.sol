@@ -1,4 +1,4 @@
-pragma solidity ^0.4.16;
+pragma solidity 0.4.18;
 
 /**
  * @title Contract for object that have an owner

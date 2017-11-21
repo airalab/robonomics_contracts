@@ -1,4 +1,4 @@
-pragma solidity ^0.4.2;
+pragma solidity 0.4.18;
 import './TestCase.sol';
 
 contract UnitTests is TestCase {

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity 0.4.18;
 import 'thesaurus/KnowledgeStorage.sol';
 import 'token/Token.sol';
 import 'lib/Voting.sol';

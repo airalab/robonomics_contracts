@@ -1,4 +1,4 @@
-pragma solidity ^0.4.16;
+pragma solidity 0.4.18;
 
 import 'token/TokenEmission.sol';
 import 'token/TokenObservable.sol';

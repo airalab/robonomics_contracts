@@ -1,4 +1,4 @@
-pragma solidity ^0.4.2;
+pragma solidity 0.4.18;
 /**
  * @dev Simple security rings implementation.
  * The security ring is a method to authorize action by multiple way
