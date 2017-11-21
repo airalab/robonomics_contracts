@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity ^0.4.18;
 import 'common/Object.sol';
 import './ERC20.sol';
 
@@ -18,7 +18,7 @@ contract Token is Object, ERC20 {
     mapping(address => mapping(address => uint256)) allowances;
 
     /* Token constructor */
-    function Token(string _name, string _symbol, uint8 _decimals, uint256 _count) {
+    function Token(string _name, string _symbol, uint8 _decimals, uint256 _count) public {
         name        = _name;
         symbol      = _symbol;
         decimals    = _decimals;
@@ -31,7 +31,7 @@ contract Token is Object, ERC20 {
      * @param _owner is a target address
      * @return amount of tokens on balance
      */
-    function balanceOf(address _owner) constant returns (uint256)
+    function balanceOf(address _owner) public view returns (uint256)
     { return balances[_owner]; }
 
     /**
@@ -40,7 +40,7 @@ contract Token is Object, ERC20 {
      * @param _spender The address of the account able to transfer the tokens
      * @return Amount of remaining tokens allowed to spent
      */
-    function allowance(address _owner, address _spender) constant returns (uint256)
+    function allowance(address _owner, address _spender) public view returns (uint256)
     { return allowances[_owner][_spender]; }
 
     /**
@@ -50,7 +50,7 @@ contract Token is Object, ERC20 {
      * @notice `_value` tokens will be sended to `_to`
      * @return `true` when transfer done
      */
-    function transfer(address _to, uint256 _value) returns (bool) {
+    function transfer(address _to, uint256 _value) public returns (bool) {
         if (balances[msg.sender] >= _value) {
             balances[msg.sender] -= _value;
             balances[_to]        += _value;
@@ -68,7 +68,7 @@ contract Token is Object, ERC20 {
      * @notice from `_from` will be sended `_value` tokens to `_to`
      * @return `true` when transfer is done
      */
-    function transferFrom(address _from, address _to, uint256 _value) returns (bool) {
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         var avail = allowances[_from][msg.sender]
                   > balances[_from] ? balances[_from]
                                     : allowances[_from][msg.sender];
@@ -87,7 +87,7 @@ contract Token is Object, ERC20 {
      * @param _spender target address (future requester)
      * @param _value amount of token values for approving
      */
-    function approve(address _spender, uint256 _value) returns (bool) {
+    function approve(address _spender, uint256 _value) public returns (bool) {
         allowances[msg.sender][_spender] += _value;
         Approval(msg.sender, _spender, _value);
         return true;
@@ -97,6 +97,6 @@ contract Token is Object, ERC20 {
      * @dev Reset count of tokens approved for given address
      * @param _spender target address (future requester)
      */
-    function unapprove(address _spender)
+    function unapprove(address _spender) public
     { allowances[msg.sender][_spender] = 0; }
 }

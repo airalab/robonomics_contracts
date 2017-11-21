@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity ^0.4.18;
 
 import './Object.sol';
 
@@ -17,14 +17,14 @@ contract Modify is Object {
      * @dev Contract constructor
      * @param _target is a owned target of modification
      */
-    function Modify(Owned _target)
+    function Modify(Owned _target) public
     { target = _target; }
 
     /**
      * @dev Modification runner
      * @notice the `target` should be delegated to this first
      */
-    function run() onlyOwner {
+    function run() public onlyOwner {
         require(target.owner() == address(this));
 
         modify();

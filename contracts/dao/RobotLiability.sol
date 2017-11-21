@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity ^0.4.18;
 
 import './MinerLiabilityValidator.sol';
 import 'common/Object.sol';
@@ -13,7 +13,7 @@ contract RobotLiability is MinerLiabilityValidator, Object {
         bytes   _model,
         address _promisee,
         address _promisor
-    ) payable {
+    ) public payable {
         promisee = _promisee;
         promisor = _promisor;
         model    = _model;
@@ -22,15 +22,15 @@ contract RobotLiability is MinerLiabilityValidator, Object {
     /**
      * @dev Contract can receive payments.
      */
-    function () payable {}
+    function () public payable {}
 
     /**
      * @dev Set objective of this liability 
      * @param _objective Objective data hash
      */
-    function setObjective(bytes _objective) payable returns (bool success) {
-        if (msg.sender != promisee) throw;
-        if (objective.length > 0) throw;
+    function setObjective(bytes _objective) public payable returns (bool success) {
+        require (msg.sender == promisee);
+        require (objective.length == 0);
 
         Objective(_objective);
         objective = _objective;
@@ -42,10 +42,10 @@ contract RobotLiability is MinerLiabilityValidator, Object {
      * @dev Set result of this liability
      * @param _result Result data hash
      */
-    function setResult(bytes _result) returns (bool success) {
-        if (msg.sender != promisor) throw;
-        if (objective.length == 0) throw;
-        if (result.length > 0) throw;
+    function setResult(bytes _result) public returns (bool success) {
+        require (msg.sender == promisor);
+        require (objective.length > 0);
+        require (result.length == 0);
         
         Result(_result);
         result = _result;
@@ -56,9 +56,9 @@ contract RobotLiability is MinerLiabilityValidator, Object {
     }
 
     function confirmed() internal
-    { if (!promisor.send(this.balance)) throw; }
+    { require (promisor.send(this.balance)); }
 
     function rejected() internal
-    { if (!promisee.send(this.balance)) throw; }
+    { require (promisee.send(this.balance)); }
 
 }

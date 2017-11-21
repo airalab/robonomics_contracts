@@ -1,5 +1,5 @@
-pragma solidity 0.4.18;
-import 'dao/Liability.sol';
+pragma solidity ^0.4.18;
+//import 'dao/Liability.sol';
 import 'common/Object.sol';
 import 'token/ERC20.sol';
 import './MarketHeap.sol';

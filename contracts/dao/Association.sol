@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity ^0.4.18;
 
 import 'common/Object.sol';
 import 'common/Observer.sol';
@@ -47,12 +47,12 @@ contract Association is Object, Observer {
     }
 
     /* First time setup */
-    function Association(address tokenAddress, uint minimumSharesToPassAVote, uint minutesForDebate) payable {
+    function Association(address tokenAddress, uint minimumSharesToPassAVote, uint minutesForDebate) public payable {
         changeVotingRules(DAOToken(tokenAddress), minimumSharesToPassAVote, minutesForDebate);
     }
 
     /*change rules*/
-    function changeVotingRules(DAOToken tokenAddress, uint minimumSharesToPassAVote, uint minutesForDebate) onlyOwner {
+    function changeVotingRules(DAOToken tokenAddress, uint minimumSharesToPassAVote, uint minutesForDebate) public onlyOwner {
         daoTokenAddress = tokenAddress;
         if (minimumSharesToPassAVote == 0 ) minimumSharesToPassAVote = 1;
         minimumQuorum = minimumSharesToPassAVote;
@@ -67,6 +67,7 @@ contract Association is Object, Observer {
         string JobDescription,
         bytes transactionBytecode
     )
+        public
         onlyShareholders
         returns (uint proposalID)
     {
@@ -90,7 +91,8 @@ contract Association is Object, Observer {
         uint etherAmount,
         bytes transactionBytecode
     )
-        constant
+        public
+        view
         returns (bool codeChecksOut)
     {
         Proposal p = proposals[proposalNumber];
@@ -99,6 +101,7 @@ contract Association is Object, Observer {
 
     /* */
     function vote(uint proposalNumber, bool supportsProposal)
+        public
         onlyShareholders
     {
         Proposal p = proposals[proposalNumber];
@@ -117,7 +120,7 @@ contract Association is Object, Observer {
         Voted(proposalNumber, supportsProposal, msg.sender);
     }
 
-    function unVote(uint proposalNumber) {
+    function unVote(uint proposalNumber) public {
         Proposal p = proposals[proposalNumber];
         var balance = daoTokenAddress.balanceOf(msg.sender);
         require(p.voted[msg.sender] && balance != 0);
@@ -142,7 +145,7 @@ contract Association is Object, Observer {
         }
     }
 
-    function executeProposal(uint proposalNumber, bytes transactionBytecode) returns (int result) {
+    function executeProposal(uint proposalNumber, bytes transactionBytecode) public {
         Proposal p = proposals[proposalNumber];
         /* Check if the proposal can be executed */
         require(
@@ -174,7 +177,7 @@ contract Association is Object, Observer {
     /**
      * @dev Observer interface
      */
-    function eventHandle(uint _event, bytes32[] _data) returns (bool) {
+    function eventHandle(uint _event, bytes32[] _data) public returns (bool) {
         require(msg.sender == address(daoTokenAddress));
 
         if (_event == 0x10) { // TRANSFER_EVENT
@@ -187,5 +190,5 @@ contract Association is Object, Observer {
         return true;
     }
 
-    function () payable {}
+    function () public payable {}
 }

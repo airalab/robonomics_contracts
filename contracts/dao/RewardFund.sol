@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity ^0.4.18;
 
 import 'token/TokenObservable.sol';
 import 'token/TokenEther.sol';
@@ -32,7 +32,7 @@ contract RewardFund is TokenEther, Observer {
     /**
      * @dev Get rewards array length
      */
-    function rewardsLength() constant returns (uint)
+    function rewardsLength() public view returns (uint)
     { return rewards.length; }
 
     /**
@@ -48,7 +48,7 @@ contract RewardFund is TokenEther, Observer {
      * @param _dao_token DAO token address
      * @param _min Minimal reward value in wei
      */
-    function RewardFund(string _name, string _symbol, address _dao_token, uint _min)
+    function RewardFund(string _name, string _symbol, address _dao_token, uint _min) public
             TokenEther(_name, _symbol) {
         daoToken = DAOToken(_dao_token);
         minimalReward = _min;
@@ -58,7 +58,7 @@ contract RewardFund is TokenEther, Observer {
      * @dev Refill reward fund
      * @notice Payment should be greater than minimal reward
      */
-    function putReward() payable {
+    function putReward() public payable {
         require(msg.value >= minimalReward);
 
         totalSupply    += msg.value;
@@ -71,7 +71,7 @@ contract RewardFund is TokenEther, Observer {
      * @param _count Count of rewards to payout
      * @notice Possible out of gas with big _count value
      */
-    function getRewards(uint _count) {
+    function getRewards(uint _count) public {
         var accountShares = daoToken.balanceOf(msg.sender);
         var daoShares     = daoToken.totalSupply();
         for (uint i = 0; i < _count && nextReward[msg.sender] < rewards.length; ++i)
@@ -84,7 +84,7 @@ contract RewardFund is TokenEther, Observer {
             var reward         = rewards[nextReward[_account]];
             uint accountReward = reward.value * _accountShares / _daoShares;
             if (accountReward > 0) {
-                if (balances[this] < accountReward) throw;
+                if (balances[this] < accountReward) revert();
 
                 balances[_account] += accountReward;
                 balances[this]     -= accountReward;
@@ -98,7 +98,7 @@ contract RewardFund is TokenEther, Observer {
     /**
      * @dev Observer interface
      */
-    function eventHandle(uint _event, bytes32[] _data) returns (bool) {
+    function eventHandle(uint _event, bytes32[] _data) public returns (bool) {
         require(msg.sender == address(daoToken));
 
         if (_event == 0x10) { // TRANSFER_EVENT
@@ -107,7 +107,7 @@ contract RewardFund is TokenEther, Observer {
 
             // Check for the all rewards is payed
             if (nextReward[from] < rewards.length
-                || nextReward[to] < rewards.length) throw;
+                || nextReward[to] < rewards.length) revert();
         }
 
         return true;

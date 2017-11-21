@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity ^0.4.18;
 
 contract Observer {
     /**
@@ -7,7 +7,7 @@ contract Observer {
      * @param _data Event data
      * @return `true` if success done
      */
-    function eventHandle(uint _event, bytes32[] _data) returns (bool)
+    function eventHandle(uint _event, bytes32[] _data) public returns (bool)
     { return true; }
 }
 
@@ -22,7 +22,7 @@ contract Observable {
     function notify(uint _event, bytes32[] _data) internal returns (bool) {
         var observers = _observers[_event];
         for (uint i = 0; i < observers.length; ++i)
-            if (!observers[i].eventHandle(_event, _data)) throw;
+            require(observers[i].eventHandle(_event, _data));
         return true;
     }
 

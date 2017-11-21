@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity ^0.4.18;
 
 import 'common/Object.sol';
 import 'token/Token.sol';
@@ -17,7 +17,7 @@ contract Offer is Object {
     /**
      * @dev Force close the offer
      */
-    function close() onlyOwner { closed = now; }
+    function close() public onlyOwner { closed = now; }
 
     /**
      * @dev Offer constructor
@@ -28,7 +28,7 @@ contract Offer is Object {
      * @param _hard_offer is a hard offer address
      */
     function Offer(string _description, address _token, uint _value,
-                   address _beneficiary, address _hard_offer) {
+                   address _beneficiary, address _hard_offer) public {
         description = _description;
         token       = Token(_token);
         value       = _value;
@@ -36,7 +36,7 @@ contract Offer is Object {
         hardOffer   = _hard_offer;
     }
 
-    function accept() {
+    function accept() public {
         require(!closed);
         require(hardOffer == 0 || msg.sender == hardOffer);
         require(token.transferFrom(msg.sender, beneficiary, value));

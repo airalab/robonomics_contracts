@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity ^0.4.18;
 
 import 'token/Token.sol';
 import 'common/Object.sol';
@@ -29,7 +29,7 @@ contract LiquidDemocracy is Object {
         address votingWeightToken,
         string forbiddenFunctionCall,
         uint percentLossInEachRound
-    ) {
+    ) public {
         votingToken = Token(votingWeightToken);
         delegatedVotes.length++;
         delegatedVotes[0] = DelegatedVote({nominee: 0, voter: 0});
@@ -38,7 +38,7 @@ contract LiquidDemocracy is Object {
         if (delegatedPercent > 100) delegatedPercent = 100;
     }
 
-    function vote(address nominatedAddress) returns (uint voteIndex) {
+    function vote(address nominatedAddress) public returns (uint voteIndex) {
         if (voterId[msg.sender]== 0) {
             voterId[msg.sender] = delegatedVotes.length;
             numberOfVotes++;
@@ -52,7 +52,7 @@ contract LiquidDemocracy is Object {
         delegatedVotes[voteIndex] = DelegatedVote({nominee: nominatedAddress, voter: msg.sender});
     }
 
-    function execute(address target, uint valueInEther, bytes32 bytecode) {
+    function execute(address target, uint valueInEther, bytes32 bytecode) public {
         require(msg.sender == appointee                             // If caller is the current appointee,
             && !underExecution //                                   // if the call is being executed,
             && bytes4(bytecode) != bytes4(sha3(forbiddenFunction))  // and it's not trying to do the forbidden function
@@ -64,7 +64,7 @@ contract LiquidDemocracy is Object {
         underExecution = false;
     }
 
-    function calculateVotes() returns (address winner) {
+    function calculateVotes() public returns (address winner) {
         address currentWinner = appointee;
         uint currentMax = 0;
         uint weight = 0;
@@ -111,5 +111,5 @@ contract LiquidDemocracy is Object {
         return currentWinner;
     }
 
-    function () payable {}
+    function () public payable {}
 }

@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity ^0.4.18;
 
 /**
  * @title Contract for object that have an owner
@@ -13,7 +13,7 @@ contract Owned {
      * @dev Delegate contract to another person
      * @param _owner New owner address 
      */
-    function setOwner(address _owner) onlyOwner
+    function setOwner(address _owner) public onlyOwner
     { owner = _owner; }
 
     /**

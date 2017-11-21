@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity ^0.4.18;
 
 import 'common/Object.sol';
 
@@ -13,7 +13,7 @@ contract ACLStorage is Object {
     /**
      * @dev Size of group array
      */
-    function groupLength() constant returns (uint256)
+    function groupLength() public view returns (uint256)
     { return group.length; }
 
     struct Members {
@@ -29,7 +29,7 @@ contract ACLStorage is Object {
      * @param _index A groum member position.
      * @return first member address
      */
-    function member(string _group, uint256 _index) constant returns (address)
+    function member(string _group, uint256 _index) public view returns (address)
     { return members[sha3(_group)].list[_index]; }
     
     /**
@@ -38,7 +38,7 @@ contract ACLStorage is Object {
      * @param _member is a address for member checking
      * @return `true` when address is member of group
      */
-    function isMemberOf(string _group, address _member) constant returns (bool)
+    function isMemberOf(string _group, address _member) public view returns (bool)
     { return members[sha3(_group)].contains[_member]; }
 
     /**
@@ -46,7 +46,7 @@ contract ACLStorage is Object {
      * @param _name is a group name
      * @param _firstMember is a first member address, group should not be empty
      */
-    function createGroup(string _name, address _firstMember) onlyOwner {
+    function createGroup(string _name, address _firstMember) public onlyOwner {
         var m = members[sha3(_name)];
         require(m.list.length == 0);
 
@@ -60,12 +60,12 @@ contract ACLStorage is Object {
      * @param _group is a group name
      * @param _member is a new member address
      */
-    function addMember(string _group, address _member) onlyOwner {
+    function addMember(string _group, address _member) public onlyOwner {
         var m = members[sha3(_group)];
         require(m.list.length > 0);
 
-        m.list.push(_firstMember);
-        m.contains[_firstMember] = true;
+        m.list.push(_member);
+        m.contains[_member] = true;
     }
 
     /**
@@ -73,11 +73,11 @@ contract ACLStorage is Object {
      * @param _group is a group name
      * @param _member is a address for remove
      */
-    function removeMember(string _group, address _member) onlyOwner {
+    function removeMember(string _group, address _member) public onlyOwner {
         var m = members[sha3(_group)];
         require(m.list.length > 0);
 
-        m.contains[_firstMember] = false;
+        m.contains[_member] = false;
         for (uint256 i = 0; i < m.list.length; ++i) {
             if (m.list[i] == _member) {
                 m.list[i] = m.list[m.list.length - 1];

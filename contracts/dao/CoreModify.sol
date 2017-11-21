@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity ^0.4.18;
 
 import 'common/Modify.sol';
 import './Core.sol';
@@ -8,7 +8,7 @@ import './Core.sol';
  * @dev   It's contract can modify core by set/remove modules
  */
 contract CoreModify is Modify {
-    function CoreModify(address _target) Modify(Owned(_target)) {}
+    function CoreModify(address _target) public Modify(Owned(_target)) {}
 
     enum ModifyType {
         SetModule,
@@ -44,7 +44,7 @@ contract CoreModify is Modify {
      * @param _constant is a flag for set module constant
      */
     function setModule(string _name, address _module,
-                       string _abi, bool _constant) onlyOwner {
+                       string _abi, bool _constant) public onlyOwner {
         modParams = ModuleParams(_name, _module, _abi, _constant);
         modType   = ModifyType.SetModule;
     }
@@ -53,7 +53,7 @@ contract CoreModify is Modify {
      * @dev Remove module from core register
      * @param _name is a module name
      */
-    function removeModule(string _name) onlyOwner {
+    function removeModule(string _name) public onlyOwner {
         modParams.name = _name;
         modType        = ModifyType.RemoveModule;
     }

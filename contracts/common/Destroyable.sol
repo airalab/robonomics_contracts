@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity ^0.4.18;
 
 /**
  * @title Common pattern for destroyable contracts 
@@ -10,15 +10,15 @@ contract Destroyable {
      * @dev Hammer setter
      * @param _hammer New hammer address
      */
-    function setHammer(address _hammer) onlyHammer
+    function setHammer(address _hammer) public onlyHammer
     { hammer = _hammer; }
 
     /**
      * @dev Destroy contract and scrub a data
      * @notice Only hammer can call it 
      */
-    function destroy() onlyHammer
-    { selfdestroy(msg.sender); }
+    function destroy() public onlyHammer
+    { selfdestruct(msg.sender); }
 
     /**
      * @dev Hammer check modifier

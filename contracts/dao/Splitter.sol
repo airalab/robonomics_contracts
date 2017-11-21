@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity ^0.4.18;
 
 import 'common/Object.sol';
 
@@ -12,8 +12,8 @@ contract Splitter is Object {
     Holder[] public holders;
     mapping(address => uint) public holderId;
 
-    function Splitter(address[] _accounts, uint8[] _parts) {
-        if (_accounts.length != _parts.length) throw;
+    function Splitter(address[] _accounts, uint8[] _parts) public {
+        require (_accounts.length == _parts.length);
 
         uint8 sum = 0;
         for (uint i = 0; i < _accounts.length; ++i) {
@@ -25,13 +25,13 @@ contract Splitter is Object {
             sum += _parts[i];
         }
         // Check when parts correct
-        if (sum != 100) throw;
+        if (sum != 100) revert();
     }
 
     /**
      * @dev Withdraw accumulated contract value according to ratio percent
      */
-    function withdraw() {
+    function withdraw() public {
         var id = holderId[msg.sender];
         require(holders[id].part != 0);
 
@@ -54,7 +54,7 @@ contract Splitter is Object {
     /**
      * @dev Received log
      */
-    function () payable {
+    function () public payable {
         Received(msg.sender, msg.value);
         totalReceived += msg.value;
     }
