@@ -28,11 +28,17 @@ contract RobotLiability is MinerLiabilityValidator, Object {
     function RobotLiability(
         bytes   _model,
         address _promisee,
-        address _promisor
+        address _promisor,
+        uint256 _cost,
+        uint256 _count,
+        uint256 _fee
     ) public {
+        model    = _model;
         promisee = _promisee;
         promisor = _promisor;
-        model    = _model;
+        cost     = _cost;
+        count    = _count;
+        fee      = _fee;
     }
 
     /**
