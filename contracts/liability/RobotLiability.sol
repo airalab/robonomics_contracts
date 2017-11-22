@@ -27,6 +27,7 @@ contract RobotLiability is MinerLiabilityValidator, Object {
      */
     function RobotLiability(
         bytes   _model,
+        bytes   _objective,
         address _promisee,
         address _promisor,
         uint256 _cost,
@@ -34,25 +35,12 @@ contract RobotLiability is MinerLiabilityValidator, Object {
         uint256 _fee
     ) public {
         model    = _model;
+        objective= _objective;
         promisee = _promisee;
         promisor = _promisor;
         cost     = _cost;
         count    = _count;
         fee      = _fee;
-    }
-
-    /**
-     * @dev Set objective of this liability 
-     * @param _objective Objective data hash
-     */
-    function setObjective(bytes _objective) public returns (bool success) {
-        require(msg.sender == promisee);
-        require(objective.length == 0);
-
-        Objective(_objective);
-        objective = _objective;
-
-        return true;
     }
 
     /**
