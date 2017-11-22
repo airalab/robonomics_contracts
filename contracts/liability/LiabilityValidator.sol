@@ -7,7 +7,7 @@ contract LiabilityValidator is LiabilityStandard {
     /**
      * @dev Utility token.
      */
-    ERC20 public constant utility = ERC20(0);
+    ERC20 public constant utility = ERC20(0x5DF531240f97049ee8d28A8E51030A3b5a8e8CE4);
 
     /**
      * @dev Validator fee in utility token.
