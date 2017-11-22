@@ -1,4 +1,4 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.18;
 import 'common/Owned.sol';
 
 contract Streaming is Owned {
@@ -11,8 +11,8 @@ contract Streaming is Owned {
      * @dev Start streaming
      * @param _ident is a 256 bit identifier of stream (maybe SHA256)
      */
-    function streamStart(bytes32 _ident) {
-        if (streamAlive) throw;
+    function streamStart(bytes32 _ident) public {
+        require (!streamAlive);
 
         Stream(_ident, true);
         streamIdent = _ident;
@@ -22,7 +22,7 @@ contract Streaming is Owned {
     /**
      * @dev Terminate streaming
      */
-    function streamEnd() {
+    function streamEnd() public {
         Stream(streamIdent, false);
         streamAlive = false;
     }

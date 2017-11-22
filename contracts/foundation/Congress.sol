@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.18;
 import 'common/Object.sol';
 import 'token/Recipient.sol';
 
@@ -30,7 +30,7 @@ contract Congress is Object, Recipient {
     /**
      * @dev Count of proposals in archive 
      */
-    function numProposals() constant returns (uint256)
+    function numProposals() public view returns (uint256)
     { return proposals.length; }
 
     /**
@@ -124,7 +124,7 @@ contract Congress is Object, Recipient {
      * @dev Modifier that allows only shareholders to vote and create new proposals
      */
     modifier onlyMembers {
-        if (memberId[msg.sender] == 0) throw;
+        require (memberId[msg.sender] != 0);
         _;
     }
 
@@ -136,7 +136,7 @@ contract Congress is Object, Recipient {
         uint256 minutesForDebate,
         int256  marginOfVotesForMajority,
         address congressLeader
-    ) {
+    ) public {
         changeVotingRules(minimumQuorumForProposals, minutesForDebate, marginOfVotesForMajority);
         // It’s necessary to add an empty first member
         addMember(0, ''); // and let's add the founder, to save a step later
@@ -149,8 +149,8 @@ contract Congress is Object, Recipient {
      * @param targetMember Member account address
      * @param memberName Member full name
      */
-    function addMember(address targetMember, string memberName) onlyOwner {
-        if (memberId[targetMember] != 0) throw;
+    function addMember(address targetMember, string memberName) public onlyOwner {
+        require (memberId[targetMember] == 0);
 
         memberId[targetMember] = members.length;
         members.push(Member({member:      targetMember,
@@ -164,8 +164,8 @@ contract Congress is Object, Recipient {
      * @dev Remove congress member
      * @param targetMember Member account address
      */
-    function removeMember(address targetMember) onlyOwner {
-        if (memberId[targetMember] == 0) throw;
+    function removeMember(address targetMember) public onlyOwner {
+        require (memberId[targetMember] != 0);
 
         uint256 targetId = memberId[targetMember];
         uint256 lastId   = members.length - 1;
@@ -194,7 +194,7 @@ contract Congress is Object, Recipient {
         uint256 minutesForDebate,
         int256  marginOfVotesForMajority
     )
-        onlyOwner
+        public onlyOwner
     {
         minimumQuorum           = minimumQuorumForProposals;
         debatingPeriodInMinutes = minutesForDebate;
@@ -216,6 +216,7 @@ contract Congress is Object, Recipient {
         string  jobDescription,
         bytes   transactionBytecode
     )
+        public
         onlyMembers
         returns (uint256 id)
     {
@@ -245,7 +246,8 @@ contract Congress is Object, Recipient {
         uint256 amount,
         bytes   transactionBytecode
     )
-        constant
+        public
+        view
         returns (bool codeChecksOut)
     {
         return proposals[id].proposalHash
@@ -263,11 +265,12 @@ contract Congress is Object, Recipient {
         bool    supportsProposal,
         string  justificationText
     )
+        public
         onlyMembers
         returns (uint256 vote)
     {
         Proposal p = proposals[id];             // Get the proposal
-        if (p.voted[msg.sender] == true) throw; // If has already voted, cancel
+        require (p.voted[msg.sender] != true);  // If has already voted, cancel
         p.voted[msg.sender] = true;             // Set this voter as having voted
         p.numberOfVotes++;                      // Increase the number of votes
         if (supportsProposal) {                 // If they support the proposal
@@ -288,6 +291,7 @@ contract Congress is Object, Recipient {
         uint256 id,
         bytes   transactionBytecode
     )
+        public
         onlyMembers
     {
         Proposal p = proposals[id];
@@ -302,7 +306,7 @@ contract Congress is Object, Recipient {
             || p.executed
             || p.proposalHash != sha3(p.recipient, p.amount, transactionBytecode)
             || p.numberOfVotes < minimumQuorum)
-            throw;
+            revert();
 
         /* execute result */
         /* If difference between support and opposition is larger than margin */
@@ -310,8 +314,7 @@ contract Congress is Object, Recipient {
             // Avoid recursive calling
 
             p.executed = true;
-            if (!p.recipient.call.value(p.amount)(transactionBytecode))
-                throw;
+            require (p.recipient.call.value(p.amount)(transactionBytecode));
 
             p.proposalPassed = true;
         } else {

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.9;
+pragma solidity ^0.4.18;
 
 import './LiabilityStandard.sol';
 
@@ -19,8 +19,8 @@ contract LiabilityValidator is LiabilityStandard {
     /**
      * @dev Confirm liability execution
      */
-    function confirm() {
-        if (!isValidator(msg.sender)) throw;
+    function confirm() public {
+        require (isValidator(msg.sender));
         confirmed();
         Confirmed();
     }
@@ -33,8 +33,8 @@ contract LiabilityValidator is LiabilityStandard {
     /**
      * @dev Reject liability execution
      */
-    function reject() {
-        if (!isValidator(msg.sender)) throw;
+    function reject() public {
+        require (isValidator(msg.sender));
         rejected();
         Rejected();
     }

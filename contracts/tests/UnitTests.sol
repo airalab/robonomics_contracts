@@ -1,4 +1,4 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.18;
 import './TestCase.sol';
 
 contract UnitTests is TestCase {
@@ -7,7 +7,7 @@ contract UnitTests is TestCase {
     event ErrorTest(address);
     event SuccessTest(address);
     
-    function run() returns (bool) {
+    function run() public returns (bool) {
         var allIsOk = true;
         for (uint i = 0; i < testList.length; ++i) {
             // Run and make an event on error

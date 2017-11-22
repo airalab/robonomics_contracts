@@ -1,4 +1,4 @@
-pragma solidity ^0.4.16;
+pragma solidity ^0.4.18;
 
 import 'common/Object.sol';
 import 'token/TokenEther.sol';
@@ -26,7 +26,7 @@ contract ShareSale is Object {
      * @dev Set price of one share in Wei
      * @param _price_wei is share price
      */
-    function setPrice(uint _price_wei) onlyOwner
+    function setPrice(uint _price_wei) public onlyOwner
     { priceWei = _price_wei; }
     
     /**
@@ -38,7 +38,7 @@ contract ShareSale is Object {
      * @notice After creation you should send shares to contract for sale
      */
     function ShareSale(address _target, address _etherFund,
-                       address _shares, uint _price_wei) {
+                       address _shares, uint _price_wei) public {
         target    = _target;
         etherFund = TokenEther(_etherFund);
         shares    = Token(_shares);
@@ -50,7 +50,7 @@ contract ShareSale is Object {
      *      by price, setted by owner.
      * @notice only full packet of shares can be saled
      */
-    function () payable {
+    function () public payable {
         var value = shares.balanceOf(this) * priceWei;
 
         require(closed == 0);
@@ -64,7 +64,7 @@ contract ShareSale is Object {
         closed = now;
     }
 
-    function destroy() onlyHammer {
+    function destroy() public onlyHammer {
         // Save the shares
         require(shares.transfer(owner, shares.balanceOf(this)));
 

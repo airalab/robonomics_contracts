@@ -1,11 +1,11 @@
-pragma solidity ^0.4.4;
-import 'dao/Liability.sol';
+pragma solidity ^0.4.18;
+//import 'dao/Liability.sol';
 import 'common/Object.sol';
 import 'token/ERC20.sol';
 import './MarketHeap.sol';
 
 library CreatorLiability {
-    function create(address, address, address, uint256)
+    function create(address, address, address, uint256) public
              returns (Liability);
 }
 
@@ -23,7 +23,7 @@ contract LiabilityMarket is Object, MarketHeap {
      * @dev Market constructor
      * @param _name Market name
      */
-    function LiabilityMarket(string _name) {
+    function LiabilityMarket(string _name) public {
         name = _name;
         // Put empty oreder with zero index
         orders[orders.length++].closed = true;
@@ -43,7 +43,7 @@ contract LiabilityMarket is Object, MarketHeap {
      * @param _i Order index
      * @return Order fields
      */
-    function getOrder(uint256 _i) constant returns (address[], address[], address, bool) {
+    function getOrder(uint256 _i) public view returns (address[], address[], address, bool) {
         var o = orders[_i];
         return (o.beneficiary, o.promisee, o.promisor, o.closed);
     }
@@ -71,7 +71,7 @@ contract LiabilityMarket is Object, MarketHeap {
      * @param _price Liability price
      * @notice Sender is promisee of liability
      */
-    function limitSell(address _beneficiary, address _promisee, uint256 _price) {
+    function limitSell(address _beneficiary, address _promisee, uint256 _price) public {
         var id = orders.length++;
 
         // Store price
@@ -91,7 +91,7 @@ contract LiabilityMarket is Object, MarketHeap {
      * @param _price Liability price
      * @notice Sender is promisor of liability
      */
-    function limitBuy(uint256 _price) {
+    function limitBuy(uint256 _price) public {
         var id = orders.length++;
 
         // Store price
@@ -102,8 +102,7 @@ contract LiabilityMarket is Object, MarketHeap {
         orders[id].promisor = msg.sender;
 
         // Lock tokens
-        if (!token.transferFrom(msg.sender, this, _price))
-            throw;
+        require (token.transferFrom(msg.sender, this, _price));
 
         ordersOf[msg.sender].push(id);
         OpenAskOrder(id);
@@ -115,9 +114,9 @@ contract LiabilityMarket is Object, MarketHeap {
      * @param _beneficiary Benificiary candidate
      * @param _promisee Promisee candidate
      */
-    function sellAt(uint256 _id, address _beneficiary, address _promisee) {
+    function sellAt(uint256 _id, address _beneficiary, address _promisee) public {
         var order = orders[_id];
-        if (_id >= orders.length || order.closed) throw;
+        if (_id >= orders.length || order.closed) revert();
 
         order.beneficiary.push(_beneficiary);
         order.promisee.push(_promisee);
@@ -130,19 +129,19 @@ contract LiabilityMarket is Object, MarketHeap {
      * @param _id Order index 
      * @param _candidates Confirmed candidates
      */
-    function sellConfirm(uint256 _id, uint256 _candidates) {
+    function sellConfirm(uint256 _id, uint256 _candidates) public {
         var o = orders[_id];
-        if (_id >= orders.length || o.closed) throw;
+        if (_id >= orders.length || o.closed) revert();
 
         getAsk(orderAskOf[_id]);
 
-        if (o.promisor != msg.sender) throw;
-        if (o.beneficiary[_candidates] == 0) throw; 
+        require (o.promisor == msg.sender);
+        require (o.beneficiary[_candidates] != 0); 
 
-        if (!runLiability(o.beneficiary[_candidates],
+        require (runLiability(o.beneficiary[_candidates],
                           o.promisee[_candidates],
                           o.promisor,
-                          priceOf[_id])) throw;
+                          priceOf[_id]));
 
         o.closed = true;
         CloseAskOrder(_id);
@@ -152,20 +151,19 @@ contract LiabilityMarket is Object, MarketHeap {
      * @dev Buy liability
      * @param _id Order index 
      */
-    function buyAt(uint256 _id) {
+    function buyAt(uint256 _id) public {
         var o = orders[_id];
-        if (_id >= orders.length || o.closed) throw;
+        if (_id >= orders.length || o.closed) revert();
 
         getBid(orderBidOf[_id]);
         o.promisor = msg.sender;
 
-        if (!token.transferFrom(msg.sender, this, priceOf[_id]))
-            throw;
+        require (token.transferFrom(msg.sender, this, priceOf[_id]));
 
-        if (!runLiability(o.beneficiary[0],
+        require (runLiability(o.beneficiary[0],
                           o.promisee[0],
                           o.promisor,
-                          priceOf[_id])) throw;
+                          priceOf[_id]));
 
         o.closed = true;
         CloseBidOrder(_id);
@@ -180,12 +178,12 @@ contract LiabilityMarket is Object, MarketHeap {
         var l = CreatorLiability.create(_promisor, _promisee, token, _price);
         l.setOwner(_beneficiary);
 
-        if (!token.transfer(l, _price)) throw;
-        if (!l.call.value(l.gasbase() * tx.gasprice)()) throw;
+        require (token.transfer(l, _price));
+        require (l.call.value(l.gasbase() * tx.gasprice)());
 
         NewLiability(l);
         return true;
     }
 
-    function () payable {}
+    function () public payable {}
 }

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.18;
 import './Lot.sol';
 
 /**
@@ -16,5 +16,5 @@ contract MarketAgent is Object {
      * @param _lot target lot address
      * @return `true` when deal is ok
      */
-    function deal(Lot _lot) onlyOwner returns (bool);
+    function deal(Lot _lot) public onlyOwner returns (bool);
 }

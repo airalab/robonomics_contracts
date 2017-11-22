@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.18;
 import 'thesaurus/KnowledgeStorage.sol';
 import 'token/Token.sol';
 import 'lib/Voting.sol';
@@ -14,7 +14,7 @@ contract DAOKnowledgeStorage is Object {
     mapping(string => Voting.Poll) termOf;
     using Voting for Voting.Poll;
     
-    function DAOKnowledgeStorage(address _thesaurus, address _shares) {
+    function DAOKnowledgeStorage(address _thesaurus, address _shares) public {
         thesaurus = KnowledgeStorage(_thesaurus);
         shares    = Token(_shares);
     }
@@ -40,7 +40,7 @@ contract DAOKnowledgeStorage is Object {
      * @param _count how much shares given for increase
      * @notice Given knownledge should be delegated to me
      */
-    function pollUp(string _termName, Knowledge _value, uint _count) {
+    function pollUp(string _termName, Knowledge _value, uint _count) public {
         // So throw when knowledge is not my 
         if (_value.owner() != address(this)) return;
 
@@ -58,7 +58,7 @@ contract DAOKnowledgeStorage is Object {
      * @param _termName name of term
      * @param _count count of refunded shares
      */
-    function pollDown(string _termName, uint _count) {
+    function pollDown(string _termName, uint _count) public {
         // Poll down given term name
         var voter = msg.sender;
         var term = termOf[_termName];

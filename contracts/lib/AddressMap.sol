@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.18;
 import './AddressList.sol';
 
 /**
@@ -18,7 +18,7 @@ library AddressMap {
      * @dev Get size of map
      * @return count of elements
      */
-    function size(Data storage _data) constant returns (uint)
+    function size(Data storage _data) public view returns (uint)
     { return _data.items.length; }
 
     /**
@@ -27,7 +27,7 @@ library AddressMap {
      * @param _key is a item key
      * @return item value
      */
-    function get(Data storage _data, string _key) constant returns (address)
+    function get(Data storage _data, string _key) public view returns (address)
     { return _data.valueOf[sha3(_key)]; }
 
     /** Get key of element
@@ -35,7 +35,7 @@ library AddressMap {
      * @param _item is a item
      * @return item key
      */
-    function getKey(Data storage _data, address _item) constant returns (string)
+    function getKey(Data storage _data, address _item) public view returns (string)
     { return _data.keyOf[_item]; }
 
     /**
@@ -45,7 +45,7 @@ library AddressMap {
      * @param _value is a item value
      * @notice by design you can't set different keys with same value
      */
-    function set(Data storage _data, string _key, address _value) {
+    function set(Data storage _data, string _key, address _value) public {
         var replaced = get(_data, _key);
         if (replaced != 0)
             _data.items.replace(replaced, _value);
@@ -60,7 +60,7 @@ library AddressMap {
      * @param _data is an map storage ref
      * @param _key is and item key
      */
-    function remove(Data storage _data, string _key) {
+    function remove(Data storage _data, string _key) public {
         var value = get(_data, _key);
         _data.items.remove(value);
         _data.valueOf[sha3(_key)] = 0;

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.18;
 import 'common/Object.sol';
 import 'token/Token.sol';
 
@@ -31,7 +31,7 @@ contract Lot is Object {
      * @param _quantity_buy amount of tokens to buy 
      */
     function Lot(address _seller, address _sale, address _buy,
-                 uint _quantity_sale, uint _quantity_buy) {
+                 uint _quantity_sale, uint _quantity_buy) public {
         seller        = _seller;
         sale          = Token(_sale);
         buy           = Token(_buy);
@@ -49,13 +49,13 @@ contract Lot is Object {
      * @param _buyer address of buyer
      * @return `true` when deal is success
      */
-    function deal(address _buyer) returns (bool) {
+    function deal(address _buyer) public returns (bool) {
         // So if lot is closed no deal available
         if (closed) return false;
 
         // Do transfer tokens
         if (!sale.transferFrom(seller, _buyer, quantity_sale)
-         || !buy.transferFrom(_buyer, seller, quantity_buy)) throw;
+         || !buy.transferFrom(_buyer, seller, quantity_buy)) revert();
 
         // Store buyer and close lot
         buyer = _buyer;
@@ -69,6 +69,6 @@ contract Lot is Object {
     /**
      * @dev Lot deal with buyer is a `sender`, see deal(address)
      */
-    function deal() returns (bool)
+    function deal() public returns (bool)
     { return deal(msg.sender); }
 }

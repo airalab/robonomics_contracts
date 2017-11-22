@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.18;
 import 'common/Object.sol';
 
 /**
@@ -12,7 +12,7 @@ contract Knowledge is Object {
     /* Knowledge type is a int value */
     int public knowledgeType;
 
-    function Knowledge(int8 _type)
+    function Knowledge(int8 _type) public
     { knowledgeType = _type; }
 
     /**
@@ -20,5 +20,5 @@ contract Knowledge is Object {
      * @param _to compared knowledge address
      * @return `true` when knowledges is equal
      */
-    function isEqual(Knowledge _to) constant returns (bool);
+    function isEqual(Knowledge _to) public view returns (bool);
 }

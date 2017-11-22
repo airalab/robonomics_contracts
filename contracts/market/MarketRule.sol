@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.18;
 import './Lot.sol';
 
 /**
@@ -10,5 +10,5 @@ contract MarketRule {
      * @param _deal lot address
      * @return count of emission token value
      */
-    function getEmission(Lot _deal) returns (uint);
+    function getEmission(Lot _deal) public returns (uint);
 }

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.18;
 import 'lib/AddressList.sol';
 import 'token/TokenEmission.sol';
 import './MarketAgent.sol';
@@ -23,7 +23,7 @@ contract MarketRegulator is Object {
     /* Only market agents can call modified functions */
     modifier onlyAgents { if (agents.contains(msg.sender)) _; }
 
-    function MarketRegulator(address _market, address _credits) {
+    function MarketRegulator(address _market, address _credits) public {
         market  = Market(_market);
         credits = TokenEmission(_credits);
     }
@@ -39,5 +39,5 @@ contract MarketRegulator is Object {
      * @dev Sign a contract with sender for trading on market
      * @return `MarketAgent` instance
      */
-    function sign() returns (MarketAgent);
+    function sign() public returns (MarketAgent);
 }

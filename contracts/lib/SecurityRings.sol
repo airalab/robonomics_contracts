@@ -1,4 +1,4 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.18;
 /**
  * @dev Simple security rings implementation.
  * The security ring is a method to authorize action by multiple way
@@ -26,7 +26,7 @@ library SecurityRings {
      * @param _index Authorization item index
      * @return Authorization status: true - when done
      */
-    function isAuthorized(Data storage _data, uint _index) constant returns (bool) {
+    function isAuthorized(Data storage _data, uint _index) public view returns (bool) {
         var authorized = _data.authorized[_index]; 
         for (uint ring = 0; ring < _data.auth.length; ++ring) {
             bool brokeRing = false;
@@ -49,7 +49,7 @@ library SecurityRings {
      * @return (Auth node address, Auth node ident (user identificator))
      */
     function authAt(Data storage _data, uint _ring, uint _gate)
-            constant returns(address, bytes32) {
+             public view returns(address, bytes32) {
         var auth = _data.auth[_ring][_gate];
         return (auth, _data.identOf[auth]);
     }
@@ -61,7 +61,7 @@ library SecurityRings {
      * @param _auth Auth node address
      * @param _ident Auth node ident (user identificator)
      */
-    function addGate(Data storage _data, uint _ring, address _auth, bytes32 _ident) {
+    function addGate(Data storage _data, uint _ring, address _auth, bytes32 _ident) public {
         _data.auth[_ring].push(_auth);
         _data.identOf[_auth] = _ident;
     }
@@ -72,13 +72,13 @@ library SecurityRings {
      * @param _auth Default auth node address
      * @param _ident Default auth node ident (user identificator)
      */
-    function addRing(Data storage _data, address _auth, bytes32 _ident)
+    function addRing(Data storage _data, address _auth, bytes32 _ident) public
     { addGate(_data, _data.auth.length++, _auth, _ident); }
 
     /**
      * @dev Create new action instance
      * @return Action index
      */
-    function newAction(Data storage _data) returns (uint)
+    function newAction(Data storage _data) public returns (uint)
     { return _data.authorized.length++; }
 }

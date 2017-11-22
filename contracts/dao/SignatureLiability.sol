@@ -1,4 +1,4 @@
-pragma solidity ^0.4.16;
+pragma solidity ^0.4.18;
 
 import './LiabilityStandard.sol';
 import 'common/Object.sol';
@@ -9,7 +9,7 @@ contract SignatureLiability is LiabilityStandard, Object {
      * @param _promisee A person to whom a promise is made.
      * @param _promisor A person who makes a promise.
      */
-    function SignatureLiability(address _promisee, address _promisor) payable {
+    function SignatureLiability(address _promisee, address _promisor) public payable {
         promisee    = _promisee;
         promisor    = _promisor;
     }
@@ -17,7 +17,7 @@ contract SignatureLiability is LiabilityStandard, Object {
     /**
      * @dev I can receive payments.
      */
-    function () payable {}
+    function () public payable {}
 
     /**
      * @dev Signature storage.
@@ -30,7 +30,7 @@ contract SignatureLiability is LiabilityStandard, Object {
      * @param _hash Signed hash.
      * @return Verification status.
      */
-    function isSigned(bytes32 _hash) constant returns (bool)
+    function isSigned(bytes32 _hash) public view returns (bool)
     { return hashSigned[_hash][promisee] && hashSigned[_hash][promisor]; }
 
     /**
@@ -47,6 +47,7 @@ contract SignatureLiability is LiabilityStandard, Object {
         bytes32 _r,
         bytes32 _s
     )
+      public
       payable
       returns
     (
@@ -83,7 +84,7 @@ contract SignatureLiability is LiabilityStandard, Object {
         uint8   _v,
         bytes32 _r,
         bytes32 _s
-    ) returns (
+    ) public returns (
         bool success
     ) {
         // Result notification

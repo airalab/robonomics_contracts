@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.18;
 import 'common/Object.sol';
 import './ERC20.sol';
 
@@ -23,7 +23,7 @@ contract TokenHash is Object, ERC20 {
      * @param _owner is a target address
      * @return amount of tokens on balance
      */
-    function balanceOf(address _owner) constant returns (uint256)
+    function balanceOf(address _owner) public view returns (uint256)
     { return balances[sha3(_owner)]; }
 
     /**
@@ -31,7 +31,7 @@ contract TokenHash is Object, ERC20 {
      * @param _owner is a target ident
      * @return amount of tokens on balance
      */
-    function balanceOf(bytes32 _owner) constant returns (uint256)
+    function balanceOf(bytes32 _owner) public view returns (uint256)
     { return balances[_owner]; }
 
     /**
@@ -40,7 +40,7 @@ contract TokenHash is Object, ERC20 {
      * @param _spender The address of the account able to transfer the tokens
      * @return Amount of remaining tokens allowed to spent
      */
-    function allowance(address _owner, address _spender) constant returns (uint256)
+    function allowance(address _owner, address _spender) public view returns (uint256)
     { return allowances[sha3(_owner)][sha3(_spender)]; }
 
     /**
@@ -49,11 +49,11 @@ contract TokenHash is Object, ERC20 {
      * @param _spender The ident of the account able to transfer the tokens
      * @return Amount of remaining tokens allowed to spent
      */
-    function allowance(bytes32 _owner, bytes32 _spender) constant returns (uint256)
+    function allowance(bytes32 _owner, bytes32 _spender) public view returns (uint256)
     { return allowances[_owner][_spender]; }
 
     /* Token constructor */
-    function TokenHash(string _name, string _symbol, uint8 _decimals, uint256 _count) {
+    function TokenHash(string _name, string _symbol, uint8 _decimals, uint256 _count) public {
         name        = _name;
         symbol      = _symbol;
         decimals    = _decimals;
@@ -68,7 +68,7 @@ contract TokenHash is Object, ERC20 {
      * @notice `_value` tokens will be sended to `_to`
      * @return `true` when transfer done
      */
-    function transfer(address _to, uint256 _value) returns (bool) {
+    function transfer(address _to, uint256 _value) public returns (bool) {
         var sender = sha3(msg.sender);
 
         if (balances[sender] >= _value) {
@@ -87,7 +87,7 @@ contract TokenHash is Object, ERC20 {
      * @notice `_value` tokens will be sended to `_to`
      * @return `true` when transfer done
      */
-    function transfer(bytes32 _to, uint256 _value) returns (bool) {
+    function transfer(bytes32 _to, uint256 _value) public returns (bool) {
         var sender = sha3(msg.sender);
 
         if (balances[sender] >= _value) {
@@ -108,7 +108,7 @@ contract TokenHash is Object, ERC20 {
      * @notice from `_from` will be sended `_value` tokens to `_to`
      * @return `true` when transfer is done
      */
-    function transferFrom(address _from, address _to, uint256 _value) returns (bool) {
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         var to    = sha3(_to);
         var from  = sha3(_from);
         var sender= sha3(msg.sender);
@@ -133,7 +133,7 @@ contract TokenHash is Object, ERC20 {
      * @notice from `_from` will be sended `_value` tokens to `_to`
      * @return `true` when transfer is done
      */
-    function transferFrom(bytes32 _from, bytes32 _to, uint256 _value) returns (bool) {
+    function transferFrom(bytes32 _from, bytes32 _to, uint256 _value) public returns (bool) {
         var sender= sha3(msg.sender);
         var avail = allowances[_from][sender]
                   > balances[_from] ? balances[_from]
@@ -153,7 +153,7 @@ contract TokenHash is Object, ERC20 {
      * @param _spender target address (future requester)
      * @param _value amount of token values for approving
      */
-    function approve(address _spender, uint256 _value) returns (bool) {
+    function approve(address _spender, uint256 _value) public returns (bool) {
         allowances[sha3(msg.sender)][sha3(_spender)] += _value;
         Approval(msg.sender, _spender, _value);
         return true;
@@ -164,7 +164,7 @@ contract TokenHash is Object, ERC20 {
      * @param _spender target ident (future requester)
      * @param _value amount of token values for approving
      */
-    function approve(bytes32 _spender, uint256 _value) returns (bool) {
+    function approve(bytes32 _spender, uint256 _value) public returns (bool) {
         allowances[sha3(msg.sender)][_spender] += _value;
         ApprovalHash(sha3(msg.sender), _spender, _value);
         return true;
@@ -174,14 +174,14 @@ contract TokenHash is Object, ERC20 {
      * @dev Reset count of tokens approved for given address
      * @param _spender target address
      */
-    function unapprove(address _spender)
+    function unapprove(address _spender) public
     { allowances[sha3(msg.sender)][sha3(_spender)] = 0; }
  
     /**
      * @dev Reset count of tokens approved for given ident
      * @param _spender target ident
      */
-    function unapprove(bytes32 _spender)
+    function unapprove(bytes32 _spender) public
     { allowances[sha3(msg.sender)][_spender] = 0; }
  
     /* Hash driven events */

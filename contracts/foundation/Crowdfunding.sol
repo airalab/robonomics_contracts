@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.18;
 import 'token/TokenEmission.sol';
 import 'token/Recipient.sol';
 
@@ -67,7 +67,7 @@ contract Crowdfunding is Object, Recipient {
      * @param _block Input block number
      * @return Bounty value
      */
-    function bountyValue(uint256 _value, uint256 _block) constant returns (uint256) {
+    function bountyValue(uint256 _value, uint256 _block) public view returns (uint256) {
         if (_block < config.startBlock || _block > config.stopBlock)
             return 0;
 
@@ -86,7 +86,7 @@ contract Crowdfunding is Object, Recipient {
         bool isRunning = totalFunded + msg.value <= config.maxValue
                       && block.number >= config.startBlock
                       && block.number <= config.stopBlock;
-        if (!isRunning) throw;
+        require (isRunning);
         _;
     }
 
@@ -96,7 +96,7 @@ contract Crowdfunding is Object, Recipient {
     modifier onlyFailure {
         bool isFailure = totalFunded  < config.minValue
                       && block.number > config.stopBlock;
-        if (!isFailure) throw;
+        require (isFailure);
         _;
     }
 
@@ -106,7 +106,7 @@ contract Crowdfunding is Object, Recipient {
     modifier onlySuccess {
         bool isSuccess = totalFunded >= config.minValue
                       && block.number > config.stopBlock;
-        if (!isSuccess) throw;
+        require (isSuccess);
         _;
     }
 
@@ -137,7 +137,7 @@ contract Crowdfunding is Object, Recipient {
         uint256 _startRatio,
         uint256 _reductionStep,
         uint256 _reductionValue
-    ) {
+    ) public {
         fund      = _fund;
         bounty    = TokenEmission(_bounty);
         reference = _reference;
@@ -155,14 +155,14 @@ contract Crowdfunding is Object, Recipient {
     /**
      * @dev Receive Ether token and send bounty
      */
-    function () payable onlyRunning {
+    function () public payable onlyRunning {
         ReceivedEther(msg.sender, msg.value);
 
         totalFunded           += msg.value;
         donations[msg.sender] += msg.value;
 
         var bountyVal = bountyValue(msg.value, block.number);
-        if (bountyVal == 0) throw;
+        require (bountyVal > 0);
 
         bounty.emission(bountyVal);
         bounty.transfer(msg.sender, bountyVal);
@@ -171,22 +171,22 @@ contract Crowdfunding is Object, Recipient {
     /**
      * @dev Withdrawal balance on successfull finish
      */
-    function withdraw() onlySuccess
-    { if (!fund.send(this.balance)) throw; }
+    function withdraw() public onlySuccess
+    { require (fund.send(this.balance)); }
 
     /**
      * @dev Refund donations when no minimal value achieved
      */
-    function refund() onlyFailure {
+    function refund() public onlyFailure {
         var donation = donations[msg.sender];
         donations[msg.sender] = 0;
-        if (!msg.sender.send(donation)) throw;
+        require (msg.sender.send(donation));
     }
 
     /**
      * @dev Disable receive another tokens
      */
     function receiveApproval(address _from, uint256 _value,
-                             ERC20 _token, bytes _extraData)
-    { throw; }
+                             ERC20 _token, bytes _extraData) public
+    { revert(); }
 }

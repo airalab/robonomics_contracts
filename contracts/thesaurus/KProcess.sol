@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.18;
 import './Knowledge.sol';
 
 /**
@@ -6,7 +6,7 @@ import './Knowledge.sol';
  */
 contract KProcess is Knowledge {
     /* KProcess constructor */
-    function KProcess() Knowledge(PROCESS) {}
+    function KProcess() public Knowledge(PROCESS) {}
 
     /**
      * Morphism describe knowledge manipulation line
@@ -17,24 +17,24 @@ contract KProcess is Knowledge {
      */
     address[] morphism;
 
-    function morphismLength() constant returns (uint)
+    function morphismLength() public view returns (uint)
     { return morphism.length; }
 
     /**
      * Append knowledge into line
      * @param _knowledge new item of `morphism` list
      */
-    function append(Knowledge _knowledge) onlyOwner
+    function append(Knowledge _knowledge) public onlyOwner
     { morphism.push(_knowledge); }
     
     /**
      * Get knowledge by position
      * @param _index knowledge position in `morphism`
      */
-    function get(uint _index) returns (Knowledge)
+    function get(uint _index) public returns (Knowledge)
     { return Knowledge(morphism[_index]); }
 
-    function isEqual(Knowledge _to) constant returns (bool) {
+    function isEqual(Knowledge _to) public view returns (bool) {
         if (knowledgeType != _to.knowledgeType())
             return false; 
         

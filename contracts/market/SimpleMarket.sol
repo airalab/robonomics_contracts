@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.18;
 import 'lib/AddressList.sol';
 import './Lot.sol';
 
@@ -20,14 +20,14 @@ contract SimpleMarket is Object {
      *      in another case only owner can place a lot, this sute is used for market regulator
      * @param _enable is new regulator mode value
      */
-    function setRegulator(bool _enable) onlyOwner
+    function setRegulator(bool _enable) public onlyOwner
     { regulatorEnabled = _enable; }
 
     /**
      * @dev Take a first lot from market
      * @return first lot
      */
-    function first() constant returns (Lot)
+    function first() public view returns (Lot)
     { return Lot(lots.first()); }
 
     /**
@@ -35,7 +35,7 @@ contract SimpleMarket is Object {
      * @param _current is a current lot
      * @return next lot
      */
-    function next(Lot _current) constant returns (Lot)
+    function next(Lot _current) public view returns (Lot)
     { return Lot(lots.next(_current)); }
 
     /**
@@ -43,7 +43,7 @@ contract SimpleMarket is Object {
      * @param _lot is a lot
      * @return `true` when lot already placed on
      */
-    function contains(Lot _lot) constant returns (bool)
+    function contains(Lot _lot) public view returns (bool)
     { return lots.contains(_lot); }
 
     /**
@@ -56,8 +56,8 @@ contract SimpleMarket is Object {
      * @return new lot address
      */
     function append(address _seller, address _sale, address _buy,
-                    uint _quantity_sale, uint _quantity_buy) returns (Lot) {
-        if (regulatorEnabled && msg.sender != owner) throw;
+                    uint _quantity_sale, uint _quantity_buy) public returns (Lot) {
+        if (regulatorEnabled && msg.sender != owner) revert();
 
         var lot = new Lot(_seller, _sale, _buy, _quantity_sale, _quantity_buy);
         lots.append(lot);
@@ -70,7 +70,7 @@ contract SimpleMarket is Object {
      * @param _lot market lot address
      * @notice only seller can remove lot from market
      */
-    function remove(Lot _lot) {
+    function remove(Lot _lot) public {
         if (_lot.seller() == msg.sender || _lot.closed()) {
             lots.remove(_lot);
             --size;

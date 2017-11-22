@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.18;
 import 'token/Token.sol';
 import './AddressList.sol';
 
@@ -31,7 +31,7 @@ library Voting {
      * @param _poll ref to `Poll` structure
      * @return current value
      */
-    function current(Poll storage _poll) constant returns (address)
+    function current(Poll storage _poll) public view returns (address)
     { return _poll.variants.first(); }
 
     /**
@@ -42,14 +42,14 @@ library Voting {
      * @param _count how much votes are given
      */
     function up(Poll storage _poll, address _voter, address _variant,
-                Token _shares, uint _count) {
+                Token _shares, uint _count) public {
         // Check for already voting for any variant
         if (_poll.pollOf[_voter] != 0 && _poll.pollOf[_voter] != _variant)
-            throw;
+            revert();
 
         // Try to transfer count of shares from voter to self
         if (!_shares.transferFrom(_voter, this, _count))
-            throw;
+            revert();
 
         // Increase shares and set the poll
         _poll.shareOf[_voter]   += _count;
@@ -73,7 +73,7 @@ library Voting {
      * @param _poll ref to `Poll` structure
      * @param _count how much shares will decreased
      */
-    function down(Poll storage _poll, address _voter, Token _shares, uint _count) {
+    function down(Poll storage _poll, address _voter, Token _shares, uint _count) public {
         // So I can refund no more that gives from voter 
         var refund = _poll.shareOf[_voter] > _count ? _count : _poll.shareOf[_voter];
         var variant = _poll.pollOf[_voter];

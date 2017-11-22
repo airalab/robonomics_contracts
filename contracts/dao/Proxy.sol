@@ -1,4 +1,4 @@
-pragma solidity ^0.4.16;
+pragma solidity ^0.4.18;
 
 import 'common/Object.sol';
 import 'lib/SecurityRings.sol';
@@ -13,19 +13,19 @@ contract Proxy is Object {
      * @param _gate Gate index
      * @return (Auth node address, Auth node ident (user identificator))
      */
-    function authAt(uint _ring, uint _gate) constant returns (address, bytes32)
+    function authAt(uint _ring, uint _gate) public view returns (address, bytes32)
     { return rings.authAt(_ring, _gate); }
 
     /**
      * @dev Get user identificator for sender node
      */
-    function getIdent() constant returns (bytes32)
+    function getIdent() public view returns (bytes32)
     { return rings.identOf[msg.sender]; }
 
     /**
      * @dev Return true when ready to run
      */
-    function isAuthorized(uint _index) constant returns (bool)
+    function isAuthorized(uint _index) public view returns (bool)
     { return rings.isAuthorized(_index); }
 
     /**
@@ -33,7 +33,7 @@ contract Proxy is Object {
      * @param _gates List of auth node addresses
      * @param _idents List of user identifiers
      */
-    function initRing(address[] _gates, bytes32[] _idents) onlyOwner {
+    function initRing(address[] _gates, bytes32[] _idents) public onlyOwner {
         var ring = rings.auth.length;
         rings.addRing(_gates[0], _idents[0]);
         for (uint i = 1; i < _gates.length; ++i)
@@ -46,7 +46,7 @@ contract Proxy is Object {
      * @param _ident Default user identifier
      * @param _safe Ring0 safety address
      */
-    function Proxy(address _auth, bytes32 _ident, address _safe) {
+    function Proxy(address _auth, bytes32 _ident, address _safe) public {
         rings.addRing(_auth, _ident);
         rings.addGate(0, _safe, bytes32("safe"));
     }
@@ -63,7 +63,7 @@ contract Proxy is Object {
      * @dev Get call info by index
      * @param _index Action call index
      */
-    function callAt(uint _index) constant returns (address, uint, bytes, uint) {
+    function callAt(uint _index) public view returns (address, uint, bytes, uint) {
         var c = queue[_index];
         return (c.target, c.value, c.transaction, c.execBlock);
     }
@@ -71,7 +71,7 @@ contract Proxy is Object {
     /**
      * @dev Get call queue length
      */
-    function queueLen() constant returns (uint)
+    function queueLen() public view returns (uint)
     { return queue.length; }
 
     /**
@@ -80,7 +80,7 @@ contract Proxy is Object {
      * @param _value Transaction value in wei
      * @param _transaction Transaction data
      */
-    function request(address _target, uint _value, bytes _transaction) {
+    function request(address _target, uint _value, bytes _transaction) public {
         var rid = rings.newAction();
         rings.authorized[rid][msg.sender] = true;
         queue.push(Call(_target, _value, _transaction, 0));
@@ -97,7 +97,7 @@ contract Proxy is Object {
      * @dev Authorization of transaction
      * @param _index Call in queue position
      */
-    function authorize(uint _index) {
+    function authorize(uint _index) public {
         require(_index < rings.authorized.length);
 
         rings.authorized[_index][msg.sender] = true;
@@ -116,7 +116,7 @@ contract Proxy is Object {
      * @param _index Call in queue position
      * @notice This can take a lot of gas
      */
-    function run(uint _index) {
+    function run(uint _index) public {
         require(rings.isAuthorized(_index) && queue[_index].execBlock == 0);
 
         // Store exec block
@@ -138,7 +138,7 @@ contract Proxy is Object {
     /**
      * @dev Payable fallback method
      */
-    function() payable
+    function() public payable
     { PaymentReceived(msg.sender, msg.value); }
 
     /**

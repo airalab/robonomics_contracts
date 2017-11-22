@@ -1,4 +1,4 @@
-pragma solidity ^0.4.16;
+pragma solidity ^0.4.18;
 
 import 'common/Object.sol';
 
@@ -38,7 +38,7 @@ contract Core is Object {
      * @param _name is a DAO name
      * @param _description is a short DAO description
      */
-    function Core(string _name, string _description) {
+    function Core(string _name, string _description) public {
         name         = _name;
         description  = _description;
         founder      = msg.sender;
@@ -50,14 +50,14 @@ contract Core is Object {
      * @param _module is a module address
      * @return `true` wnen core contains module
      */
-    function contains(address _module) constant returns (bool)
+    function contains(address _module) public view returns (bool)
     { return indexOf[sha3(getName[_module])] != 0; }
 
     /**
      * @dev Modules counter
      * @return count of modules in core
      */
-    function size() constant returns (uint)
+    function size() public view returns (uint)
     { return modules.length - 1; }
  
     /**
@@ -65,7 +65,7 @@ contract Core is Object {
      * @param _name is a module name
      * @return `true` when module have permanent name
      */
-    function isConstant(string _name) constant returns (bool)
+    function isConstant(string _name) public view returns (bool)
     { return is_constant[sha3(_name)]; }
 
     /**
@@ -73,14 +73,14 @@ contract Core is Object {
      * @param _name is module name
      * @return module address
      */
-    function get(string _name) constant returns (address)
+    function get(string _name)  public view returns (address)
     { return modules[indexOf[sha3(_name)]]; }
 
     /**
      * @dev Get first module
      * @return first address
      */
-    function first() constant returns (address)
+    function first() public view returns (address)
     { return modules[1]; }
 
     /**
@@ -88,7 +88,7 @@ contract Core is Object {
      * @param _current is an current address
      * @return next address
      */
-    function next(address _current) constant returns (address)
+    function next(address _current) public view returns (address)
     { return modules[indexOf[sha3(getName[_current])] + 1]; }
 
     /**
@@ -98,7 +98,7 @@ contract Core is Object {
      * @param _abi node interface URI
      * @param _constant have a `true` value when you create permanent name of module
      */
-    function set(string _name, address _module, string _abi, bool _constant) onlyOwner {
+    function set(string _name, address _module, string _abi, bool _constant) public onlyOwner {
         require(!is_constant[sha3(_name)]);
 
         // Notify
@@ -126,7 +126,7 @@ contract Core is Object {
      * @dev Remove module by name
      * @param _name module name
      */
-    function remove(string _name) onlyOwner {
+    function remove(string _name) public onlyOwner {
         require(!is_constant[sha3(_name)]);
 
         var index = indexOf[sha3(_name)];
@@ -142,6 +142,6 @@ contract Core is Object {
 
             // Notify
             ModuleRemoved(modules[index]);
-        } else throw;
+        } else revert();
     }
 }
