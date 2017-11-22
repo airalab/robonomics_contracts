@@ -41,6 +41,9 @@ contract RobotLiability is MinerLiabilityValidator, Object {
         cost     = _cost;
         count    = _count;
         fee      = _fee;
+
+        require(weth.transferFrom(promisee, this, cost * count));
+        require(utility.transferFrom(promisor, this, fee));
     }
 
     /**
