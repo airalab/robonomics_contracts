@@ -11,7 +11,7 @@ contract RobotLiability is MinerLiabilityValidator, Object {
     ERC20 public constant weth = ERC20(0xC00Fd9820Cd2898cC4C054B7bF142De637ad129A); 
 
     /**
-     * @dev Liability cost in weth units.
+     * @dev Objective execution cost in weth units.
      */
     uint256 public cost;
 
@@ -65,9 +65,9 @@ contract RobotLiability is MinerLiabilityValidator, Object {
      **/
 
     function confirmed() internal
-    { require(weth.transfer(promisor, cost)); }
+    { require(weth.transfer(promisor, cost * count)); }
 
     function rejected() internal
-    { require(weth.transfer(promisee, cost)); }
+    { require(weth.transfer(promisee, cost * count)); }
 
 }
