@@ -1,13 +1,15 @@
 pragma solidity ^0.4.18;
-import './Token.sol';
+
+import 'token/Token.sol';
 
 /**
  * @title Ethereum crypto currency extention for Token contract
  */
 contract TokenEther is Token {
-    function TokenEther(string _name, string _symbol) public
-             Token(_name, _symbol, 18, 0)
-    {}
+    function TokenEther(
+        string _name,
+        string _symbol
+    ) public Token(_name, _symbol, 18, 0) {}
 
     /**
      * @dev This is the way to withdraw money from token
@@ -17,7 +19,7 @@ contract TokenEther is Token {
         if (balances[msg.sender] >= _value) {
             balances[msg.sender] -= _value;
             totalSupply          -= _value;
-            require(msg.sender.send(_value));
+            msg.sender.transfer(_value);
         }
     }
 

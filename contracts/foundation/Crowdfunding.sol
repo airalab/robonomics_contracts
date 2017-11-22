@@ -1,11 +1,11 @@
 pragma solidity ^0.4.18;
+
 import 'token/TokenEmission.sol';
-import 'token/Recipient.sol';
 
 /**
  * @title Crowdfunding contract
  */
-contract Crowdfunding is Object, Recipient {
+contract Crowdfunding is Object {
     /**
      * @dev Target fund account address
      */
@@ -156,8 +156,6 @@ contract Crowdfunding is Object, Recipient {
      * @dev Receive Ether token and send bounty
      */
     function () public payable onlyRunning {
-        ReceivedEther(msg.sender, msg.value);
-
         totalFunded           += msg.value;
         donations[msg.sender] += msg.value;
 
@@ -165,7 +163,7 @@ contract Crowdfunding is Object, Recipient {
         require (bountyVal > 0);
 
         bounty.emission(bountyVal);
-        bounty.transfer(msg.sender, bountyVal);
+        require(bounty.transfer(msg.sender, bountyVal));
     }
 
     /**
@@ -182,11 +180,4 @@ contract Crowdfunding is Object, Recipient {
         donations[msg.sender] = 0;
         require (msg.sender.send(donation));
     }
-
-    /**
-     * @dev Disable receive another tokens
-     */
-    function receiveApproval(address _from, uint256 _value,
-                             ERC20 _token, bytes _extraData) public
-    { revert(); }
 }

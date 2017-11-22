@@ -1,6 +1,8 @@
 pragma solidity ^0.4.18;
+
 import 'token/TokenEmission.sol';
 import 'common/Object.sol';
+
 /**
   @dev Ambix contract is used for morph Token set to another
   Token's by rule (recipe). In distillation process given

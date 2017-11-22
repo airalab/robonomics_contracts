@@ -1,11 +1,14 @@
 pragma solidity ^0.4.18;
-import './Token.sol';
+
+import 'token/Token.sol';
 
 contract TokenEmission is Token {
-    function TokenEmission(string _name, string _symbol, uint8 _decimals,
-                           uint _start_count) public
-             Token(_name, _symbol, _decimals, _start_count)
-    {}
+    function TokenEmission(
+        string _name,
+        string _symbol,
+        uint8 _decimals,
+        uint _start_count
+    ) public Token(_name, _symbol, _decimals, _start_count) {}
 
     /**
      * @dev Token emission
@@ -14,7 +17,7 @@ contract TokenEmission is Token {
      */
     function emission(uint _value) public onlyOwner {
         // Overflow check
-        if (_value + totalSupply < totalSupply) revert();
+        require(_value + totalSupply > totalSupply);
 
         totalSupply     += _value;
         balances[owner] += _value;
@@ -28,7 +31,7 @@ contract TokenEmission is Token {
     function burn(uint _value) public {
         if (balances[msg.sender] >= _value) {
             balances[msg.sender] -= _value;
-            totalSupply      -= _value;
+            totalSupply          -= _value;
         }
     }
 }

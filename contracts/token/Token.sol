@@ -1,24 +1,41 @@
 pragma solidity ^0.4.18;
+
 import 'common/Object.sol';
-import './ERC20.sol';
+import 'token/ERC20.sol';
 
 /**
- * @title Token contract represents any asset in digital economy
+ * @title Token contract represents any asset in digital economy.
  */
 contract Token is Object, ERC20 {
-    /* Short description of token */
+
+    /**
+     * @dev Short description of token.
+     */
     string public name;
+
+    /**
+     * @dev Token acronym (3-4 chars).
+     */
     string public symbol;
 
-    /* Fixed point position */
+    /**
+     * @dev Fixed point position
+     */
     uint8 public decimals;
 
     /* Token approvement system */
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowances;
 
-    /* Token constructor */
-    function Token(string _name, string _symbol, uint8 _decimals, uint256 _count) public {
+    /**
+     * @dev Token constructor
+     */
+    function Token(
+        string _name,
+        string _symbol,
+        uint8 _decimals,
+        uint256 _count
+    ) public {
         name        = _name;
         symbol      = _symbol;
         decimals    = _decimals;

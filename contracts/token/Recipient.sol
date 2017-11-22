@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
 
-import './ERC20.sol';
+import 'token/ERC20.sol';
 
 /**
  * @title Asset recipient interface

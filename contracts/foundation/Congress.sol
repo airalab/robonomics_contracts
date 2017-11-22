@@ -1,4 +1,5 @@
 pragma solidity ^0.4.18;
+
 import 'common/Object.sol';
 import 'token/Recipient.sol';
 
@@ -220,16 +221,16 @@ contract Congress is Object, Recipient {
         onlyMembers
         returns (uint256 id)
     {
-        id               = proposals.length++;
-        Proposal p       = proposals[id];
-        p.recipient      = beneficiary;
-        p.amount         = amount;
-        p.description    = jobDescription;
-        p.proposalHash   = sha3(beneficiary, amount, transactionBytecode);
-        p.votingDeadline = now + debatingPeriodInMinutes * 1 minutes;
-        p.executed       = false;
-        p.proposalPassed = false;
-        p.numberOfVotes  = 0;
+        id                 = proposals.length++;
+        Proposal storage p = proposals[id];
+        p.recipient        = beneficiary;
+        p.amount           = amount;
+        p.description      = jobDescription;
+        p.proposalHash     = keccak256(beneficiary, amount, transactionBytecode);
+        p.votingDeadline   = now + debatingPeriodInMinutes * 1 minutes;
+        p.executed         = false;
+        p.proposalPassed   = false;
+        p.numberOfVotes    = 0;
         ProposalAdded(id, beneficiary, amount, jobDescription);
     }
 
@@ -251,7 +252,7 @@ contract Congress is Object, Recipient {
         returns (bool codeChecksOut)
     {
         return proposals[id].proposalHash
-            == sha3(beneficiary, amount, transactionBytecode);
+            == keccak256(beneficiary, amount, transactionBytecode);
     }
 
     /**
@@ -267,9 +268,8 @@ contract Congress is Object, Recipient {
     )
         public
         onlyMembers
-        returns (uint256 vote)
     {
-        Proposal p = proposals[id];             // Get the proposal
+        Proposal storage p = proposals[id];     // Get the proposal
         require (p.voted[msg.sender] != true);  // If has already voted, cancel
         p.voted[msg.sender] = true;             // Set this voter as having voted
         p.numberOfVotes++;                      // Increase the number of votes
@@ -294,7 +294,7 @@ contract Congress is Object, Recipient {
         public
         onlyMembers
     {
-        Proposal p = proposals[id];
+        Proposal storage p = proposals[id];
         /* Check if the proposal can be executed:
            - Has the voting deadline arrived?
            - Has it been already executed or is it being executed?
@@ -304,7 +304,7 @@ contract Congress is Object, Recipient {
 
         if (now < p.votingDeadline
             || p.executed
-            || p.proposalHash != sha3(p.recipient, p.amount, transactionBytecode)
+            || p.proposalHash != keccak256(p.recipient, p.amount, transactionBytecode)
             || p.numberOfVotes < minimumQuorum)
             revert();
 
