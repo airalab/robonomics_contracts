@@ -1,30 +1,32 @@
-pragma solidity ^0.4.4;
-import './Token.sol';
+pragma solidity ^0.4.18;
+
+import 'token/Token.sol';
 
 /**
  * @title Ethereum crypto currency extention for Token contract
  */
 contract TokenEther is Token {
-    function TokenEther(string _name, string _symbol)
-             Token(_name, _symbol, 18, 0)
-    {}
+    function TokenEther(
+        string _name,
+        string _symbol
+    ) public Token(_name, _symbol, 18, 0) {}
 
     /**
      * @dev This is the way to withdraw money from token
      * @param _value how many tokens withdraw from balance
      */
-    function withdraw(uint _value) {
+    function withdraw(uint _value) public {
         if (balances[msg.sender] >= _value) {
             balances[msg.sender] -= _value;
             totalSupply          -= _value;
-            if(!msg.sender.send(_value)) throw;
+            msg.sender.transfer(_value);
         }
     }
 
     /**
      * @dev This is the way to refill your token balance by ethers
      */
-    function refill() payable returns (bool) {
+    function refill() public payable returns (bool) {
         balances[msg.sender] += msg.value;
         totalSupply          += msg.value;
         return true;
@@ -34,7 +36,7 @@ contract TokenEther is Token {
      * @dev This method is called when money sended to contract address,
      *      a synonym for refill()
      */
-    function () payable {
+    function () public payable {
         balances[msg.sender] += msg.value;
         totalSupply          += msg.value;
     }

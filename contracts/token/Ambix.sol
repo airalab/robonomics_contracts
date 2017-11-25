@@ -1,6 +1,8 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.18;
+
 import 'token/TokenEmission.sol';
 import 'common/Object.sol';
+
 /**
   @dev Ambix contract is used for morph Token set to another
   Token's by rule (recipe). In distillation process given
@@ -33,8 +35,8 @@ contract Ambix is Object {
      * @param _source is a list of source alternatives
      * @param _coef is a list of source alternatives coeficients
      */
-    function setSource(uint _index, TokenEmission[] _source, uint[] _coef) onlyOwner {
-        if (_source.length != _coef.length) throw;
+    function setSource(uint _index, TokenEmission[] _source, uint[] _coef) public onlyOwner {
+        require (_source.length == _coef.length);
 
         // Lenght fix
         if (rSource.length < _index + 1) {
@@ -56,8 +58,8 @@ contract Ambix is Object {
      * @param _sink is a list of sink tokens
      * @param _coef is a list of sink coeficients
      */
-    function setSink(TokenEmission[] _sink, uint[] _coef) onlyOwner {
-        if (_sink.length != _coef.length) throw;
+    function setSink(TokenEmission[] _sink, uint[] _coef) public onlyOwner {
+        require (_sink.length == _coef.length);
 
         delete rSink;
         delete rSource;
@@ -71,7 +73,7 @@ contract Ambix is Object {
      * @dev Run distillation process
      * @notice Input tokens(any one of alternative) should be approved to this
      */
-    function run() {
+    function run() public {
         TokenEmission token;
         uint value;
         uint i;
@@ -92,7 +94,7 @@ contract Ambix is Object {
                 }
             }
 
-            if (!tokenBurned) throw;
+            require (tokenBurned);
         }
 
         // Generate sink tokens
@@ -100,7 +102,7 @@ contract Ambix is Object {
             token = rSink[i];
             value = rSinkCoef[i];
             token.emission(value);
-            if (!token.transfer(msg.sender, value)) throw;
+            require (token.transfer(msg.sender, value));
         }
     }
 }
