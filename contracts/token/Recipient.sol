@@ -1,6 +1,6 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.18;
 
-import './ERC20.sol';
+import 'token/ERC20.sol';
 
 /**
  * @title Asset recipient interface
@@ -34,14 +34,14 @@ contract Recipient {
      * @param _extraData Custom additional data
      */
     function receiveApproval(address _from, uint256 _value,
-                             ERC20 _token, bytes _extraData) {
-        if (!_token.transferFrom(_from, this, _value)) throw;
+                             ERC20 _token, bytes _extraData) public {
+        require (_token.transferFrom(_from, this, _value));
         ReceivedTokens(_from, _value, _token, _extraData);
     }
 
     /**
      * @dev Catch sended to contract ethers
      */
-    function () payable
+    function () public payable
     { ReceivedEther(msg.sender, msg.value); }
 }
