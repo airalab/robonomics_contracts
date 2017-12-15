@@ -7,7 +7,7 @@ contract InvestorSupply is Object {
     /**
      * @dev Utility token.
      */
-    ERC20 public constant utility = ERC20(0);
+    ERC20 public constant utility = ERC20(0x5DF531240f97049ee8d28A8E51030A3b5a8e8CE4);
 
     mapping(bytes32 => uint256) supplyOf;
     mapping(bytes32 => mapping(address => uint256)) accountSupplyOf;
@@ -18,6 +18,14 @@ contract InvestorSupply is Object {
      */
     function supply(string _market) public view returns (uint256)
     { return supplyOf[keccak256(_market)]; }
+
+    /**
+     * @dev Account token supply.
+     * @dev _market Market identifier
+     * @dev _account Account address
+     */
+    function accountSupply(string _market, address _account) public view returns (uint256)
+    { return accountSupplyOf[keccak256(_market)][_account]; }
 
     /**
      * @dev Refill market supply.
