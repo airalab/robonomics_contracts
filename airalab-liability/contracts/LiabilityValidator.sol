@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18;
 
-import 'liability/LiabilityStandard.sol';
-import 'token/ERC20.sol';
+import './LiabilityStandard.sol';
+import 'airalab-token/contracts/ERC20.sol';
 
 contract LiabilityValidator is LiabilityStandard {
     /**

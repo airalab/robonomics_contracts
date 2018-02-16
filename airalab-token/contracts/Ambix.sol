@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18;
 
-import 'token/TokenEmission.sol';
-import 'common/Object.sol';
+import './TokenEmission.sol';
+import {Object} from 'airalab-common/contracts/Object.sol';
 
 /**
   @dev Ambix contract is used for morph Token set to another

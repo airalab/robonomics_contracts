@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18;
 
-import 'token/ERC20.sol';
-import 'common/Object.sol';
+import 'airalab-token/contracts/ERC20.sol';
+import 'airalab-common/contracts/Object.sol';
 
 contract Presale is Object {
     ERC20   public token;

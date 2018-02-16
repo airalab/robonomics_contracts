@@ -1,8 +1,8 @@
 pragma solidity ^0.4.18;
 
-import 'liability/MinerLiabilityValidator.sol';
-import 'common/Object.sol';
-import 'token/ERC20.sol';
+import './MinerLiabilityValidator.sol';
+import 'airalab-common/contracts/Object.sol';
+import 'airalab-token/contracts/ERC20.sol';
 
 contract RobotLiability is MinerLiabilityValidator, Object {
     /**

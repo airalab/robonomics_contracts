@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18;
 
-import 'common/Object.sol';
-import 'token/Recipient.sol';
+import 'airalab-common/contracts/Object.sol';
+import 'airalab-token/contracts/Recipient.sol';
 
 contract TokenHolder is Object, Recipient {
     /**

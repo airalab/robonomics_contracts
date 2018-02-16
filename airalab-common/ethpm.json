@@ -1,0 +1,14 @@
+{
+  "package_name": "airalab-common",
+  "version": "0.7.0",
+  "description": "Airalab common smart-contracts",
+  "authors": [
+    "Alexander Krupenkin <mail@akru.me>"
+  ],
+  "keywords": [
+    "airalab", 
+    "core",
+    "robonomics"
+  ],
+  "license": "BSD-3"
+}

@@ -1,0 +1,19 @@
+{
+  "package_name": "airalab-token",
+  "version": "0.7.0",
+  "description": "Airalab token smart-contracts",
+  "authors": [
+    "Alexander Krupenkin <mail@akru.me>"
+  ],
+  "keywords": [
+    "airalab", 
+    "core",
+    "token",
+    "robonomics"
+  ],
+  "build_dependencies": {
+    "airalab-common": "ipfs://Qmc8dothLPPNfqiRp9nBjM7vgEqzC5T9D8LN52T6ePAgDd",
+    "airalab-token": "ipfs://QmU5c7HaGjNKWzeBWHN29VGSvpXqj75TsG5Ta2prctRXMQ"
+  },
+  "license": "BSD-3"
+}

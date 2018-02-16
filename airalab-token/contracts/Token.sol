@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18;
 
-import 'common/Object.sol';
-import 'token/ERC20.sol';
+import {Object} from 'airalab-common/contracts/Object.sol';
+import './ERC20.sol';
 
 /**
  * @title Token contract represents any asset in digital economy.
