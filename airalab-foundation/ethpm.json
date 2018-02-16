@@ -1,6 +1,6 @@
 {
-  "package_name": "aira-test-pkg",
-  "version": "0.7.3",
+  "package_name": "airalab-foundation",
+  "version": "0.7.0",
   "description": "Airalab foundation smart-contracts",
   "authors": [
     "Alexander Krupenkin <mail@akru.me>"
