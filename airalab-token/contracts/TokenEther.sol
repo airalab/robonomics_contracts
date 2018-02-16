@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
 
-import 'token/Token.sol';
+import './Token.sol';
 
 /**
  * @title Ethereum crypto currency extention for Token contract

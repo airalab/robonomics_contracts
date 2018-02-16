@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18;
 
-import 'common/Owned.sol';
-import 'common/Destroyable.sol';
+import './Owned.sol';
+import './Destroyable.sol';
 
 /**
  * @title Generic owned destroyable contract

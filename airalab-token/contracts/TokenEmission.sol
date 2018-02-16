@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
 
-import 'token/Token.sol';
+import './Token.sol';
 
 contract TokenEmission is Token {
     function TokenEmission(

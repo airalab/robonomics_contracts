@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
 
-import 'liability/LiabilityValidator.sol';
+import './LiabilityValidator.sol';
 
 contract MinerLiabilityValidator is LiabilityValidator {
     function isValidator(address _sender) internal view returns (bool)
