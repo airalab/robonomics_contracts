@@ -26,4 +26,7 @@ To publish a package to EthPM register run:
 truffle publish
 ```
 
-Configuration of RPC is located in truffle.js file
+Configuration of RPC is located in truffle.js file. Here's links to our packages in EthPM:   
+- [airalab-common](https://www.ethpm.com/registry/packages/39)
+- [airalab-token](https://www.ethpm.com/registry/packages/40)
+- [airalab-liability](https://www.ethpm.com/registry/packages/41)
