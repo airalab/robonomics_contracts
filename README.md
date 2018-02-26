@@ -7,9 +7,10 @@
 
 - [API Reference](https://airalab.github.io/core/docs)
 - [ABIs](https://github.com/airalab/core/tree/master/abi)
+- [EthPM](https://www.ethpm.com/registry)
 
 ## How to build
-Tested on Truffle@3.4.11
+Tested on Truffle@3.4.11     
 To build a single package run in it's directory:
 ```
 truffle compile
