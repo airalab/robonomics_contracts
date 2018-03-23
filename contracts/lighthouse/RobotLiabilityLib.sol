@@ -1,6 +1,5 @@
-pragma solidity ^0.4.20;
+pragma solidity ^0.4.18;
 
-import './ERC20.sol';
 import './RobotLiabilityABI.sol';
 import './RobotLiabilityAPI.sol';
 import './RobotLiabilityEvents.sol';
@@ -38,7 +37,7 @@ contract RobotLiabilityLib is RobotLiabilityABI
             require(token.transfer(promisor, token.balanceOf(this)));
             finalized = true;
         } else {
-            ValidationReady();
+            emit ValidationReady();
         }
     }
 

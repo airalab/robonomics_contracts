@@ -1,11 +1,11 @@
-pragma solidity ^0.4.20;
+pragma solidity ^0.4.18;
 
 import './LighthouseAPI.sol';
 
 contract Lighthouse is LighthouseAPI {
     function Lighthouse(uint256 _minimalFreeze) public {
         minimalFreeze = _minimalFreeze;
-        factory = Factory(msg.sender);
+        factory = msg.sender;
     }
 
     function() public {

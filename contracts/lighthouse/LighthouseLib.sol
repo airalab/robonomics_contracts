@@ -1,14 +1,16 @@
-pragma solidity ^0.4.20;
+pragma solidity ^0.4.18;
 
 import './LighthouseAPI.sol';
 import './LighthouseABI.sol';
+import './Factory.sol';
 
 contract LighthouseLib is LighthouseAPI, LighthouseABI {
     function quotaOf(address _member) public view returns (uint256)
     { return balances[_member] / minimalFreeze; }
 
     function refill(uint256 _value) public {
-        require(factory.xrt().transferFrom(msg.sender, this, _value));
+        ERC20 xrt = Factory(factory).xrt();
+        require(xrt.transferFrom(msg.sender, this, _value));
         require(_value >= minimalFreeze);
 
         if (balances[msg.sender] == 0) {
@@ -19,14 +21,16 @@ contract LighthouseLib is LighthouseAPI, LighthouseABI {
     }
 
     function withdraw(uint256 _value) public {
+        ERC20 xrt = Factory(factory).xrt();
+
         require(balances[msg.sender] >= _value);
 
-        require(factory.xrt().transfer(msg.sender, _value));
+        require(xrt.transfer(msg.sender, _value));
         balances[msg.sender] -= _value;
 
         // Drop member if quota go to zero
         if (quotaOf(msg.sender) == 0) {
-            require(factory.xrt().transfer(msg.sender, balances[msg.sender])); 
+            require(xrt.transfer(msg.sender, balances[msg.sender])); 
             balances[msg.sender] = 0;
             
             uint256 senderIndex = indexOf[msg.sender];

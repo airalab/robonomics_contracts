@@ -1,6 +1,4 @@
-pragma solidity ^0.4.20;
-
-import './Factory.sol';
+pragma solidity ^0.4.18;
 
 contract LighthouseAPI {
     address[] public members;
@@ -9,7 +7,7 @@ contract LighthouseAPI {
     mapping(address => uint256) public balances;
 
     uint256 public minimalFreeze;
-    Factory public factory;
+    address public factory;
 
     uint256 public marker = 0;
     uint256 public quota = 0;

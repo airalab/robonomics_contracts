@@ -1,4 +1,4 @@
-pragma solidity ^0.4.20;
+pragma solidity ^0.4.18;
 
 contract LighthouseABI {
     function quotaOf(address _member) public view returns (uint256);

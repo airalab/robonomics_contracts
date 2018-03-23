@@ -71,7 +71,7 @@ contract Token is Object, ERC20 {
         if (balances[msg.sender] >= _value) {
             balances[msg.sender] -= _value;
             balances[_to]        += _value;
-            Transfer(msg.sender, _to, _value);
+            emit Transfer(msg.sender, _to, _value);
             return true;
         }
         return false;
@@ -86,14 +86,14 @@ contract Token is Object, ERC20 {
      * @return `true` when transfer is done
      */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
-        var avail = allowances[_from][msg.sender]
-                  > balances[_from] ? balances[_from]
-                                    : allowances[_from][msg.sender];
+        uint256 avail = allowances[_from][msg.sender]
+                      > balances[_from] ? balances[_from]
+                                        : allowances[_from][msg.sender];
         if (avail >= _value) {
             allowances[_from][msg.sender] -= _value;
             balances[_from] -= _value;
             balances[_to]   += _value;
-            Transfer(_from, _to, _value);
+            emit Transfer(_from, _to, _value);
             return true;
         }
         return false;
@@ -106,7 +106,7 @@ contract Token is Object, ERC20 {
      */
     function approve(address _spender, uint256 _value) public returns (bool) {
         allowances[msg.sender][_spender] += _value;
-        Approval(msg.sender, _spender, _value);
+        emit Approval(msg.sender, _spender, _value);
         return true;
     }
 

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.20;
+pragma solidity ^0.4.18;
 
 import 'token/TokenEmission.sol';
 import './RobotLiability.sol';
@@ -93,7 +93,7 @@ contract Factory {
                                                       _expenses[2]);
         buildedLiability.push(liability);
         isBuiled[liability] = true;
-        BuildedLiability(liability);
+        emit BuildedLiability(liability);
 
         // Tnasfer robot fee for lighthouse
         require(xrt.transferFrom(promisor, msg.sender, _expenses[1]));
@@ -121,6 +121,6 @@ contract Factory {
 
         buildedLighthouse.push(lighthouse);
         isBuiled[lighthouse] = true;
-        BuildedLighthouse(lighthouse);
+        emit BuildedLighthouse(lighthouse);
     }
 }

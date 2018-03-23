@@ -36,12 +36,12 @@ contract Recipient {
     function receiveApproval(address _from, uint256 _value,
                              ERC20 _token, bytes _extraData) public {
         require (_token.transferFrom(_from, this, _value));
-        ReceivedTokens(_from, _value, _token, _extraData);
+        emit ReceivedTokens(_from, _value, _token, _extraData);
     }
 
     /**
      * @dev Catch sended to contract ethers
      */
     function () public payable
-    { ReceivedEther(msg.sender, msg.value); }
+    { emit ReceivedEther(msg.sender, msg.value); }
 }
