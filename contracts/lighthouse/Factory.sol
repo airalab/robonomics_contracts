@@ -5,9 +5,22 @@ import './RobotLiability.sol';
 import './Lighthouse.sol';
 
 contract Factory {
+    function Factory(TokenEmission _xrt) public {
+        xrt = _xrt;
+    }
+
     /* Constants */
-    TokenEmission public constant xrt = TokenEmission(0x5DF531240f97049ee8d28A8E51030A3b5a8e8CE4);
     bytes constant MSGPREFIX = "\x19Ethereum Signed Message:\n32";
+
+    /**
+     * @dev Robonomics network utility token
+     */
+    TokenEmission public xrt;
+
+    /**
+     * @dev Total GAS utilized by Robonomics network
+     */
+    uint256 public totalGasUtilizing = 0;
 
     /**
      * @dev Used market order hashes tracking.
@@ -56,8 +69,12 @@ contract Factory {
         uint256[3] _expenses,
         bytes32[8] _sign,
         uint256[2] _deadline
-    ) public {
+    ) public returns (RobotLiability liability) {
+        uint256 gasinit = gasleft();
+        require(gasinit >= 700000);
+
         require(isBuiled[msg.sender]);
+
         require(block.number < _deadline[0]);
         require(block.number < _deadline[1]);
 
@@ -84,40 +101,64 @@ contract Factory {
         address promisor = ecrecover(keccak256(MSGPREFIX, bidHash), uint8(_sign[5]), _sign[6], _sign[7]);
 
         // Instantiate liability contract
-        RobotLiability liability = new RobotLiability(_model,
-                                                      _objective,
-                                                      _token,
-                                                      promisee,
-                                                      promisor,
-                                                      _validator,
-                                                      _expenses[2]);
+        liability = new RobotLiability(_model,
+                                       _objective,
+                                       _token,
+                                       _expenses,
+                                       [promisee, promisor, msg.sender, _validator]);
         buildedLiability.push(liability);
         isBuiled[liability] = true;
         emit BuildedLiability(liability);
 
         // Tnasfer robot fee for lighthouse
         require(xrt.transferFrom(promisor, msg.sender, _expenses[1]));
+
         // Transfer token security
         require(_token.transferFrom(promisee, liability, _expenses[0]));
+
         // Transfer promisee fee for validator
         if (_validator != 0 && _expenses[2] > 0)
             require(xrt.transferFrom(promisee, liability, _expenses[2]));
+
         // Transfer XRT emission for finalization
-        require(xrt.transfer(liability, xrt_emission()));
+        require(xrt.transfer(liability, xrt_emission(gasinit - gasleft())));
     }
 
-    function xrt_emission() internal returns (uint256) {
-        // TODO: Emission formula
-        xrt.emission(100);
-        return 100;
+    function xrt_emission(uint256 gas) internal returns (uint256) {
+        // Gas used = limit - left + uncounted expenses: emission, transfer, finalization
+        totalGasUtilizing += gas;
+
+        uint256 wnEmission = gas;
+        /* Additional emission table */
+        if (totalGasUtilizing < 856368000) {
+            wnEmission *= 37;
+        } else if (totalGasUtilizing < 856368000 * 2) {
+            wnEmission *= 25;
+        } else if (totalGasUtilizing < 856368000 * 3) {
+            wnEmission *= 17;
+        } else if (totalGasUtilizing < 856368000 * 4) {
+            wnEmission *= 11;
+        } else if (totalGasUtilizing < 856368000 * 5) {
+            wnEmission *= 7;
+        } else if (totalGasUtilizing < 856368000 * 6) {
+            wnEmission *= 5;
+        } else if (totalGasUtilizing < 856368000 * 7) {
+            wnEmission *= 3;
+        } else if (totalGasUtilizing < 856368000 * 8) {
+            wnEmission *= 2;
+        }
+        xrt.emission(wnEmission);
+        return wnEmission;
     }
 
     /**
      * @dev Create lighthouse
      * @param _minimalFreeze Minimal freeze value of XRT token
      */
-    function createLighthouse(uint256 _minimalFreeze) public {
-        Lighthouse lighthouse = new Lighthouse(_minimalFreeze);
+    function createLighthouse(
+        uint256 _minimalFreeze
+    ) public returns (Lighthouse lighthouse) {
+        lighthouse = new Lighthouse(_minimalFreeze);
 
         buildedLighthouse.push(lighthouse);
         isBuiled[lighthouse] = true;

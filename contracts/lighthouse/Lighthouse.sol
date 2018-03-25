@@ -12,5 +12,5 @@ contract Lighthouse is LighthouseAPI {
         require(lib.delegatecall(msg.data));
     }
 
-    address constant lib = 0;
+    address constant lib = 0x06C0AC0fB1EC037F98F94287c40EdBD05c1583E9;
 }
