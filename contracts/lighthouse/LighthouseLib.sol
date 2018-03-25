@@ -5,11 +5,13 @@ import './LighthouseABI.sol';
 import './Factory.sol';
 
 contract LighthouseLib is LighthouseAPI, LighthouseABI {
+
     function quotaOf(address _member) public view returns (uint256)
     { return balances[_member] / minimalFreeze; }
 
     function refill(uint256 _value) public {
         ERC20 xrt = Factory(factory).xrt();
+
         require(xrt.transferFrom(msg.sender, this, _value));
         require(_value >= minimalFreeze);
 
@@ -41,16 +43,23 @@ contract LighthouseLib is LighthouseAPI, LighthouseABI {
         }
     }
 
-    function () public {
+    modifier quotedCall {
         require(members.length > 0);
 
         if (quota == 0) {
             marker = (marker + 1) % members.length;
             quota = balances[members[marker]] / minimalFreeze;
         }
-        require(msg.sender == members[marker]);
 
+        require(msg.sender == members[marker]);
         quota -= 1;
-        require(factory.call(msg.data));
+
+        _;
     }
+
+    function to(address _to, bytes _data) public quotedCall
+    { require(_to.call(_data)); }
+
+    function () public quotedCall
+    { require(factory.call(msg.data)); }
 }

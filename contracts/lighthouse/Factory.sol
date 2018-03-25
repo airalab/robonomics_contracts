@@ -30,7 +30,7 @@ contract Factory {
     RobotLiability[] public buildedLiability;
     Lighthouse[]     public buildedLighthouse;
 
-    mapping(address => bool) public isBuiled;
+    mapping(address => bool) public isBuilded;
 
     /* Events */
     event BuildedLiability(address indexed robotLiability);
@@ -73,7 +73,7 @@ contract Factory {
         uint256 gasinit = gasleft();
         require(gasinit >= 700000);
 
-        require(isBuiled[msg.sender]);
+        require(isBuilded[msg.sender]);
 
         require(block.number < _deadline[0]);
         require(block.number < _deadline[1]);
@@ -105,9 +105,9 @@ contract Factory {
                                        _objective,
                                        _token,
                                        _expenses,
-                                       [promisee, promisor, msg.sender, _validator]);
+                                       [promisee, promisor, _validator]);
         buildedLiability.push(liability);
-        isBuiled[liability] = true;
+        isBuilded[liability] = true;
         emit BuildedLiability(liability);
 
         // Tnasfer robot fee for lighthouse
@@ -161,7 +161,7 @@ contract Factory {
         lighthouse = new Lighthouse(_minimalFreeze);
 
         buildedLighthouse.push(lighthouse);
-        isBuiled[lighthouse] = true;
+        isBuilded[lighthouse] = true;
         emit BuildedLighthouse(lighthouse);
     }
 }
