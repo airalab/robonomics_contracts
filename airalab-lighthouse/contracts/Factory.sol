@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
 
-import 'token/TokenEmission.sol';
+import {TokenEmission} from 'airalab-token/contracts/TokenEmission.sol';
 import './RobotLiability.sol';
 import './Lighthouse.sol';
 
