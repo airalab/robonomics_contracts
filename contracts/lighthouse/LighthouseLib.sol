@@ -43,23 +43,41 @@ contract LighthouseLib is LighthouseAPI, LighthouseABI {
         }
     }
 
-    modifier quotedCall {
-        require(members.length > 0);
+    function nextMember() internal {
+        marker = (marker + 1) % members.length;
+        quota = balances[members[marker]] / minimalFreeze;
+        keepaliveBlock = block.number;
+    }
 
-        if (quota == 0) {
-            marker = (marker + 1) % members.length;
-            quota = balances[members[marker]] / minimalFreeze;
-        }
-
-        require(msg.sender == members[marker]);
+    modifier quoted {
+        if (quota == 0) nextMember();
         quota -= 1;
 
         _;
     }
 
-    function to(address _to, bytes _data) public quotedCall
+    modifier keepalive {
+        if (timeoutBlocks < block.number - keepaliveBlock) {
+            nextMember();
+
+            // The main reason why here used 'while' is deadlock if two members is unavailable
+            while (msg.sender != members[marker])
+                nextMember();
+        }
+
+        _;
+    }
+
+    modifier member {
+        require(members.length > 0);
+        require(msg.sender == members[marker]);
+
+        _;
+    }
+
+    function to(address _to, bytes _data) public quoted keepalive member
     { require(_to.call(_data)); }
 
-    function () public quotedCall
+    function () public quoted keepalive member 
     { require(factory.call(msg.data)); }
 }
