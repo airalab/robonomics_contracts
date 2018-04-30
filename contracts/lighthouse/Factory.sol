@@ -26,16 +26,14 @@ contract Factory {
      */
     mapping(bytes32 => bool) public usedHash;
 
-    RobotLiability[] public liabilities;
-    Lighthouse[]     public lighthouses;
-
-    mapping(address => bytes) public modelOf;
-    mapping(bytes => address) public lighthouseOf;
-
-    /* Events */
-    event NewLiability(address indexed liability);
-    event NewLighthouse(address indexed lighthouse);
-
+    RobotLiability[] public buildedLiability;
+    Lighthouse[]     public buildedLighthouse;
+ 
+    mapping(address => bool) public isBuilded;
+ 
+     /* Events */
+    event BuildedLiability(address indexed robotLiability);
+    event BuildedLighthouse(address indexed lighthouse);
 
     /**
      * @dev Create robot liability contract
