@@ -48,7 +48,7 @@ contract LighthouseLib is LighthouseAPI, LighthouseABI {
 
         if (quota == 0) {
             marker = (marker + 1) % members.length;
-            quota = balances[members[marker]] / minimalFreeze;
+            quota = quotaOf(members[marker]);
         }
 
         require(msg.sender == members[marker]);
