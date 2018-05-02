@@ -45,7 +45,7 @@ contract LighthouseLib is LighthouseAPI, LighthouseABI {
 
     function nextMember() internal {
         marker = (marker + 1) % members.length;
-        quota = balances[members[marker]] / minimalFreeze;
+        quota = quotaOf(members[marker]);
         keepaliveBlock = block.number;
     }
 
