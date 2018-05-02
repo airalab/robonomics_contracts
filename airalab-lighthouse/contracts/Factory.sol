@@ -5,17 +5,16 @@ import './RobotLiability.sol';
 import './Lighthouse.sol';
 
 contract Factory {
-    function Factory(TokenEmission _xrt) public {
-        xrt = _xrt;
-    }
-
-    /* Constants */
-    bytes constant MSGPREFIX = "\x19Ethereum Signed Message:\n32";
+    function Factory(TokenEmission _xrt) public
+    { xrt = _xrt; }
 
     /**
      * @dev Robonomics network utility token
      */
     TokenEmission public xrt;
+
+    /* Constants */
+    bytes constant MSGPREFIX = "\x19Ethereum Signed Message:\n32";
 
     /**
      * @dev Total GAS utilized by Robonomics network
@@ -29,10 +28,10 @@ contract Factory {
 
     RobotLiability[] public buildedLiability;
     Lighthouse[]     public buildedLighthouse;
-
+ 
     mapping(address => bool) public isBuilded;
-
-    /* Events */
+ 
+     /* Events */
     event BuildedLiability(address indexed robotLiability);
     event BuildedLighthouse(address indexed lighthouse);
 
@@ -59,7 +58,6 @@ contract Factory {
      * '_deadline' is a list of:
      * - ASK deadline block number
      * - BID deadline block number
-     *
      */
     function createLiability(
         bytes32 _model,
@@ -157,8 +155,9 @@ contract Factory {
      */
     function createLighthouse(
         uint256 _minimalFreeze
+      , uint256 _timeoutBlocks
     ) public returns (Lighthouse lighthouse) {
-        lighthouse = new Lighthouse(_minimalFreeze);
+        lighthouse = new Lighthouse(_minimalFreeze, _timeoutBlocks);
 
         buildedLighthouse.push(lighthouse);
         isBuilded[lighthouse] = true;
