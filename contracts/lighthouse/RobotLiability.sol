@@ -27,5 +27,5 @@ contract RobotLiability is RobotLiabilityAPI {
         require(lib.delegatecall(msg.data));
     }
 
-    address constant lib = 0xCC9309FB32404F9Fee9abfFC74Fe14a8ECFc2340;
+    address constant lib = 0xd70D7001B6e93940A384B144997a3d95FcF5c3c8;
 }
