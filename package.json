@@ -1,0 +1,34 @@
+{
+  "name": "robonomics_contracts",
+  "version": "0.9.0",
+  "homepage": "https://github.com/airalab/robonomics_contracts#readme",
+  "description": "Robonomics platform smart contracts",
+  "main": "truffle.js",
+  "directories": {
+    "ens": "ens",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/airalab/robonomics_contracts.git"
+  },
+  "keywords": [
+    "robonomics",
+    "contracts",
+    "ethereum",
+    "solidity",
+    "airalab"
+  ],
+  "dependencies": {
+    "truffle": "^4.0.0",
+    "openzeppelin-solidity": "1.9.0",
+    "eth-ens-namehash": "^1.0.2",
+    "ethereum-ens": "^0.7.4",
+    "web3-utils": "^1.0.0-beta.34"
+  },
+  "author": "Airalab <research@aira.life>",
+  "license": "BSD-3-Clause"
+}

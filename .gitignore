@@ -1,2 +1,2 @@
-.cache/*.json
-.libs.json
+build
+node_modules

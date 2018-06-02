@@ -1,16 +1,16 @@
 language: node_js
-dist: trusty
-sudo: false
+sudo: required 
+
+services:
+- docker
 
 node_js:
-- "6"
+- "8"
 
 install:
-- npm install -g aira-deploy ethereumjs-testrpc
+- npm install
 
 script:
-- aira-deploy --abi
-
-cache:
-  directories:
-  - .cache
+- docker run --rm -d -p 8545:8545 foamspace/cliquebait:latest && sleep 30
+- truffle migrate
+- truffle test 
