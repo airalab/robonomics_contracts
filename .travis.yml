@@ -1,5 +1,4 @@
 language: node_js
-sudo: required 
 
 services:
 - docker
@@ -11,6 +10,6 @@ install:
 - npm install
 
 script:
-- docker run --rm -d -p 8545:8545 foamspace/cliquebait:latest && sleep 30
-- truffle migrate
-- truffle test 
+- docker run --rm -d -p 8545:8545 foamspace/cliquebait:latest
+- sleep 30
+- npm test

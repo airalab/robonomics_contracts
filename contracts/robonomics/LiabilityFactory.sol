@@ -8,7 +8,6 @@ import './XRT.sol';
 import 'ens/contracts/ENS.sol';
 import 'ens/contracts/ENSRegistry.sol';
 import 'ens/contracts/PublicResolver.sol';
-import 'ens/contracts/FIFSRegistrar.sol';
 
 contract LiabilityFactory {
     using ECRecovery for bytes32;
@@ -16,13 +15,11 @@ contract LiabilityFactory {
     constructor(
         address _robotLiabilityLib,
         address _lighthouseLib,
-        XRT _xrt,
-        ENS _ens
+        XRT _xrt
     ) public {
         robotLiabilityLib = _robotLiabilityLib;
         lighthouseLib = _lighthouseLib;
         xrt = _xrt;
-        ens = _ens;
     }
 
     /**
@@ -34,6 +31,21 @@ contract LiabilityFactory {
      * @dev Ethereum name system
      */
     ENS public ens;
+
+    /**
+     * @dev Robonomics ENS resolver
+     */
+    PublicResolver public resolver;
+
+    bytes32 constant lighthouseNode
+        // lighthouse.0.robonomics.eth
+        = 0x1e42a8e8e1e8cf36e83d096dcc74af801d0a194a14b897f9c8dfd403b4eebeda;
+
+    function setENS(ENS _ens) public {
+      require(address(ens) == 0);
+      ens = _ens;
+      resolver = PublicResolver(ens.resolver(lighthouseNode));
+    }
 
     /**
      * @dev Total GAS utilized by Robonomics network
@@ -220,7 +232,9 @@ contract LiabilityFactory {
     ) external returns (Lighthouse lighthouse) {
         lighthouse = new Lighthouse(lighthouseLib, _minimalFreeze, _timeoutBlocks);
 
-        // TODO: Add lighthouse name to ENS
+        ens.setSubnodeOwner(lighthouseNode, keccak256(_name), this);
+        ens.setResolver(keccak256(lighthouseNode, keccak256(_name)), resolver);
+        resolver.setAddr(keccak256(lighthouseNode, keccak256(_name)), lighthouse);
 
         isLighthouse[lighthouse] = true;
         emit NewLighthouse(lighthouse);
