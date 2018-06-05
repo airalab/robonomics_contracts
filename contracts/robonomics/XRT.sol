@@ -4,7 +4,15 @@ import 'openzeppelin-solidity/contracts/token/ERC20/MintableToken.sol';
 import 'openzeppelin-solidity/contracts/token/ERC20/BurnableToken.sol';
 
 contract XRT is MintableToken, BurnableToken {
-    string public name     = "Robonomics Token :: Kovan";
-    string public symbol   = "XRT";
-    uint   public decimals = 9;
+    string public constant name     = "Robonomics Token :: Kovan";
+    string public constant symbol   = "XRT";
+    uint   public constant decimals = 9;
+
+    uint256 public constant INITIAL_SUPPLY = 1 * (10 ** uint256(decimals));
+
+    constructor() public {
+        totalSupply_ = INITIAL_SUPPLY;
+        balances[msg.sender] = INITIAL_SUPPLY;
+        emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
+    }
 }

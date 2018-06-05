@@ -8,13 +8,13 @@ const ens = new ethereum_ens(web3, ENSRegistry.address);
 contract("XRT", () => {
 
   it("should be resolved via ENS", async () => {
-    let addr = await ens.resolver("xrt.0.robonomics.eth").addr();
+    const addr = await ens.resolver("xrt.0.robonomics.eth").addr();
     assert.equal(addr, XRT.address);
   });
 
   it("should be owned by factory", async () => {
-    let xrt = await XRT.deployed();
-    let owner = await xrt.owner.call(); 
+    const xrt = await XRT.deployed();
+    const owner = await xrt.owner.call(); 
     assert.equal(owner, LiabilityFactory.address);
   });
 
