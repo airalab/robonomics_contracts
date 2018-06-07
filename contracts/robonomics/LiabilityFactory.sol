@@ -27,7 +27,7 @@ contract LiabilityFactory {
     /**
      * @dev New lighthouse created
      */
-    event NewLighthouse(address indexed lighthouse);
+    event NewLighthouse(address indexed lighthouse, string name);
 
     /**
      * @dev Robonomics network protocol token
@@ -201,7 +201,7 @@ contract LiabilityFactory {
     {
         // Create lighthouse
         lighthouse = new Lighthouse(lighthouseLib, _minimalFreeze, _timeoutBlocks);
-        emit NewLighthouse(lighthouse);
+        emit NewLighthouse(lighthouse, _name);
         isLighthouse[lighthouse] = true;
 
         // Register subnode
