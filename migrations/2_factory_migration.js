@@ -4,8 +4,6 @@ const LighthouseLib = artifacts.require("LighthouseLib");
 const LiabilityFactory = artifacts.require("LiabilityFactory");
 const XRT = artifacts.require("XRT");
 
-const initialSupply = 10000000;
-
 module.exports = (deployer, network, accounts) => {
   deployer.deploy(RobotLiabilityLib).then(a => {
     return deployer.deploy(LighthouseLib).then(b => {
