@@ -115,6 +115,49 @@ function finalize(liability, account) {
   return abi.encodeFunctionCall(finalizeAbi, [result, web3.eth.sign(account, hash)]); 
 }
 
+async function liabilityCreation(lighthouse, account, promisee, promisor) {
+  const factory = LiabilityFactory.at(LiabilityFactory.address);
+  const xrt = XRT.at(XRT.address);
+
+  const builder = LiabilityFactory.at(lighthouse.address);
+
+  const ask = randomAsk(promisee);
+  const bid = pairBid(ask, promisor);
+
+  await xrt.increaseApproval(LiabilityFactory.address, ask.cost, {from: promisee});
+  await xrt.increaseApproval(LiabilityFactory.address, bid.lighthouseFee, {from: promisor});
+
+  const result = await builder.createLiability(encodeAsk(ask), encodeBid(bid), {from: account});
+  assert.equal(result.logs[0].event, "NewLiability");
+
+  const liability = Liability.at(result.logs[0].args.liability);
+
+  const txgas = result.receipt.gasUsed;
+  const gas = await factory.gasUtilizing.call(liability.address);
+  const delta = txgas - gas.toNumber();
+  console.log("gas:" + " tx = " + txgas + ", factory = " + gas.toNumber() + ", delta = " + delta); 
+//  assert.equal(delta, 0);
+
+  return liability;
+}
+
+async function liabilityFinalization(liability, lighthouse, account, promisor) {
+  const factory = LiabilityFactory.at(LiabilityFactory.address);
+  let gas = await factory.gasUtilizing.call(liability.address);
+
+  const result = await lighthouse.to(liability.address, finalize(liability.address, promisor), {from: account}); 
+
+  const txgas = result.receipt.gasUsed;
+  gas = (await factory.gasUtilizing.call(liability.address)).toNumber() - gas.toNumber();
+  const delta = txgas - gas;
+  console.log("gas:" + " tx = " + txgas + ", factory = " + gas + ", delta = " + delta); 
+
+  const totalgas = await factory.totalGasUtilizing.call();
+  console.log("total gas: " + totalgas.toNumber());
+
+//  assert.equal(delta, 0);
+}
+
 contract("Lighthouse", (accounts) => {
   const factory = LiabilityFactory.at(LiabilityFactory.address);
   const xrt = XRT.at(XRT.address);
@@ -157,42 +200,56 @@ contract("Lighthouse", (accounts) => {
   });
 
   it("liability creation", async () => {
-    const builder = LiabilityFactory.at(lighthouse.address);
-
     await xrt.approve(lighthouse.address, 1000);
     await lighthouse.refill(1000);
 
-    const ask = randomAsk(accounts[0]);
-    const bid = pairBid(ask, accounts[0]);
-
-    await xrt.approve(LiabilityFactory.address, ask.cost + bid.lighthouseFee);
-
-    const result = await builder.createLiability(encodeAsk(ask), encodeBid(bid));
-    assert.equal(result.logs[0].event, "NewLiability");
-
-    liability = Liability.at(result.logs[0].args.liability);
-
-    const txgas = result.receipt.gasUsed;
-    const gas = await factory.gasUtilizing.call(liability.address);
-    const delta = txgas - gas.toNumber();
-    console.log("gas:" + " tx = " + txgas + ", factory = " + gas.toNumber() + ", delta = " + delta); 
-    assert.equal(delta, 0);
+    liability = await liabilityCreation(lighthouse, accounts[0], accounts[0], accounts[0]);
   });
 
   it("liability finalization", async () => {
-    let gas = await factory.gasUtilizing.call(liability.address);
+    await liabilityFinalization(liability, lighthouse, accounts[0], accounts[0]);
+  });
 
-    const result = await lighthouse.to(liability.address, finalize(liability.address, accounts[0])); 
+  it("marker marathon", async () => {
+    await xrt.transfer(accounts[1], 1000);
+    await xrt.approve(lighthouse.address, 1000, {from: accounts[1]});
+    await lighthouse.refill(1000, {from: accounts[1]});
 
-    const txgas = result.receipt.gasUsed;
-    gas = (await factory.gasUtilizing.call(liability.address)).toNumber() - gas.toNumber();
-    const delta = txgas - gas;
-    console.log("gas:" + " tx = " + txgas + ", factory = " + gas + ", delta = " + delta); 
+    await xrt.transfer(accounts[2], 2000);
+    await xrt.approve(lighthouse.address, 2000, {from: accounts[2]});
+    await lighthouse.refill(2000, {from: accounts[2]});
 
-    const totalgas = await factory.totalGasUtilizing.call();
-    console.log("total gas: " + totalgas.toNumber());
+    async function markerLog() {
+        const marker = await lighthouse.marker.call();
+        const quota  = await lighthouse.quota.call();
+        const member = await lighthouse.members.call(marker);
+        console.log("m: " + marker + " q: " + quota + " a: " + member);
+    }
 
-    assert.equal(delta, 0);
+    liability = await liabilityCreation(lighthouse, accounts[1], accounts[0], accounts[0]);
+    await markerLog();
+
+    await liabilityFinalization(liability, lighthouse, accounts[2], accounts[0]);
+    await markerLog();
+
+    liability = await liabilityCreation(lighthouse, accounts[2], accounts[0], accounts[0]);
+    await markerLog();
+
+    await liabilityFinalization(liability, lighthouse, accounts[0], accounts[0]);
+    await markerLog();
+
+    liability = await liabilityCreation(lighthouse, accounts[1], accounts[0], accounts[0]);
+    await markerLog();
+
+    await liabilityFinalization(liability, lighthouse, accounts[2], accounts[0]);
+    await markerLog();
+
+    liability = await liabilityCreation(lighthouse, accounts[2], accounts[0], accounts[0]);
+    await markerLog();
+
+    await liabilityFinalization(liability, lighthouse, accounts[0], accounts[0]);
+    await markerLog();
+
   });
 
 });
