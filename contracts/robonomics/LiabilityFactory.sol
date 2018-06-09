@@ -199,6 +199,10 @@ contract LiabilityFactory {
         external
         returns (address lighthouse)
     {
+        // Name reservation check
+        bytes32 subnode = keccak256(abi.encodePacked(lighthouseNode, keccak256(_name)));
+        require(ens.resolver(subnode) == 0);
+
         // Create lighthouse
         lighthouse = new Lighthouse(lighthouseLib, _minimalFreeze, _timeoutBlocks);
         emit NewLighthouse(lighthouse, _name);
@@ -208,7 +212,6 @@ contract LiabilityFactory {
         ens.setSubnodeOwner(lighthouseNode, keccak256(_name), this);
 
         // Register lighthouse address
-        bytes32 subnode = keccak256(abi.encodePacked(lighthouseNode, keccak256(_name)));
         ens.setResolver(subnode, resolver);
         resolver.setAddr(subnode, lighthouse);
     }
