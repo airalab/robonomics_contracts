@@ -18,4 +18,7 @@ contract LighthouseAPI {
     uint256 public keepaliveBlock = 0;
     uint256 public marker = 0;
     uint256 public quota = 0;
+
+    function quotaOf(address _member) public view returns (uint256)
+    { return balances[_member] / minimalFreeze; }
 }

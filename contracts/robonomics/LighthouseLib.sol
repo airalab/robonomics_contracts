@@ -6,9 +6,6 @@ import './LiabilityFactory.sol';
 
 contract LighthouseLib is LighthouseAPI, LighthouseABI {
 
-    function quotaOf(address _member) public view returns (uint256)
-    { return balances[_member] / minimalFreeze; }
-
     function refill(uint256 _value) external {
         require(xrt.transferFrom(msg.sender, this, _value));
         require(_value >= minimalFreeze);
@@ -42,7 +39,6 @@ contract LighthouseLib is LighthouseAPI, LighthouseABI {
     function nextMember() internal {
         marker = (marker + 1) % members.length;
         quota = balances[members[marker]] / minimalFreeze;
-        keepaliveBlock = block.number;
     }
 
     modifier quoted {
@@ -53,13 +49,9 @@ contract LighthouseLib is LighthouseAPI, LighthouseABI {
     }
 
     modifier keepalive {
-        if (timeoutBlocks < block.number - keepaliveBlock) {
-            nextMember();
-
-            // The main reason why here used 'while' is deadlock if two members is unavailable
+        if (timeoutBlocks < block.number - keepaliveBlock)
             while (msg.sender != members[marker])
                 nextMember();
-        }
 
         _;
     }
@@ -67,13 +59,14 @@ contract LighthouseLib is LighthouseAPI, LighthouseABI {
     modifier member {
         require(members.length > 0);
         require(msg.sender == members[marker]);
+        keepaliveBlock = block.number;
 
         _;
     }
 
-    function to(address _to, bytes _data) external quoted keepalive member
+    function to(address _to, bytes _data) external keepalive quoted member
     { require(_to.call(_data)); }
 
-    function () external quoted keepalive member 
+    function () external keepalive quoted member
     { require(factory.call(msg.data)); }
 }

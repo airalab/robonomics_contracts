@@ -166,7 +166,7 @@ contract("Lighthouse", (accounts) => {
   let liability;
 
   it("should be created via factory", async () => {
-    const result = await factory.createLighthouse(1000, 10, "test");
+    const result = await factory.createLighthouse(1000, 3, "test");
     assert.equal(result.logs[0].event, "NewLighthouse");
 
     lighthouse = Lighthouse.at(result.logs[0].args.lighthouse);
@@ -247,6 +247,40 @@ contract("Lighthouse", (accounts) => {
     liability = await liabilityCreation(lighthouse, accounts[2], accounts[0], accounts[0]);
     await markerLog();
 
+    await liabilityFinalization(liability, lighthouse, accounts[0], accounts[0]);
+    await markerLog();
+
+  });
+
+  it("keepalive marathon", async () => {
+    async function markerLog() {
+      const marker = await lighthouse.marker.call();
+      const quota  = await lighthouse.quota.call();
+      const member = await lighthouse.members.call(marker);
+      console.log("m: " + marker + " q: " + quota + " a: " + member);
+    }
+
+    function waitFor(blockNumber) {
+      console.log('waiting for block ' + blockNumber);
+      while (web3.eth.blockNumber < blockNumber)
+        console.log('.');
+    }
+
+    liability = await liabilityCreation(lighthouse, accounts[1], accounts[0], accounts[0]);
+    await markerLog();
+    waitFor(web3.eth.blockNumber + 3);
+    await liabilityFinalization(liability, lighthouse, accounts[0], accounts[0]);
+    await markerLog();
+
+    liability = await liabilityCreation(lighthouse, accounts[1], accounts[0], accounts[0]);
+    await markerLog();
+    waitFor(web3.eth.blockNumber + 3);
+    await liabilityFinalization(liability, lighthouse, accounts[0], accounts[0]);
+    await markerLog();
+
+    liability = await liabilityCreation(lighthouse, accounts[1], accounts[0], accounts[0]);
+    await markerLog();
+    waitFor(web3.eth.blockNumber + 3);
     await liabilityFinalization(liability, lighthouse, accounts[0], accounts[0]);
     await markerLog();
 
