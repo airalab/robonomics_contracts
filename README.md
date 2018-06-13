@@ -1,32 +1,31 @@
-## Airalab smart contracts 
+Robonomics platform contracts 
+=============================
 
-[![Build Status](https://travis-ci.org/airalab/core.svg?branch=master)](https://travis-ci.org/airalab/core)
-[![GitHub release](https://img.shields.io/github/release/airalab/core.svg)]()
+[![Build Status](https://travis-ci.org/airalab/robonomics_contracts.svg?branch=master)](https://travis-ci.org/airalab/robonomics_contracts)
+[![GitHub release](https://img.shields.io/github/release/airalab/robonomics_contracts.svg)]()
 
 > Keep all significant smart-contracts in this repository.
 
-- [API Reference](https://airalab.github.io/core/docs)
-- [ABIs](https://github.com/airalab/core/tree/master/abi)
-- [EthPM](https://www.ethpm.com/registry)
+How to use
+----------
 
-## How to build
-Tested on Truffle@3.4.11     
-To build a single package run in it's directory:
+Tested on Truffle@4.1.11
+
+To build contracts run in it's directory:
+
 ```
 truffle compile
 ```
 
-To install dependencies:
+
+To run testing framework:
+
 ```
-truffle install airalab-token airalab-common
+truffle test 
 ```
 
-To publish a package to EthPM register run:
-```
-truffle publish
-```
+To deploy contracts in testnet run in it's directory:
 
-Configuration of RPC is located in truffle.js file. Here's links to our packages in EthPM:   
-- [airalab-common](https://www.ethpm.com/registry/packages/39)
-- [airalab-token](https://www.ethpm.com/registry/packages/40)
-- [airalab-liability](https://www.ethpm.com/registry/packages/41)
+```
+truffle migrate
+```
