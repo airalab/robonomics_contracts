@@ -95,7 +95,7 @@ contract LiabilityFactory {
         // Basic equal formula
         uint256 wn = _gas;
 
-        /* Additional emission table */
+        /* Additional emission table
         if (totalGasUtilizing < 347 * (10 ** 10)) {
             wn *= 6;
         } else if (totalGasUtilizing < 2 * 347 * (10 ** 10)) {
@@ -106,7 +106,7 @@ contract LiabilityFactory {
             wn = wn * 1778 / 1000;
         } else if (totalGasUtilizing < 5 * 347 * (10 ** 10)) {
             wn = wn * 1185 / 1000;
-        }
+        } */
 
         return wn ;
     }
