@@ -217,7 +217,7 @@ contract("Lighthouse", (accounts) => {
     const deltaB = currentBalance - originBalance;
     console.log("emission: " + deltaB + " wn");
 
-    assert.equal(deltaB - 1, (await factory.gasUtilizing.call(liability.address)).toNumber() * 6);
+    assert.equal(deltaB - 1, (await factory.gasUtilizing.call(liability.address)).toNumber());
   });
 
   it("marker marathon", async () => {
