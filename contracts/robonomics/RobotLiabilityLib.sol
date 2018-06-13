@@ -135,7 +135,7 @@ contract RobotLiabilityLib is RobotLiabilityABI
         result = _result;
         isFinalized = true;
 
-        require(factory.liabilityFinalized(gasinit - gasleft()));
+        require(factory.liabilityFinalized(gasinit));
         return true;
     }
 }

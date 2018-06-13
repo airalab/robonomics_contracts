@@ -96,22 +96,16 @@ contract LiabilityFactory {
         uint256 wn = _gas;
 
         /* Additional emission table */
-        if (totalGasUtilizing < 856368000) {
-            wn *= 37;
-        } else if (totalGasUtilizing < 856368000 * 2) {
-            wn *= 25;
-        } else if (totalGasUtilizing < 856368000 * 3) {
-            wn *= 17;
-        } else if (totalGasUtilizing < 856368000 * 4) {
-            wn *= 11;
-        } else if (totalGasUtilizing < 856368000 * 5) {
-            wn *= 7;
-        } else if (totalGasUtilizing < 856368000 * 6) {
-            wn *= 5;
-        } else if (totalGasUtilizing < 856368000 * 7) {
-            wn *= 3;
-        } else if (totalGasUtilizing < 856368000 * 8) {
-            wn *= 2;
+        if (totalGasUtilizing < 347 * (10 ** 10)) {
+            wn *= 6;
+        } else if (totalGasUtilizing < 2 * 347 * (10 ** 10)) {
+            wn *= 4;
+        } else if (totalGasUtilizing < 3 * 347 * (10 ** 10)) {
+            wn = wn * 2667 / 1000;
+        } else if (totalGasUtilizing < 4 * 347 * (10 ** 10)) {
+            wn = wn * 1778 / 1000;
+        } else if (totalGasUtilizing < 5 * 347 * (10 ** 10)) {
+            wn = wn * 1185 / 1000;
         }
 
         return wn ;
@@ -179,7 +173,7 @@ contract LiabilityFactory {
                                      liability.validatorFee()));
 
         // Accounting gas usage of transaction
-        uint256 gas = gasinit - gasleft() + 120525; // Including observation error
+        uint256 gas = gasinit - gasleft() + 110525; // Including observation error
         totalGasUtilizing       += gas;
         gasUtilizing[liability] += gas;
      }
@@ -228,8 +222,9 @@ contract LiabilityFactory {
     {
         require(gasUtilizing[msg.sender] > 0);
 
-        totalGasUtilizing        += _gas + 75801; // Including observation error
-        gasUtilizing[msg.sender] += _gas + 75800; // Including observation error
+        uint256 gas = _gas - gasleft();
+        totalGasUtilizing        += gas;
+        gasUtilizing[msg.sender] += gas;
         require(xrt.mint(tx.origin, winnerFromGas(gasUtilizing[msg.sender])));
         return true;
     }

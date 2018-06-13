@@ -143,12 +143,14 @@ async function liabilityCreation(lighthouse, account, promisee, promisor) {
 
 async function liabilityFinalization(liability, lighthouse, account, promisor) {
   const factory = LiabilityFactory.at(LiabilityFactory.address);
+  const xrt = XRT.at(XRT.address);
   let gas = await factory.gasUtilizing.call(liability.address);
 
   const result = await lighthouse.to(liability.address, finalize(liability.address, promisor), {from: account}); 
 
   const txgas = result.receipt.gasUsed;
   gas = (await factory.gasUtilizing.call(liability.address)).toNumber() - gas.toNumber();
+  
   const delta = txgas - gas;
   console.log("gas:" + " tx = " + txgas + ", factory = " + gas + ", delta = " + delta); 
 
@@ -207,7 +209,15 @@ contract("Lighthouse", (accounts) => {
   });
 
   it("liability finalization", async () => {
+    const originBalance = (await xrt.balanceOf(accounts[0])).toNumber();
+
     await liabilityFinalization(liability, lighthouse, accounts[0], accounts[0]);
+
+    const currentBalance = (await xrt.balanceOf(accounts[0])).toNumber();
+    const deltaB = currentBalance - originBalance;
+    console.log("emission: " + deltaB + " wn");
+
+    assert.equal(deltaB - 1, (await factory.gasUtilizing.call(liability.address)).toNumber() * 6);
   });
 
   it("marker marathon", async () => {
