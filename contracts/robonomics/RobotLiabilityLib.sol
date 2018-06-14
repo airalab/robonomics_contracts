@@ -129,7 +129,7 @@ contract RobotLiabilityLib is RobotLiabilityABI
                 require(token.transfer(promisee, cost));
 
             if (validatorFee > 0)
-                require(xrt.transfer(validator, validatorFee));
+                require(factory.xrt().transfer(validator, validatorFee));
         }
 
         result = _result;

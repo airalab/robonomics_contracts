@@ -8,9 +8,7 @@ contract RobotLiabilityAPI {
     bytes   public objective;
     bytes   public result;
 
-    XRT     public xrt;
     ERC20   public token;
-
     uint256 public cost;
     uint256 public lighthouseFee;
     uint256 public validatorFee;
