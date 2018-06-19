@@ -36,29 +36,45 @@ contract LighthouseLib is LighthouseAPI, LighthouseABI {
         }
     }
 
-    function nextMember() internal {
-        marker = (marker + 1) % members.length;
-        quota = balances[members[marker]] / minimalFreeze;
-    }
+    function nextMember() internal
+    { marker = (marker + 1) % members.length; }
 
     modifier quoted {
-        if (quota == 0) nextMember();
+        if (quota == 0) {
+            // Step over marker
+            nextMember();
+
+            // Allocate new quota
+            quota = quotaOf(members[marker]);
+        }
+
+        // Consume one quota for transaction sending
         quota -= 1;
 
         _;
     }
 
     modifier keepalive {
-        if (timeoutBlocks < block.number - keepaliveBlock)
+        if (timeoutBlocks < block.number - keepaliveBlock) {
+            // Search keepalive sender
             while (msg.sender != members[marker])
                 nextMember();
+
+            // Allocate new quota
+            quota = quotaOf(members[marker]);
+        }
 
         _;
     }
 
     modifier member {
+        // Zero members guard
         require(members.length > 0);
+
+        // Only member with marker can to send transaction
         require(msg.sender == members[marker]);
+
+        // Store transaction sending block
         keepaliveBlock = block.number;
 
         _;
