@@ -73,7 +73,7 @@ contract RobotLiabilityLib is RobotLiabilityABI
         require(keccak256(abi.encodePacked(model, objective))
                 == keccak256(abi.encodePacked(_model, _objective)));
         require(_token == token);
-        require(_cost == _cost);
+        require(_cost == cost);
 
         lighthouseFee = _lighthouse_fee;
 
@@ -108,7 +108,6 @@ contract RobotLiabilityLib is RobotLiabilityABI
         returns (bool)
     {
         uint256 gasinit = gasleft();
-
         require(!isFinalized);
 
         address resultSender = keccak256(abi.encodePacked(this, _result))
