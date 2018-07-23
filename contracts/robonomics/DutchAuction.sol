@@ -1,11 +1,13 @@
 pragma solidity 0.4.24;
 
 import "./XRT.sol";
+import "./Ambix.sol";
+import "./LiabilityFactory.sol";
 
 
 /// @title Dutch auction contract - distribution of Gnosis tokens using an auction.
 /// @author Stefan George - <stefan.george@consensys.net>
-/// @coauthor Alexander Krupenkin - <mail@akru.me>
+/// @author Airalab - <research@aira.life> 
 contract DutchAuction {
 
     /*
@@ -16,16 +18,17 @@ contract DutchAuction {
     /*
      *  Constants
      */
-    uint constant public MAX_TOKENS_SOLD = 9000000 * 10**18; // 9M
+    uint constant public MAX_TOKENS_SOLD = 9000000 * 10**9; // 9M
     uint constant public WAITING_PERIOD = 7 days;
 
     /*
      *  Storage
      */
-    XRT public xrt;
+    XRT              public xrt;
+    Ambix            public ambix;
+    LiabilityFactory public factory;
     address public wallet;
     address public owner;
-    address public ambix;
     uint public ceiling;
     uint public priceFactor;
     uint public startBlock;
@@ -85,16 +88,14 @@ contract DutchAuction {
      */
     /// @dev Contract constructor function sets owner.
     /// @param _wallet Gnosis wallet.
-    /// @param _ambix Distillation cube contract.
     /// @param _ceiling Auction ceiling.
     /// @param _priceFactor Auction price factor.
-    function DutchAuction(address _wallet, address _ambix, uint _ceiling, uint _priceFactor)
+    constructor(address _wallet, uint _ceiling, uint _priceFactor)
         public
     {
-        require(_wallet != 0 && _ambix != 0 && _ceiling != 0 && _priceFactor != 0);
+        require(_wallet != 0 && _ceiling != 0 && _priceFactor != 0);
         owner = msg.sender;
         wallet = _wallet;
-        ambix = _ambix;
         ceiling = _ceiling;
         priceFactor = _priceFactor;
         stage = Stages.AuctionDeployed;
@@ -102,14 +103,18 @@ contract DutchAuction {
 
     /// @dev Setup function sets external contracts' addresses.
     /// @param _xrt Robonomics token address.
-    function setup(address _xrt)
+    /// @param _ambix Distillation cube address.
+    /// @param _factory Robonomics liability factory address.
+    function setup(address _xrt, address _ambix, address _factory)
         public
         isOwner
         atStage(Stages.AuctionDeployed)
     {
         // Validate argument
-        require(_xrt != 0);
+        require(_xrt != 0 && _ambix != 0 && _factory != 0);
         xrt = XRT(_xrt);
+        ambix = Ambix(_ambix);
+        factory = LiabilityFactory(_factory);
 
         // Validate token balance
         require(xrt.balanceOf(this) == MAX_TOKENS_SOLD);
@@ -249,8 +254,13 @@ contract DutchAuction {
         else
             finalPrice = calcStopPrice();
         uint soldTokens = totalReceived * 10**18 / finalPrice;
+
         // Auction contract transfers all unsold tokens to Ambix contract
         require(xrt.transfer(ambix, MAX_TOKENS_SOLD - soldTokens));
+
         endTime = now;
+
+        // Setup factory emission rate
+        //require(factory.enableEmission());
     }
 }
