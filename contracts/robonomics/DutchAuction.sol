@@ -259,8 +259,5 @@ contract DutchAuction {
         require(xrt.transfer(ambix, MAX_TOKENS_SOLD - soldTokens));
 
         endTime = now;
-
-        // Setup factory emission rate
-        //require(factory.enableEmission());
     }
 }

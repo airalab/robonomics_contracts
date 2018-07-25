@@ -1,6 +1,7 @@
 pragma solidity ^0.4.24;
 
 import './RobotLiability.sol';
+import './DutchAuction.sol';
 import './Lighthouse.sol';
 import './XRT.sol';
 
@@ -12,11 +13,15 @@ contract LiabilityFactory {
     constructor(
         address _robot_liability_lib,
         address _lighthouse_lib,
-        XRT _xrt
+        DutchAuction _auction,
+        XRT _xrt,
+        ENS _ens
     ) public {
         robotLiabilityLib = _robot_liability_lib;
         lighthouseLib = _lighthouse_lib;
+        auction = _auction;
         xrt = _xrt;
+        ens = _ens;
     }
 
     /**
@@ -30,6 +35,11 @@ contract LiabilityFactory {
     event NewLighthouse(address indexed lighthouse, string name);
 
     /**
+     * @dev Robonomics dutch auction contract
+     */
+    DutchAuction public auction;
+
+    /**
      * @dev Robonomics network protocol token
      */
     XRT public xrt;
@@ -38,24 +48,6 @@ contract LiabilityFactory {
      * @dev Ethereum name system
      */
     ENS public ens;
-
-    /**
-     * @dev Robonomics ENS resolver
-     */
-    PublicResolver public resolver;
-
-    bytes32 constant lighthouseNode
-        // lighthouse.0.robonomics.eth
-        = 0x1e42a8e8e1e8cf36e83d096dcc74af801d0a194a14b897f9c8dfd403b4eebeda;
-
-    /**
-     *  @dev Set ENS registry contract address
-     */
-    function setENS(ENS _ens) public {
-      require(address(ens) == 0);
-      ens = _ens;
-      resolver = PublicResolver(ens.resolver(lighthouseNode));
-    }
 
     /**
      * @dev Total GAS utilized by Robonomics network
@@ -67,6 +59,15 @@ contract LiabilityFactory {
      */
     mapping(address => uint256) public gasUtilizing;
 
+    /**
+     * @dev The count of utilized gas for switch to next epoch 
+     */
+    uint256 public constant gasEpoch = 347 * 10**10;
+
+    /**
+     * @dev Weighted average gasprice
+     */
+    uint256 public constant gasPrice = 10 * 10**9;
 
     /**
      * @dev Used market orders accounting
@@ -91,24 +92,15 @@ contract LiabilityFactory {
     /**
      * @dev XRT emission value for utilized gas
      */
-    function winnerFromGas(uint256 _gas) public view returns (uint256) {
-        // Basic equal formula
-        uint256 wn = _gas;
+    function wnFromGas(uint256 _gas) public view returns (uint256) {
+        // Current gas utilization epoch
+        uint256 epoch = totalGasUtilizing / gasEpoch;
 
-        /* Additional emission table
-        if (totalGasUtilizing < 347 * (10 ** 10)) {
-            wn *= 6;
-        } else if (totalGasUtilizing < 2 * 347 * (10 ** 10)) {
-            wn *= 4;
-        } else if (totalGasUtilizing < 3 * 347 * (10 ** 10)) {
-            wn = wn * 2667 / 1000;
-        } else if (totalGasUtilizing < 4 * 347 * (10 ** 10)) {
-            wn = wn * 1778 / 1000;
-        } else if (totalGasUtilizing < 5 * 347 * (10 ** 10)) {
-            wn = wn * 1185 / 1000;
-        } */
+        // XRT emission with addition coefficient by gas utilzation epoch
+        uint256 wn = _gas * gasPrice * 2**epoch / 3**epoch / auction.finalPrice();
 
-        return wn ;
+        // Check to not permit emission decrease below wn=gas
+        return wn < _gas ? _gas : wn;
     }
 
     /**
@@ -202,10 +194,15 @@ contract LiabilityFactory {
         emit NewLighthouse(lighthouse, _name);
         isLighthouse[lighthouse] = true;
 
+        bytes32 lighthouseNode
+            // lighthouse.0.robonomics.eth
+            = 0x1e42a8e8e1e8cf36e83d096dcc74af801d0a194a14b897f9c8dfd403b4eebeda;
+
         // Register subnode
         ens.setSubnodeOwner(lighthouseNode, keccak256(_name), this);
 
         // Register lighthouse address
+        PublicResolver resolver = PublicResolver(ens.resolver(lighthouseNode));
         ens.setResolver(subnode, resolver);
         resolver.setAddr(subnode, lighthouse);
     }
@@ -225,7 +222,7 @@ contract LiabilityFactory {
         uint256 gas = _gas - gasleft();
         totalGasUtilizing        += gas;
         gasUtilizing[msg.sender] += gas;
-        require(xrt.mint(tx.origin, winnerFromGas(gasUtilizing[msg.sender])));
+        require(xrt.mint(tx.origin, wnFromGas(gasUtilizing[msg.sender])));
         return true;
     }
 }
