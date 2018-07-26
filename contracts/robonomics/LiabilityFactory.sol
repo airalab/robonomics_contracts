@@ -175,7 +175,7 @@ contract LiabilityFactory {
      * @param _minimalFreeze Minimal freeze value of XRT token
      * @param _timeoutBlocks Max time of lighthouse silence in blocks
      * @param _name Lighthouse subdomain,
-     *              example: for 'my-name' will created 'my-name.lighthouse.0.robonomics.eth' domain
+     *              example: for 'my-name' will created 'my-name.lighthouse.1.robonomics.eth' domain
      */
     function createLighthouse(
         uint256 _minimalFreeze,
@@ -185,6 +185,10 @@ contract LiabilityFactory {
         external
         returns (address lighthouse)
     {
+        bytes32 lighthouseNode
+            // lighthouse.1.robonomics.eth
+            = 0x3662a5d633e9a5ca4b4bd25284e1b343c15a92b5347feb9b965a2b1ef3e1ea1a;
+
         // Name reservation check
         bytes32 subnode = keccak256(abi.encodePacked(lighthouseNode, keccak256(_name)));
         require(ens.resolver(subnode) == 0);
@@ -193,10 +197,6 @@ contract LiabilityFactory {
         lighthouse = new Lighthouse(lighthouseLib, _minimalFreeze, _timeoutBlocks);
         emit NewLighthouse(lighthouse, _name);
         isLighthouse[lighthouse] = true;
-
-        bytes32 lighthouseNode
-            // lighthouse.0.robonomics.eth
-            = 0x1e42a8e8e1e8cf36e83d096dcc74af801d0a194a14b897f9c8dfd403b4eebeda;
 
         // Register subnode
         ens.setSubnodeOwner(lighthouseNode, keccak256(_name), this);

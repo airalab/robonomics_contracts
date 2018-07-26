@@ -35,7 +35,7 @@ contract Ambix is Ownable {
     function appendSource(
         address[] _a,
         uint256[] _n
-    ) public onlyOwner {
+    ) external onlyOwner {
         require(_a.length == _n.length);
         A.length++;
         N.length++;
@@ -53,7 +53,7 @@ contract Ambix is Ownable {
      * @dev Erase token recipe at '_ix' index
      * @param _ix Token recipe index
      */
-    function removeSource(uint256 _ix) public onlyOwner {
+    function removeSource(uint256 _ix) external onlyOwner {
         A[_ix].length = 0;
         N[_ix].length = 0;
     }
@@ -66,7 +66,7 @@ contract Ambix is Ownable {
     function setSink(
         address[] _b,
         uint256[] _m
-    ) public onlyOwner{
+    ) external onlyOwner{
         B = _b;
         M = _m;
     }
@@ -75,7 +75,7 @@ contract Ambix is Ownable {
      * @dev Run distillation process
      * @param _ix Source alternative index
      */
-    function run(uint256 _ix) {
+    function run(uint256 _ix) external {
         require(_ix < A.length);
         uint256 i;
 

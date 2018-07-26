@@ -87,7 +87,7 @@ contract DutchAuction {
      *  Public functions
      */
     /// @dev Contract constructor function sets owner.
-    /// @param _wallet Gnosis wallet.
+    /// @param _wallet Multisig wallet.
     /// @param _ceiling Auction ceiling.
     /// @param _priceFactor Auction price factor.
     constructor(address _wallet, uint _ceiling, uint _priceFactor)
@@ -184,7 +184,7 @@ contract DutchAuction {
             receiver = msg.sender;
 
         // Prevent that more than 90% of tokens are sold. Only relevant if cap not reached.
-        uint maxWei = (MAX_TOKENS_SOLD / 10**18) * calcTokenPrice() - totalReceived;
+        uint maxWei = (MAX_TOKENS_SOLD / 10**9) * calcTokenPrice() - totalReceived;
         uint maxWeiBasedOnTotalReceived = ceiling - totalReceived;
         if (maxWeiBasedOnTotalReceived < maxWei)
             maxWei = maxWeiBasedOnTotalReceived;
@@ -217,7 +217,7 @@ contract DutchAuction {
     {
         if (receiver == 0)
             receiver = msg.sender;
-        uint tokenCount = bids[receiver] * 10**18 / finalPrice;
+        uint tokenCount = bids[receiver] * 10**9 / finalPrice;
         bids[receiver] = 0;
         require(xrt.transfer(receiver, tokenCount));
     }
@@ -229,7 +229,7 @@ contract DutchAuction {
         public
         returns (uint)
     {
-        return totalReceived * 10**18 / MAX_TOKENS_SOLD + 1;
+        return totalReceived * 10**9 / MAX_TOKENS_SOLD + 1;
     }
 
     /// @dev Calculates token price.
@@ -239,7 +239,7 @@ contract DutchAuction {
         public
         returns (uint)
     {
-        return priceFactor * 10**18 / (block.number - startBlock + 7500) + 1;
+        return priceFactor * 10**9 / (block.number - startBlock + 7500) + 1;
     }
 
     /*
@@ -249,14 +249,17 @@ contract DutchAuction {
         private
     {
         stage = Stages.AuctionEnded;
-        if (totalReceived == ceiling)
-            finalPrice = calcTokenPrice();
-        else
-            finalPrice = calcStopPrice();
-        uint soldTokens = totalReceived * 10**18 / finalPrice;
+        uint soldTokens = totalReceived * 10**9 / finalPrice;
 
-        // Auction contract transfers all unsold tokens to Ambix contract
-        require(xrt.transfer(ambix, MAX_TOKENS_SOLD - soldTokens));
+        if (totalReceived == ceiling) {
+            finalPrice = calcTokenPrice();
+            // Auction contract transfers all unsold tokens to Ambix contract
+            require(xrt.transfer(ambix, MAX_TOKENS_SOLD - soldTokens));
+        } else {
+            finalPrice = calcStopPrice();
+            // Auction contract burn all unsold tokens
+            xrt.burn(MAX_TOKENS_SOLD - soldTokens);
+        }
 
         endTime = now;
     }
