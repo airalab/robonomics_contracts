@@ -80,8 +80,10 @@ contract LighthouseLib is LighthouseAPI, LighthouseABI {
         _;
     }
 
-    function to(address _to, bytes _data) external keepalive quoted member
-    { require(_to.call(_data)); }
+    function to(address _to, bytes _data) external keepalive quoted member {
+        require(factory.gasUtilizing(_to) > 0);
+        require(_to.call(_data));
+    }
 
     function () external keepalive quoted member
     { require(factory.call(msg.data)); }
