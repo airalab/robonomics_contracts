@@ -1,11 +1,8 @@
 pragma solidity 0.4.24;
 
 import "./XRT.sol";
-import "./Ambix.sol";
-import "./LiabilityFactory.sol";
 
-
-/// @title Dutch auction contract - distribution of Gnosis tokens using an auction.
+/// @title Dutch auction contract - distribution of XRT tokens using an auction.
 /// @author Stefan George - <stefan.george@consensys.net>
 /// @author Airalab - <research@aira.life> 
 contract DutchAuction {
@@ -18,15 +15,14 @@ contract DutchAuction {
     /*
      *  Constants
      */
-    uint constant public MAX_TOKENS_SOLD = 9000000 * 10**9; // 9M
-    uint constant public WAITING_PERIOD = 7 days;
+    uint constant public MAX_TOKENS_SOLD = 9000000 * 10**9; // 9M XRT
+    uint constant public WAITING_PERIOD = 0; // XXX: 7 days;
 
     /*
      *  Storage
      */
-    XRT              public xrt;
-    Ambix            public ambix;
-    LiabilityFactory public factory;
+    XRT     public xrt;
+    address public ambix;
     address public wallet;
     address public owner;
     uint public ceiling;
@@ -104,17 +100,15 @@ contract DutchAuction {
     /// @dev Setup function sets external contracts' addresses.
     /// @param _xrt Robonomics token address.
     /// @param _ambix Distillation cube address.
-    /// @param _factory Robonomics liability factory address.
-    function setup(address _xrt, address _ambix, address _factory)
+    function setup(address _xrt, address _ambix)
         public
         isOwner
         atStage(Stages.AuctionDeployed)
     {
         // Validate argument
-        require(_xrt != 0 && _ambix != 0 && _factory != 0);
+        require(_xrt != 0 && _ambix != 0);
         xrt = XRT(_xrt);
-        ambix = Ambix(_ambix);
-        factory = LiabilityFactory(_factory);
+        ambix = _ambix;
 
         // Validate token balance
         require(xrt.balanceOf(this) == MAX_TOKENS_SOLD);
@@ -184,7 +178,7 @@ contract DutchAuction {
             receiver = msg.sender;
 
         // Prevent that more than 90% of tokens are sold. Only relevant if cap not reached.
-        uint maxWei = (MAX_TOKENS_SOLD / 10**9) * calcTokenPrice() - totalReceived;
+        uint maxWei = MAX_TOKENS_SOLD * calcTokenPrice() / 10**9 - totalReceived;
         uint maxWeiBasedOnTotalReceived = ceiling - totalReceived;
         if (maxWeiBasedOnTotalReceived < maxWei)
             maxWei = maxWeiBasedOnTotalReceived;
@@ -201,10 +195,11 @@ contract DutchAuction {
 
         bids[receiver] += amount;
         totalReceived += amount;
-        if (maxWei == amount)
-            // When maxWei is equal to the big amount the auction is ended and finalizeAuction is triggered.
-            finalizeAuction();
         BidSubmission(receiver, amount);
+
+        // Finalize auction when maxWei reached
+        if (amount == maxWei)
+            finalizeAuction();
     }
 
     /// @dev Claims tokens for bidder after auction.
@@ -225,7 +220,7 @@ contract DutchAuction {
     /// @dev Calculates stop price.
     /// @return Returns stop price.
     function calcStopPrice()
-        constant
+        view
         public
         returns (uint)
     {
@@ -235,11 +230,11 @@ contract DutchAuction {
     /// @dev Calculates token price.
     /// @return Returns token price.
     function calcTokenPrice()
-        constant
+        view
         public
         returns (uint)
     {
-        return priceFactor * 10**9 / (block.number - startBlock + 7500) + 1;
+        return priceFactor * 10**18 / (block.number - startBlock + 7500) + 1;
     }
 
     /*
@@ -249,14 +244,13 @@ contract DutchAuction {
         private
     {
         stage = Stages.AuctionEnded;
+        finalPrice = totalReceived == ceiling ? calcTokenPrice() : calcStopPrice();
         uint soldTokens = totalReceived * 10**9 / finalPrice;
 
         if (totalReceived == ceiling) {
-            finalPrice = calcTokenPrice();
             // Auction contract transfers all unsold tokens to Ambix contract
             require(xrt.transfer(ambix, MAX_TOKENS_SOLD - soldTokens));
         } else {
-            finalPrice = calcStopPrice();
             // Auction contract burn all unsold tokens
             xrt.burn(MAX_TOKENS_SOLD - soldTokens);
         }

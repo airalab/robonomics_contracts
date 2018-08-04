@@ -8,7 +8,7 @@ const ens = new ethereum_ens(web3, ENSRegistry.address);
 contract("XRT", () => {
 
   it("should be resolved via ENS", async () => {
-    const addr = await ens.resolver("xrt.0.robonomics.eth").addr();
+    const addr = await ens.resolver("xrt.1.robonomics.eth").addr();
     assert.equal(addr, XRT.address);
   });
 

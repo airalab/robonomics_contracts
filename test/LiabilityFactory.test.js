@@ -12,7 +12,7 @@ contract("LiabilityFactory", () => {
   const factory = LiabilityFactory.at(LiabilityFactory.address);
 
   it("shoudl be resolved via ENS", async () => {
-    const addr = await ens.resolver("factory.0.robonomics.eth").addr();
+    const addr = await ens.resolver("factory.1.robonomics.eth").addr();
     assert.equal(addr, LiabilityFactory.address);
   });
 

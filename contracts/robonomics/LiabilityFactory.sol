@@ -93,6 +93,10 @@ contract LiabilityFactory {
      * @dev XRT emission value for utilized gas
      */
     function wnFromGas(uint256 _gas) public view returns (uint256) {
+        // Just return wn=gas when auction isn't finish
+        if (auction.finalPrice() == 0)
+            return _gas;
+
         // Current gas utilization epoch
         uint256 epoch = totalGasUtilizing / gasEpoch;
 

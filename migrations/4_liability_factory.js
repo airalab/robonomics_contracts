@@ -23,7 +23,7 @@ function deployFactory(deployer, ens) {
       return Promise.all([
         xrt.transferOwnership(factory.address),
         xrt.transfer(DutchAuction.address, 9000000 * 10**9).then(() => {
-          return DutchAuction.at(DutchAuction.address).setup(xrt.address, Ambix.address, factory.address);
+          return DutchAuction.at(DutchAuction.address).setup(xrt.address, Ambix.address);
         })
       ]);
     });
