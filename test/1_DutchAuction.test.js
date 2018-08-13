@@ -5,7 +5,7 @@ const XRT = artifacts.require("XRT");
 
 const ethereum_ens = require("ethereum-ens");
 const ens = new ethereum_ens(web3, ENSRegistry.address);
-const initialBalance = 9000000 * 10**9;
+const initialBalance = 8000000 * 10**9;
 
 contract("DutchAuction", (accounts) => {
 
@@ -44,16 +44,16 @@ contract("DutchAuction", (accounts) => {
 
   it("bid to another account", async () => {
     const auction = await DutchAuction.deployed();
-    await auction.bid(accounts[1], {value: web3.toWei(1, 'ether')});
+    await auction.bid(accounts[1], {value: web3.toWei(1.5, 'ether')});
     const bid = await auction.bids.call(accounts[1]);
-    assert.equal(bid, web3.toWei(1, 'ether'));
+    assert.equal(bid, web3.toWei(1.5, 'ether'));
   });
 
   it("auction finalize bid", async () => {
     const auction = await DutchAuction.deployed();
-    await auction.bid(accounts[2], {value: web3.toWei(1, 'ether')});
+    await auction.bid(accounts[2], {value: web3.toWei(2.5, 'ether')});
     const bid = await auction.bids.call(accounts[2]);
-    assert.equal(bid, web3.toWei(1, 'ether'));
+    assert.equal(bid, web3.toWei(2.5, 'ether'));
 
     const stage = await auction.stage.call();
     assert.equal(stage, 3);

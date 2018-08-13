@@ -37,25 +37,11 @@ contract Ambix is Ownable {
         uint256[] _n
     ) external onlyOwner {
         require(_a.length == _n.length);
-        A.length++;
-        N.length++;
-
-        uint256 ix = A.length - 1;
-        for (uint256 i = 0; i < _a.length; ++i) {
+        for (uint256 i = 0; i < _a.length; ++i)
             require(_a[i] != 0);
 
-            A[ix].push(_a[i]);
-            N[ix].push(_n[i]);
-        }
-    }
-
-    /**
-     * @dev Erase token recipe at '_ix' index
-     * @param _ix Token recipe index
-     */
-    function removeSource(uint256 _ix) external onlyOwner {
-        A[_ix].length = 0;
-        N[_ix].length = 0;
+        A.push(_a);
+        N.push(_n);
     }
 
     /**
@@ -67,6 +53,10 @@ contract Ambix is Ownable {
         address[] _b,
         uint256[] _m
     ) external onlyOwner{
+        require(_b.length == _m.length);
+        for (uint256 i = 0; i < _b.length; ++i)
+            require(_b[i] != 0);
+
         B = _b;
         M = _m;
     }
@@ -75,7 +65,7 @@ contract Ambix is Ownable {
      * @dev Run distillation process
      * @param _ix Source alternative index
      */
-    function run(uint256 _ix) external {
+    function run(uint256 _ix) public {
         require(_ix < A.length);
         uint256 i;
 
@@ -90,7 +80,8 @@ contract Ambix is Ownable {
             // Burning run
             for (i = 0; i < A[_ix].length; ++i) {
                 token = StandardBurnableToken(A[_ix][i]);
-                token.burnFrom(msg.sender, mux * N[_ix][i]);
+                require(token.transferFrom(msg.sender, this, mux * N[_ix][i]));
+                token.burn(mux * N[_ix][i]);
             }
 
             // Transfer up
@@ -115,7 +106,8 @@ contract Ambix is Ownable {
 
             uint256 allowance = source.allowance(msg.sender, this);
             require(allowance > 0);
-            source.burnFrom(msg.sender, allowance);
+            require(source.transferFrom(msg.sender, this, allowance));
+            source.burn(allowance);
 
             uint256 reward = scale * allowance / 10 ** 18;
             require(reward > 0);

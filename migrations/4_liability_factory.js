@@ -6,7 +6,9 @@ const XRT = artifacts.require("XRT");
 const Ambix = artifacts.require("Ambix");
 const DutchAuction = artifacts.require("DutchAuction");
 
-function deployFactory(deployer, ens) {
+const foundation = "";
+
+function deployFactory(deployer, ens, foundation_address) {
   deployer.deploy(XRT).then(xrt => {
     return Promise.all([
       deployer.deploy(RobotLiabilityLib),
@@ -22,7 +24,12 @@ function deployFactory(deployer, ens) {
     }).then(factory => {
       return Promise.all([
         xrt.transferOwnership(factory.address),
-        xrt.transfer(DutchAuction.address, 9000000 * 10**9).then(() => {
+
+        xrt.transfer(foundation_address, 1000000 * 10**9),
+
+        xrt.transfer(Ambix.address, 1000000 * 10**9),
+
+        xrt.transfer(DutchAuction.address, 8000000 * 10**9).then(() => {
           return DutchAuction.at(DutchAuction.address).setup(xrt.address, Ambix.address);
         })
       ]);
@@ -33,9 +40,9 @@ function deployFactory(deployer, ens) {
 module.exports = (deployer, network, accounts) => {
 
   if (network === 'development') {
-    return deployFactory(deployer, ENSRegistry.at(ENSRegistry.address));
+    return deployFactory(deployer, ENSRegistry.at(ENSRegistry.address), accounts[4]);
   } else {
-	return deployFactory(deployer, ENSRegistry.at('0x314159265dD8dbb310642f98f50C066173C1259b'));
+	return deployFactory(deployer, ENSRegistry.at('0x314159265dD8dbb310642f98f50C066173C1259b'), foundation);
   }
 
 };
