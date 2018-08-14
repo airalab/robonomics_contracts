@@ -70,8 +70,8 @@ contract RobotLiabilityLib is RobotLiabilityABI
     {
         require(msg.sender == address(factory));
         require(block.number < _deadline);
-        require(keccak256(abi.encodePacked(model, objective))
-                == keccak256(abi.encodePacked(_model, _objective)));
+        require(keccak256(abi.encode(model, objective))
+                == keccak256(abi.encode(_model, _objective)));
         require(_token == token);
         require(_cost == cost);
 
