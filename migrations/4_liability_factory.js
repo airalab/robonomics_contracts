@@ -25,11 +25,11 @@ function deployFactory(deployer, ens, foundation_address) {
       return Promise.all([
         xrt.transferOwnership(factory.address),
 
-        xrt.transfer(foundation_address, 1000000 * 10**9),
+        xrt.transfer(foundation_address, 1000 * 10**9),
 
-        xrt.transfer(Ambix.address, 1000000 * 10**9),
+        xrt.transfer(Ambix.address, 1000 * 10**9),
 
-        xrt.transfer(DutchAuction.address, 8000000 * 10**9).then(() => {
+        xrt.transfer(DutchAuction.address, 8000 * 10**9).then(() => {
           return DutchAuction.at(DutchAuction.address).setup(xrt.address, Ambix.address);
         })
       ]);
@@ -40,7 +40,7 @@ function deployFactory(deployer, ens, foundation_address) {
 module.exports = (deployer, network, accounts) => {
 
   if (network === 'development') {
-    return deployFactory(deployer, ENSRegistry.at(ENSRegistry.address), accounts[4]);
+    return deployFactory(deployer, ENSRegistry.at(ENSRegistry.address), accounts[0]);
   } else {
 	return deployFactory(deployer, ENSRegistry.at('0x314159265dD8dbb310642f98f50C066173C1259b'), foundation);
   }

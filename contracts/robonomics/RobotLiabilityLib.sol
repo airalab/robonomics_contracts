@@ -70,8 +70,8 @@ contract RobotLiabilityLib is RobotLiabilityABI
     {
         require(msg.sender == address(factory));
         require(block.number < _deadline);
-        require(keccak256(abi.encode(model, objective))
-                == keccak256(abi.encode(_model, _objective)));
+        require(keccak256(model) == keccak256(_model));
+        require(keccak256(objective) == keccak256(_objective));
         require(_token == token);
         require(_cost == cost);
 
@@ -115,6 +115,9 @@ contract RobotLiabilityLib is RobotLiabilityABI
             .recover(_signature);
         require(resultSender == promisor);
 
+        result = _result;
+        isFinalized = true;
+
         if (validator == 0) {
             require(factory.isLighthouse(msg.sender));
             require(token.transfer(promisor, cost));
@@ -130,9 +133,6 @@ contract RobotLiabilityLib is RobotLiabilityABI
             if (validatorFee > 0)
                 require(factory.xrt().transfer(validator, validatorFee));
         }
-
-        result = _result;
-        isFinalized = true;
 
         require(factory.liabilityFinalized(gasinit));
         return true;

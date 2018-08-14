@@ -168,7 +168,7 @@ contract("Lighthouse", (accounts) => {
   let liability;
 
   it("should be created via factory", async () => {
-    const result = await factory.createLighthouse(1000, 3, "test");
+    const result = await factory.createLighthouse(1000, 10, "test");
     assert.equal(result.logs[0].event, "NewLighthouse");
 
     lighthouse = Lighthouse.at(result.logs[0].args.lighthouse);
@@ -222,11 +222,11 @@ contract("Lighthouse", (accounts) => {
 
   it("marker marathon", async () => {
     await xrt.transfer(accounts[1], 1000);
-    await xrt.approve(lighthouse.address, 1000, {from: accounts[1]});
+    await xrt.increaseApproval(lighthouse.address, 1000, {from: accounts[1]});
     await lighthouse.refill(1000, {from: accounts[1]});
 
     await xrt.transfer(accounts[2], 2000);
-    await xrt.approve(lighthouse.address, 2000, {from: accounts[2]});
+    await xrt.increaseApproval(lighthouse.address, 2000, {from: accounts[2]});
     await lighthouse.refill(2000, {from: accounts[2]});
 
     async function markerLog() {
@@ -276,21 +276,29 @@ contract("Lighthouse", (accounts) => {
         console.log('.');
     }
 
+    const timeout = await lighthouse.timeoutBlocks.call();
+
     liability = await liabilityCreation(lighthouse, accounts[1], accounts[0], accounts[0]);
     await markerLog();
-    waitFor(web3.eth.blockNumber + 3);
+    waitFor(web3.eth.blockNumber + timeout.toNumber());
     await liabilityFinalization(liability, lighthouse, accounts[0], accounts[0]);
     await markerLog();
 
     liability = await liabilityCreation(lighthouse, accounts[1], accounts[0], accounts[0]);
     await markerLog();
-    waitFor(web3.eth.blockNumber + 3);
+    waitFor(web3.eth.blockNumber + timeout.toNumber());
     await liabilityFinalization(liability, lighthouse, accounts[0], accounts[0]);
     await markerLog();
 
     liability = await liabilityCreation(lighthouse, accounts[1], accounts[0], accounts[0]);
     await markerLog();
-    waitFor(web3.eth.blockNumber + 3);
+    waitFor(web3.eth.blockNumber + timeout.toNumber());
+    await liabilityFinalization(liability, lighthouse, accounts[0], accounts[0]);
+    await markerLog();
+
+    liability = await liabilityCreation(lighthouse, accounts[1], accounts[0], accounts[0]);
+    await markerLog();
+    waitFor(web3.eth.blockNumber + timeout.toNumber());
     await liabilityFinalization(liability, lighthouse, accounts[0], accounts[0]);
     await markerLog();
 

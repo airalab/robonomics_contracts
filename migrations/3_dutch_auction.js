@@ -1,8 +1,8 @@
 const DutchAuction = artifacts.require("DutchAuction");
 
 const wallet = "";
-const ceiling = 5 * 10**18;
-const priceFactor = 4;
+const ceiling = 4 * 10**18;
+const priceFactor = 600;
 
 module.exports = function(deployer, network, accounts) {
 

@@ -20,13 +20,14 @@ contract LighthouseLib is LighthouseAPI, LighthouseABI {
     function withdraw(uint256 _value) external {
         require(balances[msg.sender] >= _value);
 
-        require(xrt.transfer(msg.sender, _value));
         balances[msg.sender] -= _value;
+        require(xrt.transfer(msg.sender, _value));
 
         // Drop member if quota go to zero
         if (quotaOf(msg.sender) == 0) {
-            require(xrt.transfer(msg.sender, balances[msg.sender])); 
+            uint256 balance = balances[msg.sender];
             balances[msg.sender] = 0;
+            require(xrt.transfer(msg.sender, balance)); 
             
             uint256 senderIndex = indexOf[msg.sender];
             uint256 lastIndex = members.length - 1;
@@ -49,6 +50,7 @@ contract LighthouseLib is LighthouseAPI, LighthouseABI {
         }
 
         // Consume one quota for transaction sending
+        assert(quota > 0);
         quota -= 1;
 
         _;
