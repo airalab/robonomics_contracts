@@ -5,7 +5,7 @@ const XRT = artifacts.require("XRT");
 
 const ethereum_ens = require("ethereum-ens");
 const ens = new ethereum_ens(web3, ENSRegistry.address);
-const initialBalance = 8000 * 10**9;
+const initialBalance = 800 * 10**9;
 
 contract("DutchAuction", (accounts) => {
 

@@ -215,9 +215,11 @@ contract("Lighthouse", (accounts) => {
 
     const currentBalance = (await xrt.balanceOf(accounts[0])).toNumber();
     const deltaB = currentBalance - originBalance;
-    console.log("emission: " + deltaB + " wn");
+    console.log("emission: " + (deltaB - 1) + " wn");
 
-    assert.equal(deltaB - 1, (await factory.gasUtilizing.call(liability.address)).toNumber());
+    const gas = await factory.gasUtilizing.call(liability.address);
+    const wn = await factory.wnFromGas.call(gas);
+    assert.equal(deltaB - 1, wn);
   });
 
   it("marker marathon", async () => {
@@ -271,9 +273,8 @@ contract("Lighthouse", (accounts) => {
     }
 
     function waitFor(blockNumber) {
-      console.log('waiting for block ' + blockNumber);
-      while (web3.eth.blockNumber < blockNumber)
-        console.log('.');
+      console.log('waiting for block ' + blockNumber + '...');
+      while (web3.eth.blockNumber < blockNumber) {}
     }
 
     const timeout = await lighthouse.timeoutBlocks.call();

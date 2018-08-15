@@ -51,7 +51,7 @@ contract("Ambix", (accounts) => {
     await ambix.run(0, {from: accounts[2]});
 
     const balance = await sink.balanceOf.call(accounts[2]);
-    assert.equal(balance.toNumber(), 100 * 10**9);
+    assert.equal(balance.toNumber(), 1000 * 10**9);
   });
 
 });

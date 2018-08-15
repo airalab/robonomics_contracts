@@ -101,7 +101,7 @@ contract LiabilityFactory {
         uint256 epoch = totalGasUtilizing / gasEpoch;
 
         // XRT emission with addition coefficient by gas utilzation epoch
-        uint256 wn = _gas * gasPrice * 2**epoch / 3**epoch / auction.finalPrice();
+        uint256 wn = _gas * 10**9 * gasPrice * 2**epoch / 3**epoch / auction.finalPrice();
 
         // Check to not permit emission decrease below wn=gas
         return wn < _gas ? _gas : wn;

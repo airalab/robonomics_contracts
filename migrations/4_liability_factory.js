@@ -25,11 +25,11 @@ function deployFactory(deployer, ens, foundation_address) {
       return Promise.all([
         xrt.transferOwnership(factory.address),
 
-        xrt.transfer(foundation_address, 1000 * 10**9),
+        xrt.transfer(foundation_address, 100 * 10**9),
 
-        xrt.transfer(Ambix.address, 1000 * 10**9),
+        xrt.transfer(Ambix.address, 100 * 10**9),
 
-        xrt.transfer(DutchAuction.address, 8000 * 10**9).then(() => {
+        xrt.transfer(DutchAuction.address, 800 * 10**9).then(() => {
           return DutchAuction.at(DutchAuction.address).setup(xrt.address, Ambix.address);
         })
       ]);

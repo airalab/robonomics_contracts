@@ -15,7 +15,7 @@ contract DutchAuction {
     /*
      *  Constants
      */
-    uint constant public MAX_TOKENS_SOLD = 8000 * 10**9; // 8M XRT = 10M - 1M (Foundation) - 1M (Early investors base)
+    uint constant public MAX_TOKENS_SOLD = 800 * 10**9; // 8M XRT = 10M - 1M (Foundation) - 1M (Early investors base)
     uint constant public WAITING_PERIOD = 0; // 1 days;
 
     /*
