@@ -6,7 +6,7 @@ import 'openzeppelin-solidity/contracts/token/ERC20/BurnableToken.sol';
 contract XRT is MintableToken, BurnableToken {
     string public constant name     = "Robonomics Beta";
     string public constant symbol   = "XRT";
-    uint   public constant decimals = 9;
+    uint8  public constant decimals = 9;
 
     uint256 public constant INITIAL_SUPPLY = 1000 * (10 ** uint256(decimals));
 
