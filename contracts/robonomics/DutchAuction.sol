@@ -89,7 +89,8 @@ contract DutchAuction {
     constructor(address _wallet, uint _ceiling, uint _priceFactor)
         public
     {
-        require(_wallet != 0 && _ceiling != 0 && _priceFactor != 0);
+        require(_wallet != 0 && _ceiling > 0 && _priceFactor > 0);
+
         owner = msg.sender;
         wallet = _wallet;
         ceiling = _ceiling;
@@ -107,6 +108,7 @@ contract DutchAuction {
     {
         // Validate argument
         require(_xrt != 0 && _ambix != 0);
+
         xrt = XRT(_xrt);
         ambix = _ambix;
 
@@ -124,18 +126,6 @@ contract DutchAuction {
     {
         stage = Stages.AuctionStarted;
         startBlock = block.number;
-    }
-
-    /// @dev Changes auction ceiling and start price factor before auction is started.
-    /// @param _ceiling Updated auction ceiling.
-    /// @param _priceFactor Updated start price factor.
-    function changeSettings(uint _ceiling, uint _priceFactor)
-        public
-        isWallet
-        atStage(Stages.AuctionSetUp)
-    {
-        ceiling = _ceiling;
-        priceFactor = _priceFactor;
     }
 
     /// @dev Calculates current token price.

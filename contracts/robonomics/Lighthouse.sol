@@ -12,6 +12,8 @@ contract Lighthouse is LighthouseAPI, LightContract {
         public
         LightContract(_lib)
     {
+        require(_minimalFreeze > 0 && _timeoutBlocks > 0);
+
         minimalFreeze = _minimalFreeze;
         timeoutBlocks = _timeoutBlocks;
         factory = LiabilityFactory(msg.sender);
