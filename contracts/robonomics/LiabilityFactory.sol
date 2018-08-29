@@ -224,6 +224,8 @@ contract LiabilityFactory {
         require(gasUtilizing[msg.sender] > 0);
 
         uint256 gas = _gas - gasleft();
+        require(_gas > gas);
+
         totalGasUtilizing        += gas;
         gasUtilizing[msg.sender] += gas;
         require(xrt.mint(tx.origin, wnFromGas(gasUtilizing[msg.sender])));
