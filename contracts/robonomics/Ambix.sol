@@ -36,9 +36,19 @@ contract Ambix is Ownable {
         address[] _a,
         uint256[] _n
     ) external onlyOwner {
-        require(_a.length == _n.length);
-        for (uint256 i = 0; i < _a.length; ++i)
+        uint256 i;
+
+        require(_a.length == _n.length && _a.length > 0);
+
+        for (i = 0; i < _a.length; ++i)
             require(_a[i] != 0);
+
+        if (_n.length == 1 && _n[0] == 0) {
+            require(B.length == 1);
+        } else {
+            for (i = 0; i < _n.length; ++i)
+                require(_n[i] > 0);
+        }
 
         A.push(_a);
         N.push(_n);
@@ -54,6 +64,7 @@ contract Ambix is Ownable {
         uint256[] _m
     ) external onlyOwner{
         require(_b.length == _m.length);
+
         for (uint256 i = 0; i < _b.length; ++i)
             require(_b[i] != 0);
 
