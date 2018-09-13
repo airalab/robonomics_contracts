@@ -1,3 +1,6 @@
 [submodule "ens"]
 	path = ens
 	url = https://github.com/ensdomains/ens
+[submodule "MultiSigWallet"]
+	path = MultiSigWallet
+	url = https://github.com/gnosis/MultiSigWallet
