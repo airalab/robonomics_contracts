@@ -96,8 +96,8 @@ contract RobotLiabilityLib is RobotLiabilityABI
     /**
      * @dev Finalize this liability
      * @param _result Result data hash
-     * @param _agree Validation network confirmation
      * @param _signature Result sender signature
+     * @param _agree Validation network confirmation
      */
     function finalize(
         bytes _result,
@@ -117,21 +117,21 @@ contract RobotLiabilityLib is RobotLiabilityABI
 
         result = _result;
         isFinalized = true;
+        isConfirmed = _agree;
 
         if (validator == 0) {
             require(factory.isLighthouse(msg.sender));
-            require(token.transfer(promisor, cost));
         } else {
             require(msg.sender == validator);
+            if (validatorFee > 0)
+                require(factory.xrt().transfer(validator, validatorFee));
+        }
 
-            isConfirmed = _agree;
-            if (isConfirmed)
+        if (cost > 0) {
+            if (isConfirmed && result.length > 0)
                 require(token.transfer(promisor, cost));
             else
                 require(token.transfer(promisee, cost));
-
-            if (validatorFee > 0)
-                require(factory.xrt().transfer(validator, validatorFee));
         }
 
         require(factory.liabilityFinalized(gasinit));

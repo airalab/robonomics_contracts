@@ -112,7 +112,7 @@ function finalize(liability, account) {
     , {t: "bytes",     v: result}
   );
 
-  return abi.encodeFunctionCall(finalizeAbi, [result, web3.eth.sign(account, hash)]); 
+  return abi.encodeFunctionCall(finalizeAbi, [result, web3.eth.sign(account, hash), true]); 
 }
 
 async function liabilityCreation(lighthouse, account, promisee, promisor) {
