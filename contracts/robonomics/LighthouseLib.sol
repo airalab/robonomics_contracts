@@ -58,6 +58,9 @@ contract LighthouseLib is LighthouseAPI, LighthouseABI {
 
     modifier keepalive {
         if (timeoutBlocks < block.number - keepaliveBlock) {
+            // Require to sender have a quota
+            require(quotaOf(msg.sender) > 0);
+
             // Search keepalive sender
             while (msg.sender != members[marker])
                 nextMember();

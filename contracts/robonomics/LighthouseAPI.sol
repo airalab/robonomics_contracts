@@ -5,6 +5,10 @@ import './XRT.sol';
 
 contract LighthouseAPI {
     address[] public members;
+
+    function membersLength() public view returns (uint256)
+    { return members.length; }
+
     mapping(address => uint256) indexOf;
 
     mapping(address => uint256) public balances;
