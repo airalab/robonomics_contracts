@@ -62,8 +62,9 @@ contract LighthouseLib is LighthouseAPI, LighthouseABI {
             require(quotaOf(msg.sender) > 0);
 
             // Search keepalive sender
-            while (msg.sender != members[marker])
+            do
                 nextMember();
+            while (msg.sender != members[marker]);
 
             // Allocate new quota
             quota = quotaOf(members[marker]);
