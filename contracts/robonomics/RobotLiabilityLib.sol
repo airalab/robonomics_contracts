@@ -1,14 +1,17 @@
 pragma solidity ^0.4.24;
 
-import 'openzeppelin-solidity/contracts/ECRecovery.sol';
+import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
+import 'openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol';
 import './RobotLiabilityABI.sol';
 import './RobotLiabilityAPI.sol';
 
 contract RobotLiabilityLib is RobotLiabilityABI
                             , RobotLiabilityAPI {
-    using ECRecovery for bytes32;
+    using ECDSA for bytes32;
+    using SafeERC20 for XRT;
+    using SafeERC20 for ERC20;
 
-    function ask(
+    function demand(
         bytes   _model,
         bytes   _objective,
 
@@ -35,7 +38,7 @@ contract RobotLiabilityLib is RobotLiabilityABI
         validator    = _validator;
         validatorFee = _validator_fee;
 
-        askHash = keccak256(abi.encodePacked(
+        demandHash = keccak256(abi.encodePacked(
             _model
           , _objective
           , _token
@@ -46,19 +49,20 @@ contract RobotLiabilityLib is RobotLiabilityABI
           , _nonce
         ));
 
-        promisee = askHash
+        promisee = demandHash
             .toEthSignedMessageHash()
             .recover(_signature);
         return true;
     }
 
-    function bid(
+    function offer(
         bytes   _model,
         bytes   _objective,
         
         ERC20   _token,
         uint256 _cost,
 
+        address _validator,
         uint256 _lighthouse_fee,
 
         uint256 _deadline,
@@ -74,20 +78,22 @@ contract RobotLiabilityLib is RobotLiabilityABI
         require(keccak256(objective) == keccak256(_objective));
         require(_token == token);
         require(_cost == cost);
+        require(_validator == validator);
 
         lighthouseFee = _lighthouse_fee;
 
-        bidHash = keccak256(abi.encodePacked(
+        offerHash = keccak256(abi.encodePacked(
             _model
           , _objective
           , _token
           , _cost
+          , _validator
           , _lighthouse_fee
           , _deadline
           , _nonce
         ));
 
-        promisor = bidHash
+        promisor = offerHash
             .toEthSignedMessageHash()
             .recover(_signature);
         return true;
@@ -96,11 +102,13 @@ contract RobotLiabilityLib is RobotLiabilityABI
     /**
      * @dev Finalize this liability
      * @param _result Result data hash
-     * @param _signature Result sender signature
-     * @param _agree Validation network confirmation
+     * @param _success Set 'true' when liability has success result
+     * @param _signature Result signature: liability address, result and success flag signed by promisor
+     * @param _agree Validator decision around liability
      */
     function finalize(
         bytes _result,
+        bool  _success,
         bytes _signature,
         bool  _agree
     )
@@ -108,31 +116,30 @@ contract RobotLiabilityLib is RobotLiabilityABI
         returns (bool)
     {
         uint256 gasinit = gasleft();
+
         require(!isFinalized);
 
-        address resultSender = keccak256(abi.encodePacked(this, _result))
+        address resultSender = keccak256(abi.encodePacked(this, _result, _success))
             .toEthSignedMessageHash()
             .recover(_signature);
         require(resultSender == promisor);
 
-        result = _result;
+        result      = _result;
+        isSuccess   = validator == 0 ? _success : _success && _agree;
+
         isFinalized = true;
-        isConfirmed = _agree;
+        emit Finalized(isSuccess, result);
 
         if (validator == 0) {
             require(factory.isLighthouse(msg.sender));
         } else {
             require(msg.sender == validator);
             if (validatorFee > 0)
-                require(factory.xrt().transfer(validator, validatorFee));
+                factory.xrt().safeTransfer(validator, validatorFee);
         }
 
-        if (cost > 0) {
-            if (isConfirmed && result.length > 0)
-                require(token.transfer(promisor, cost));
-            else
-                require(token.transfer(promisee, cost));
-        }
+        if (cost > 0)
+            token.safeTransfer(_success ? promisor : promisee, cost);
 
         require(factory.liabilityFinalized(gasinit));
         return true;

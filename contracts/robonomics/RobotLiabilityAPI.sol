@@ -13,15 +13,17 @@ contract RobotLiabilityAPI {
     uint256 public lighthouseFee;
     uint256 public validatorFee;
 
-    bytes32 public askHash;
-    bytes32 public bidHash;
+    bytes32 public demandHash;
+    bytes32 public offerHash;
 
     address public promisor;
     address public promisee;
     address public validator;
 
-    bool    public isConfirmed;
+    bool    public isSuccess;
     bool    public isFinalized;
 
     LiabilityFactory public factory;
+
+    event Finalized(bool indexed success, bytes result);
 }

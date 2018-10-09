@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 import "./XRT.sol";
 
 contract RobotLiabilityABI {
-    function ask(
+    function demand(
         bytes   _model,
         bytes   _objective,
 
@@ -18,13 +18,14 @@ contract RobotLiabilityABI {
         bytes   _signature
     ) external returns (bool);
 
-    function bid(
+    function offer(
         bytes   _model,
         bytes   _objective,
         
         ERC20   _token,
         uint256 _cost,
 
+        address _validator,
         uint256 _lighthouse_fee,
 
         uint256 _deadline,
@@ -34,6 +35,7 @@ contract RobotLiabilityABI {
 
     function finalize(
         bytes _result,
+        bool  _success,
         bytes _signature,
         bool  _agree
     ) external returns (bool);

@@ -1,6 +1,7 @@
 pragma solidity ^0.4.24;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol';
+import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol';
+import 'openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol';
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
 /**
@@ -22,6 +23,9 @@ import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
   part of equation and send (transfer) right part.
 */
 contract Ambix is Ownable {
+    using SafeERC20 for ERC20Burnable;
+    using SafeERC20 for ERC20;
+
     address[][] public A;
     uint256[][] public N;
     address[] public B;
@@ -83,23 +87,17 @@ contract Ambix is Ownable {
         if (N[_ix][0] > 0) {
             // Static conversion
 
-            StandardBurnableToken token = StandardBurnableToken(A[_ix][0]);
             // Token count multiplier
-            uint256 mux = token.allowance(msg.sender, this) / N[_ix][0];
+            uint256 mux = ERC20(A[_ix][0]).allowance(msg.sender, this) / N[_ix][0];
             require(mux > 0);
 
             // Burning run
-            for (i = 0; i < A[_ix].length; ++i) {
-                token = StandardBurnableToken(A[_ix][i]);
-                require(token.transferFrom(msg.sender, this, mux * N[_ix][i]));
-                token.burn(mux * N[_ix][i]);
-            }
+            for (i = 0; i < A[_ix].length; ++i)
+                ERC20Burnable(A[_ix][i]).burnFrom(msg.sender, mux * N[_ix][i]);
 
             // Transfer up
-            for (i = 0; i < B.length; ++i) {
-                token = StandardBurnableToken(B[i]);
-                require(token.transfer(msg.sender, M[i] * mux));
-            }
+            for (i = 0; i < B.length; ++i)
+                ERC20(B[i]).safeTransfer(msg.sender, M[i] * mux);
 
         } else {
             // Dynamic conversion
@@ -110,19 +108,18 @@ contract Ambix is Ownable {
             // Is available for single source and single sink only
             require(A[_ix].length == 1 && B.length == 1);
 
-            StandardBurnableToken source = StandardBurnableToken(A[_ix][0]);
-            StandardBurnableToken sink = StandardBurnableToken(B[0]);
+            ERC20Burnable source = ERC20Burnable(A[_ix][0]);
+            ERC20 sink = ERC20(B[0]);
 
             uint256 scale = 10 ** 18 * sink.balanceOf(this) / source.totalSupply();
 
             uint256 allowance = source.allowance(msg.sender, this);
             require(allowance > 0);
-            require(source.transferFrom(msg.sender, this, allowance));
-            source.burn(allowance);
+            source.burnFrom(msg.sender, allowance);
 
             uint256 reward = scale * allowance / 10 ** 18;
             require(reward > 0);
-            require(sink.transfer(msg.sender, reward));
+            sink.safeTransfer(msg.sender, reward);
         }
     }
 }

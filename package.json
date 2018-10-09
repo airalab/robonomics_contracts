@@ -23,13 +23,13 @@
     "airalab"
   ],
   "dependencies": {
-    "eth-ens-namehash": "^1.0.2",
+    "eth-ens-namehash": "^2.0.8",
     "ethereum-ens": "^0.7.4",
-    "openzeppelin-solidity": "1.12.0",
-    "truffle": "^4.0.0",
-    "truffle-flattener": "^1.2.6",
-    "web3-eth-abi": "^1.0.0-beta.34",
-    "web3-utils": "^1.0.0-beta.34"
+    "openzeppelin-solidity": "next",
+    "truffle": "^4.1.14",
+    "truffle-flattener": "^1.2.9",
+    "web3-eth-abi": "^1.0.0-beta.36",
+    "web3-utils": "^1.0.0-beta.36"
   },
   "author": "Airalab <research@aira.life>",
   "license": "BSD-3-Clause"

@@ -1,18 +1,18 @@
 const LiabilityFactory = artifacts.require("LiabilityFactory");
-const ENSRegistry = artifacts.require("ENSRegistry");
+const ENS = artifacts.require("ENS");
 const RobotLiabilityLib = artifacts.require("RobotLiabilityLib");
 const LighthouseLib = artifacts.require("LighthouseLib");
 const XRT = artifacts.require("XRT");
 
 const ethereum_ens = require("ethereum-ens");
-const ens = new ethereum_ens(web3, ENSRegistry.address);
+const ens = new ethereum_ens(web3, ENS.address);
 const namehash = require('eth-ens-namehash');
 
 contract("LiabilityFactory", () => {
   const factory = LiabilityFactory.at(LiabilityFactory.address);
 
   it("shoudl be resolved via ENS", async () => {
-    const addr = await ens.resolver("factory.1.robonomics.eth").addr();
+    const addr = await ens.resolver("factory.2.robonomics.eth").addr();
     assert.equal(addr, LiabilityFactory.address);
   });
 
@@ -23,7 +23,7 @@ contract("LiabilityFactory", () => {
 
   it("should point to ENS", async () => {
     const ens = await factory.ens.call();
-    assert.equal(ens, ENSRegistry.address);
+    assert.equal(ens, ENS.address);
   });
 
   it("should point to RobotLiability binary", async () => {

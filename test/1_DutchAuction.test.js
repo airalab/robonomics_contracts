@@ -1,16 +1,16 @@
 const DutchAuction = artifacts.require("DutchAuction");
-const ENSRegistry = artifacts.require("ENSRegistry");
+const ENS = artifacts.require("ENS");
 const Ambix = artifacts.require("Ambix");
 const XRT = artifacts.require("XRT");
 
 const ethereum_ens = require("ethereum-ens");
-const ens = new ethereum_ens(web3, ENSRegistry.address);
+const ens = new ethereum_ens(web3, ENS.address);
 const initialBalance = 800 * 10**9;
 
 contract("DutchAuction", (accounts) => {
 
   it("should be resolved via ENS", async () => {
-    const addr = await ens.resolver("auction.1.robonomics.eth").addr();
+    const addr = await ens.resolver("auction.2.robonomics.eth").addr();
     assert.equal(addr, DutchAuction.address);
   });
 

@@ -1,18 +1,12 @@
 pragma solidity ^0.4.24;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/MintableToken.sol';
-import 'openzeppelin-solidity/contracts/token/ERC20/BurnableToken.sol';
+import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol';
+import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol';
+import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol';
 
-contract XRT is MintableToken, BurnableToken {
-    string public constant name     = "Robonomics Beta";
-    string public constant symbol   = "XRT";
-    uint8  public constant decimals = 9;
-
-    uint256 public constant INITIAL_SUPPLY = 1000 * (10 ** uint256(decimals));
-
-    constructor() public {
-        totalSupply_ = INITIAL_SUPPLY;
-        balances[msg.sender] = INITIAL_SUPPLY;
-        emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
+contract XRT is ERC20Mintable, ERC20Burnable, ERC20Detailed {
+    constructor() public ERC20Detailed("XRT", "Robonomics Beta", 9) {
+        uint256 INITIAL_SUPPLY = 1000 * (10 ** 9);
+        _mint(msg.sender, INITIAL_SUPPLY);
     }
 }

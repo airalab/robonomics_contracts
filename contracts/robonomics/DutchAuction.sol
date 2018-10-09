@@ -185,7 +185,7 @@ contract DutchAuction {
 
         bids[receiver] += amount;
         totalReceived += amount;
-        BidSubmission(receiver, amount);
+        emit BidSubmission(receiver, amount);
 
         // Finalize auction when maxWei reached
         if (amount == maxWei)

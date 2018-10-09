@@ -1,14 +1,14 @@
-const XRT = artifacts.require("XRT");
-const Ambix = artifacts.require("Ambix");
-const DutchAuction = artifacts.require("DutchAuction");
-const ENSRegistry = artifacts.require("ENSRegistry");
-const PublicResolver = artifacts.require("PublicResolver");
 const LiabilityFactory = artifacts.require("LiabilityFactory");
+const PublicResolver = artifacts.require("PublicResolver");
+const DutchAuction = artifacts.require("DutchAuction");
+const Ambix = artifacts.require("Ambix");
+const XRT = artifacts.require("XRT");
+const ENS = artifacts.require("ENS");
 
-const namehash = require('eth-ens-namehash');
+const namehash = require('eth-ens-namehash').hash;
 const sha3 = require('web3-utils').sha3;
 
-const robonomicsGen  = "1";
+const robonomicsGen  = "2";
 const robonomicsRoot = robonomicsGen+".robonomics.eth";
 
 function regNames(deployer, ens, accounts) {
@@ -46,9 +46,9 @@ function regNames(deployer, ens, accounts) {
 module.exports = function(deployer, network, accounts) {
 
   if (network === 'development') {
-    regNames(deployer, ENSRegistry.at(ENSRegistry.address), accounts);
+    regNames(deployer, ENS.at(ENS.address), accounts);
   } else {
-	regNames(deployer, ENSRegistry.at('0x314159265dD8dbb310642f98f50C066173C1259b'), accounts);
+	regNames(deployer, ENS.at('0x314159265dD8dbb310642f98f50C066173C1259b'), accounts);
    };
 
 };

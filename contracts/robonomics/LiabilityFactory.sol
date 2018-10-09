@@ -1,15 +1,18 @@
 pragma solidity ^0.4.24;
 
 import './RobotLiability.sol';
+import './SingletonHash.sol';
 import './DutchAuction.sol';
 import './Lighthouse.sol';
 import './XRT.sol';
 
 import 'ens/contracts/ENS.sol';
-import 'ens/contracts/ENSRegistry.sol';
+import 'ens/contracts/AbstractENS.sol';
 import 'ens/contracts/PublicResolver.sol';
 
-contract LiabilityFactory {
+import 'openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol';
+
+contract LiabilityFactory is SingletonHash {
     constructor(
         address _robot_liability_lib,
         address _lighthouse_lib,
@@ -23,6 +26,9 @@ contract LiabilityFactory {
         xrt = _xrt;
         ens = _ens;
     }
+
+    using SafeERC20 for XRT;
+    using SafeERC20 for ERC20;
 
     /**
      * @dev New liability created 
@@ -70,11 +76,6 @@ contract LiabilityFactory {
     uint256 public constant gasPrice = 10 * 10**9;
 
     /**
-     * @dev Used market orders accounting
-     */
-    mapping(bytes32 => bool) public usedHash;
-
-    /**
      * @dev Lighthouse accounting
      */
     mapping(address => bool) public isLighthouse;
@@ -116,22 +117,13 @@ contract LiabilityFactory {
     }
 
     /**
-     * @dev Parameter can be used only once
-     * @param _hash Single usage hash
-     */
-    function usedHashGuard(bytes32 _hash) internal {
-        require(!usedHash[_hash]);
-        usedHash[_hash] = true;
-    }
-
-    /**
      * @dev Create robot liability smart contract
-     * @param _ask ABI-encoded ASK order message 
-     * @param _bid ABI-encoded BID order message 
+     * @param _demand ABI-encoded demand message 
+     * @param _offer ABI-encoded offer message 
      */
     function createLiability(
-        bytes _ask,
-        bytes _bid
+        bytes _demand,
+        bytes _offer
     )
         external 
         onlyLighthouse
@@ -145,28 +137,30 @@ contract LiabilityFactory {
         emit NewLiability(liability);
 
         // Parse messages
-        require(liability.call(abi.encodePacked(bytes4(0x82fbaa25), _ask))); // liability.ask(...)
-        usedHashGuard(liability.askHash());
+        require(liability.call(abi.encodePacked(bytes4(0x0be8947a), _demand))); // liability.demand(...)
+        singletonHash(liability.demandHash());
 
-        require(liability.call(abi.encodePacked(bytes4(0x66193359), _bid))); // liability.bid(...)
-        usedHashGuard(liability.bidHash());
+        require(liability.call(abi.encodePacked(bytes4(0x87bca1cf), _offer))); // liability.offer(...)
+        singletonHash(liability.offerHash());
 
         // Transfer lighthouse fee to lighthouse worker directly
-        require(xrt.transferFrom(liability.promisor(),
+        if (liability.lighthouseFee() > 0)
+            xrt.safeTransferFrom(liability.promisor(),
                                  tx.origin,
-                                 liability.lighthouseFee()));
+                                 liability.lighthouseFee());
 
         // Transfer liability security and hold on contract
         ERC20 token = liability.token();
-        require(token.transferFrom(liability.promisee(),
+        if (liability.cost() > 0)
+            token.safeTransferFrom(liability.promisee(),
                                    liability,
-                                   liability.cost()));
+                                   liability.cost());
 
         // Transfer validator fee and hold on contract
         if (address(liability.validator()) != 0 && liability.validatorFee() > 0)
-            require(xrt.transferFrom(liability.promisee(),
-                                     liability,
-                                     liability.validatorFee()));
+            xrt.safeTransferFrom(liability.promisee(),
+                                 liability,
+                                 liability.validatorFee());
 
         // Accounting gas usage of transaction
         uint256 gas = gasinit - gasleft() + 110525; // Including observation error
@@ -190,8 +184,8 @@ contract LiabilityFactory {
         returns (address lighthouse)
     {
         bytes32 lighthouseNode
-            // lighthouse.1.robonomics.eth
-            = 0x3662a5d633e9a5ca4b4bd25284e1b343c15a92b5347feb9b965a2b1ef3e1ea1a;
+            // lighthouse.2.robonomics.eth
+            = 0xa058d6058d5ec525aa555c572720908a8d6ea6e2781b460bdecb2abf8bf56d4c;
 
         // Name reservation check
         bytes32 subnode = keccak256(abi.encodePacked(lighthouseNode, keccak256(_name)));

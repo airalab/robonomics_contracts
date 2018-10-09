@@ -1,17 +1,17 @@
 const LiabilityFactory = artifacts.require("LiabilityFactory");
-const ENSRegistry = artifacts.require("ENSRegistry");
+const ENS = artifacts.require("ENS");
 const Lighthouse = artifacts.require("LighthouseLib");
 const Liability = artifacts.require("RobotLiabilityLib");
 const XRT = artifacts.require("XRT");
 
 const ethereum_ens = require("ethereum-ens");
-const ens = new ethereum_ens(web3, ENSRegistry.address);
+const ens = new ethereum_ens(web3, ENS.address);
 const namehash = require("eth-ens-namehash");
 const utils = require("web3-utils");
 const abi = require("web3-eth-abi");
 
-function randomAsk(account) {
-  let ask = { model:        utils.randomHex(34)
+function randomDemand(account) {
+  let demand = { model:        utils.randomHex(34)
             , objective:    utils.randomHex(34)
             , token:        XRT.address
             , cost:         1
@@ -22,40 +22,41 @@ function randomAsk(account) {
             };
             
   const hash = utils.soliditySha3(
-      {t: "bytes",   v: ask.model}
-    , {t: "bytes",   v: ask.objective}
-    , {t: "address", v: ask.token}
-    , {t: "uint256", v: ask.cost}
-    , {t: "address", v: ask.validator}
-    , {t: "uint256", v: ask.validatorFee}
-    , {t: "uint256", v: ask.deadline}
-    , {t: "bytes32", v: ask.nonce}
+      {t: "bytes",   v: demand.model}
+    , {t: "bytes",   v: demand.objective}
+    , {t: "address", v: demand.token}
+    , {t: "uint256", v: demand.cost}
+    , {t: "address", v: demand.validator}
+    , {t: "uint256", v: demand.validatorFee}
+    , {t: "uint256", v: demand.deadline}
+    , {t: "bytes32", v: demand.nonce}
   );
-  ask.signature = web3.eth.sign(account, hash);
+  demand.signature = web3.eth.sign(account, hash);
 
-  return ask;
+  return demand;
 }
 
-function pairBid(ask, account) {
-  let bid = Object.assign({}, ask);
-  bid.nonce = utils.randomHex(32); 
-  bid.lighthouseFee = 1;
+function pairOffer(demand, account) {
+  let offer = Object.assign({}, demand);
+  offer.nonce = utils.randomHex(32); 
+  offer.lighthouseFee = 42;
 
   const hash = utils.soliditySha3(
-      {t: "bytes",   v: bid.model}
-    , {t: "bytes",   v: bid.objective}
-    , {t: "address", v: bid.token}
-    , {t: "uint256", v: bid.cost}
-    , {t: "uint256", v: bid.lighthouseFee}
-    , {t: "uint256", v: bid.deadline}
-    , {t: "bytes32", v: bid.nonce}
+      {t: "bytes",   v: offer.model}
+    , {t: "bytes",   v: offer.objective}
+    , {t: "address", v: offer.token}
+    , {t: "uint256", v: offer.cost}
+    , {t: "address", v: offer.validator}
+    , {t: "uint256", v: offer.lighthouseFee}
+    , {t: "uint256", v: offer.deadline}
+    , {t: "bytes32", v: offer.nonce}
   );
-  bid.signature = web3.eth.sign(account, hash);
+  offer.signature = web3.eth.sign(account, hash);
 
-  return bid;
+  return offer;
 }
 
-function encodeAsk(ask) {
+function encodeDemand(demand) {
   return abi.encodeParameters(
     [ "bytes"
     , "bytes"
@@ -67,38 +68,40 @@ function encodeAsk(ask) {
     , "bytes32"
     , "bytes"
     ],
-    [ ask.model
-    , ask.objective
-    , ask.token
-    , ask.cost
-    , ask.validator
-    , ask.validatorFee
-    , ask.deadline
-    , ask.nonce
-    , ask.signature
+    [ demand.model
+    , demand.objective
+    , demand.token
+    , demand.cost
+    , demand.validator
+    , demand.validatorFee
+    , demand.deadline
+    , demand.nonce
+    , demand.signature
     ]
   );
 }
 
-function encodeBid(bid) {
+function encodeOffer(offer) {
   return abi.encodeParameters(
     [ "bytes"
     , "bytes"
     , "address"
     , "uint256"
+    , "address"
     , "uint256"
     , "uint256"
     , "bytes32"
     , "bytes"
     ],
-    [ bid.model
-    , bid.objective
-    , bid.token
-    , bid.cost
-    , bid.lighthouseFee
-    , bid.deadline
-    , bid.nonce
-    , bid.signature
+    [ offer.model
+    , offer.objective
+    , offer.token
+    , offer.cost
+    , offer.validator
+    , offer.lighthouseFee
+    , offer.deadline
+    , offer.nonce
+    , offer.signature
     ]
   );
 }
@@ -110,9 +113,10 @@ function finalize(liability, account) {
   const hash = utils.soliditySha3(
       {t: "address",   v: liability}
     , {t: "bytes",     v: result}
+    , {t: "bool",      v: true}
   );
 
-  return abi.encodeFunctionCall(finalizeAbi, [result, web3.eth.sign(account, hash), true]); 
+  return abi.encodeFunctionCall(finalizeAbi, [result, true, web3.eth.sign(account, hash), true]); 
 }
 
 async function liabilityCreation(lighthouse, account, promisee, promisor) {
@@ -121,13 +125,13 @@ async function liabilityCreation(lighthouse, account, promisee, promisor) {
 
   const builder = LiabilityFactory.at(lighthouse.address);
 
-  const ask = randomAsk(promisee);
-  const bid = pairBid(ask, promisor);
+  const demand = randomDemand(promisee);
+  const offer = pairOffer(demand, promisor);
 
-  await xrt.increaseApproval(LiabilityFactory.address, ask.cost, {from: promisee});
-  await xrt.increaseApproval(LiabilityFactory.address, bid.lighthouseFee, {from: promisor});
+  await xrt.increaseAllowance(LiabilityFactory.address, demand.cost, {from: promisee});
+  await xrt.increaseAllowance(LiabilityFactory.address, offer.lighthouseFee, {from: promisor});
 
-  const result = await builder.createLiability(encodeAsk(ask), encodeBid(bid), {from: account});
+  const result = await builder.createLiability(encodeDemand(demand), encodeOffer(offer), {from: account});
   assert.equal(result.logs[0].event, "NewLiability");
 
   const liability = Liability.at(result.logs[0].args.liability);
@@ -173,17 +177,17 @@ contract("Lighthouse", (accounts) => {
 
     lighthouse = Lighthouse.at(result.logs[0].args.lighthouse);
 
-    const registered = await factory.isLighthouse.call(lighthouse.address);
+    const registered = await factory.isLighthouse(lighthouse.address);
     assert.equal(registered, true);
   });
 
   it("should be resolved via ENS", async () => {
-    const addr = await ens.resolver("test.lighthouse.1.robonomics.eth").addr();
+    const addr = await ens.resolver("test.lighthouse.2.robonomics.eth").addr();
     assert.equal(addr, lighthouse.address);
   });
 
   it("security placement", async () => {
-    await xrt.approve(lighthouse.address, 2000);
+    await xrt.increaseAllowance(lighthouse.address, 2000);
     await lighthouse.refill(2000);
     const balance = await lighthouse.balances.call(accounts[0]);
     assert.equal(balance, 2000);
@@ -202,7 +206,7 @@ contract("Lighthouse", (accounts) => {
   });
 
   it("liability creation", async () => {
-    await xrt.approve(lighthouse.address, 1000);
+    await xrt.increaseAllowance(lighthouse.address, 1000);
     await lighthouse.refill(1000);
 
     liability = await liabilityCreation(lighthouse, accounts[0], accounts[0], accounts[0]);
@@ -224,11 +228,11 @@ contract("Lighthouse", (accounts) => {
 
   it("marker marathon", async () => {
     await xrt.transfer(accounts[1], 1000);
-    await xrt.increaseApproval(lighthouse.address, 1000, {from: accounts[1]});
+    await xrt.increaseAllowance(lighthouse.address, 1000, {from: accounts[1]});
     await lighthouse.refill(1000, {from: accounts[1]});
 
     await xrt.transfer(accounts[2], 2000);
-    await xrt.increaseApproval(lighthouse.address, 2000, {from: accounts[2]});
+    await xrt.increaseAllowance(lighthouse.address, 2000, {from: accounts[2]});
     await lighthouse.refill(2000, {from: accounts[2]});
 
     async function markerLog() {

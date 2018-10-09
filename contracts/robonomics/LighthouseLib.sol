@@ -92,5 +92,5 @@ contract LighthouseLib is LighthouseAPI, LighthouseABI {
     }
 
     function () external keepalive quoted member
-    { require(factory.call(msg.data)); }
+    { require(address(factory).call(msg.data)); }
 }
