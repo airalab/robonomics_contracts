@@ -45,7 +45,7 @@ function regNames(deployer, ens, accounts) {
 
 module.exports = function(deployer, network, accounts) {
 
-  if (network === 'development') {
+  if (network === 'development' || network === 'testing') {
     regNames(deployer, ENS.at(ENS.address), accounts);
   } else {
 	regNames(deployer, ENS.at('0x314159265dD8dbb310642f98f50C066173C1259b'), accounts);
