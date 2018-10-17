@@ -41,7 +41,7 @@ function deployFactory(deployer, ens, foundation_address) {
 
 module.exports = (deployer, network, accounts) => {
 
-  if (network === 'development') {
+  if (network === 'development' || network === 'testing') {
     return deployFactory(deployer, ENS.at(ENS.address), accounts[0]);
   } else {
 	return deployFactory(deployer, ENS.at('0x314159265dD8dbb310642f98f50C066173C1259b'), foundation);
