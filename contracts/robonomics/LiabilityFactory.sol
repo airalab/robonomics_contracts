@@ -71,9 +71,24 @@ contract LiabilityFactory is SingletonHash {
     uint256 public constant gasEpoch = 347 * 10**10;
 
     /**
-     * @dev Weighted average gasprice
+     * @dev SMMA filter with function: SMMA(i) = (SMMA(i-1)*(n-1) + PRICE(i)) / n
+     * @param _prePrice PRICE[n-1]
+     * @param _price PRICE[n]
+     * @return filtered price
      */
-    uint256 public constant gasPrice = 10 * 10**9;
+    function smma(uint256 _prePrice, uint256 _price) internal returns (uint256) {
+        return (_prePrice * (smmaPeriod - 1) + _price) / smmaPeriod;
+    }
+
+    /**
+     * @dev SMMA filter period
+     */
+    uint256 public constant smmaPeriod = 100;
+
+    /**
+     * @dev Current gas price in wei
+     */
+    uint256 public gasPrice = 10 * 10**9;
 
     /**
      * @dev Lighthouse accounting
@@ -93,7 +108,7 @@ contract LiabilityFactory is SingletonHash {
     /**
      * @dev XRT emission value for utilized gas
      */
-    function wnFromGas(uint256 _gas) public view returns (uint256) {
+    function wnFromGas(uint256 _gas) view returns (uint256) {
         // Just return wn=gas when auction isn't finish
         if (auction.finalPrice() == 0)
             return _gas;
@@ -116,6 +131,12 @@ contract LiabilityFactory is SingletonHash {
         _;
     }
 
+    modifier gasPriceEstimated {
+        gasPrice = smma(gasPrice, tx.gasprice);
+        _;
+    }
+
+
     /**
      * @dev Create robot liability smart contract
      * @param _demand ABI-encoded demand message 
@@ -127,9 +148,8 @@ contract LiabilityFactory is SingletonHash {
     )
         external 
         onlyLighthouse
-        returns (RobotLiability liability)
-    {
-        // Store in memory available gas
+        gasPriceEstimated
+        returns (RobotLiability liability) { // Store in memory available gas
         uint256 gasinit = gasleft();
 
         // Create liability
@@ -213,6 +233,7 @@ contract LiabilityFactory is SingletonHash {
         uint256 _gas
     )
         external
+        gasPriceEstimated
         returns (bool)
     {
         require(gasUtilizing[msg.sender] > 0);
@@ -222,6 +243,7 @@ contract LiabilityFactory is SingletonHash {
 
         totalGasUtilizing        += gas;
         gasUtilizing[msg.sender] += gas;
+
         require(xrt.mint(tx.origin, wnFromGas(gasUtilizing[msg.sender])));
         return true;
     }
