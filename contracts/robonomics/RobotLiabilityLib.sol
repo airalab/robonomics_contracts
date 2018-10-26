@@ -18,6 +18,8 @@ contract RobotLiabilityLib is RobotLiabilityABI
         ERC20   _token,
         uint256 _cost,
 
+        address _lighthouse,
+
         address _validator,
         uint256 _validator_fee,
 
@@ -30,11 +32,13 @@ contract RobotLiabilityLib is RobotLiabilityABI
     {
         require(msg.sender == address(factory));
         require(block.number < _deadline);
+        require(factory.isLighthouse(_lighthouse));
 
         model        = _model;
         objective    = _objective;
         token        = _token;
         cost         = _cost;
+        lighthouse   = _lighthouse;
         validator    = _validator;
         validatorFee = _validator_fee;
 
@@ -43,6 +47,7 @@ contract RobotLiabilityLib is RobotLiabilityABI
           , _objective
           , _token
           , _cost
+          , _lighthouse
           , _validator
           , _validator_fee
           , _deadline
@@ -63,6 +68,8 @@ contract RobotLiabilityLib is RobotLiabilityABI
         uint256 _cost,
 
         address _validator,
+
+        address _lighthouse,
         uint256 _lighthouse_fee,
 
         uint256 _deadline,
@@ -78,6 +85,7 @@ contract RobotLiabilityLib is RobotLiabilityABI
         require(keccak256(objective) == keccak256(_objective));
         require(_token == token);
         require(_cost == cost);
+        require(_lighthouse == lighthouse);
         require(_validator == validator);
 
         lighthouseFee = _lighthouse_fee;
@@ -88,6 +96,7 @@ contract RobotLiabilityLib is RobotLiabilityABI
           , _token
           , _cost
           , _validator
+          , _lighthouse
           , _lighthouse_fee
           , _deadline
           , _nonce
@@ -131,7 +140,7 @@ contract RobotLiabilityLib is RobotLiabilityABI
         emit Finalized(isSuccess, result);
 
         if (validator == 0) {
-            require(factory.isLighthouse(msg.sender));
+            require(msg.sender == lighthouse);
         } else {
             require(msg.sender == validator);
             if (validatorFee > 0)

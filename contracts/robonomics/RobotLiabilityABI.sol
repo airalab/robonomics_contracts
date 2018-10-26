@@ -10,6 +10,8 @@ contract RobotLiabilityABI {
         ERC20   _token,
         uint256 _cost,
 
+        address _lighthouse,
+
         address _validator,
         uint256 _validator_fee,
 
@@ -26,6 +28,8 @@ contract RobotLiabilityABI {
         uint256 _cost,
 
         address _validator,
+
+        address _lighthouse,
         uint256 _lighthouse_fee,
 
         uint256 _deadline,

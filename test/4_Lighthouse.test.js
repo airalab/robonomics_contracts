@@ -10,22 +10,25 @@ const namehash = require("eth-ens-namehash");
 const utils = require("web3-utils");
 const abi = require("web3-eth-abi");
 
-function randomDemand(account) {
-  let demand = { model:        utils.randomHex(34)
-            , objective:    utils.randomHex(34)
-            , token:        XRT.address
-            , cost:         1
-            , validator:    "0x0000000000000000000000000000000000000000"
-            , validatorFee: 0
-            , deadline:     web3.eth.blockNumber + 1000
-            , nonce:        utils.randomHex(32)
-            };
-            
+function randomDemand(account, lighthouse) {
+  let demand =
+        { model:        utils.randomHex(34)
+        , objective:    utils.randomHex(34)
+        , token:        XRT.address
+        , cost:         1
+        , lighthouse:   lighthouse.address
+        , validator:    "0x0000000000000000000000000000000000000000"
+        , validatorFee: 0
+        , deadline:     web3.eth.blockNumber + 1000
+        , nonce:        utils.randomHex(32)
+        };
+ 
   const hash = utils.soliditySha3(
       {t: "bytes",   v: demand.model}
     , {t: "bytes",   v: demand.objective}
     , {t: "address", v: demand.token}
     , {t: "uint256", v: demand.cost}
+    , {t: "address", v: demand.lighthouse}
     , {t: "address", v: demand.validator}
     , {t: "uint256", v: demand.validatorFee}
     , {t: "uint256", v: demand.deadline}
@@ -47,6 +50,7 @@ function pairOffer(demand, account) {
     , {t: "address", v: offer.token}
     , {t: "uint256", v: offer.cost}
     , {t: "address", v: offer.validator}
+    , {t: "address", v: offer.lighthouse}
     , {t: "uint256", v: offer.lighthouseFee}
     , {t: "uint256", v: offer.deadline}
     , {t: "bytes32", v: offer.nonce}
@@ -63,6 +67,7 @@ function encodeDemand(demand) {
     , "address"
     , "uint256"
     , "address"
+    , "address"
     , "uint256"
     , "uint256"
     , "bytes32"
@@ -72,6 +77,7 @@ function encodeDemand(demand) {
     , demand.objective
     , demand.token
     , demand.cost
+    , demand.lighthouse
     , demand.validator
     , demand.validatorFee
     , demand.deadline
@@ -88,6 +94,7 @@ function encodeOffer(offer) {
     , "address"
     , "uint256"
     , "address"
+    , "address"
     , "uint256"
     , "uint256"
     , "bytes32"
@@ -98,6 +105,7 @@ function encodeOffer(offer) {
     , offer.token
     , offer.cost
     , offer.validator
+    , offer.lighthouse
     , offer.lighthouseFee
     , offer.deadline
     , offer.nonce
@@ -125,7 +133,7 @@ async function liabilityCreation(lighthouse, account, promisee, promisor) {
 
   const builder = LiabilityFactory.at(lighthouse.address);
 
-  const demand = randomDemand(promisee);
+  const demand = randomDemand(promisee, lighthouse);
   const offer = pairOffer(demand, promisor);
 
   await xrt.increaseAllowance(LiabilityFactory.address, demand.cost, {from: promisee});

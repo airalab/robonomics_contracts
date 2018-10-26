@@ -18,6 +18,7 @@ contract RobotLiabilityAPI {
 
     address public promisor;
     address public promisee;
+    address public lighthouse;
     address public validator;
 
     bool    public isSuccess;

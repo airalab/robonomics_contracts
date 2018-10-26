@@ -137,10 +137,10 @@ contract LiabilityFactory is SingletonHash {
         emit NewLiability(liability);
 
         // Parse messages
-        require(liability.call(abi.encodePacked(bytes4(0x0be8947a), _demand))); // liability.demand(...)
+        require(liability.call(abi.encodePacked(bytes4(0xd9ff764a), _demand))); // liability.demand(...)
         singletonHash(liability.demandHash());
 
-        require(liability.call(abi.encodePacked(bytes4(0x87bca1cf), _offer))); // liability.offer(...)
+        require(liability.call(abi.encodePacked(bytes4(0xd5056962), _offer))); // liability.offer(...)
         singletonHash(liability.offerHash());
 
         // Transfer lighthouse fee to lighthouse worker directly
