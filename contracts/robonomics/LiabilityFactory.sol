@@ -204,8 +204,8 @@ contract LiabilityFactory is SingletonHash {
         returns (address lighthouse)
     {
         bytes32 lighthouseNode
-            // lighthouse.2.robonomics.eth
-            = 0xa058d6058d5ec525aa555c572720908a8d6ea6e2781b460bdecb2abf8bf56d4c;
+            // lighthouse.3.robonomics.eth
+            = 0x87bd923a85f096b00a4a347fb56cef68e95319b3d9dae1dff59259db094afd02;
 
         // Name reservation check
         bytes32 subnode = keccak256(abi.encodePacked(lighthouseNode, keccak256(_name)));

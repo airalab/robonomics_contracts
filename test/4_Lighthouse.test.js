@@ -190,7 +190,7 @@ contract("Lighthouse", (accounts) => {
   });
 
   it("should be resolved via ENS", async () => {
-    const addr = await ens.resolver("test.lighthouse.2.robonomics.eth").addr();
+    const addr = await ens.resolver("test.lighthouse.3.robonomics.eth").addr();
     assert.equal(addr, lighthouse.address);
   });
 

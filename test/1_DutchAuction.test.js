@@ -10,7 +10,7 @@ const initialBalance = 800 * 10**9;
 contract("DutchAuction", (accounts) => {
 
   it("should be resolved via ENS", async () => {
-    const addr = await ens.resolver("auction.2.robonomics.eth").addr();
+    const addr = await ens.resolver("auction.3.robonomics.eth").addr();
     assert.equal(addr, DutchAuction.address);
   });
 

@@ -7,7 +7,7 @@ const ens = new ethereum_ens(web3, ENS.address);
 
 contract("Ambix", (accounts) => {
   it("should be resolved via ENS", async () => {
-    const addr = await ens.resolver("ambix.2.robonomics.eth").addr();
+    const addr = await ens.resolver("ambix.3.robonomics.eth").addr();
     assert.equal(addr, Ambix.address);
   });
 

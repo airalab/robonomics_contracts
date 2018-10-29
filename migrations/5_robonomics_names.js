@@ -8,7 +8,7 @@ const ENS = artifacts.require("ENS");
 const namehash = require('eth-ens-namehash').hash;
 const sha3 = require('web3-utils').sha3;
 
-const robonomicsGen  = "2";
+const robonomicsGen  = "3";
 const robonomicsRoot = robonomicsGen+".robonomics.eth";
 
 function regNames(deployer, ens, accounts) {
