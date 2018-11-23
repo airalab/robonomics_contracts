@@ -1,54 +1,44 @@
-const LiabilityFactory = artifacts.require("LiabilityFactory");
-const PublicResolver = artifacts.require("PublicResolver");
-const DutchAuction = artifacts.require("DutchAuction");
-const Ambix = artifacts.require("Ambix");
-const XRT = artifacts.require("XRT");
-const ENS = artifacts.require("ENS");
+const PublicResolver = artifacts.require('PublicResolver');
+const DutchAuction = artifacts.require('DutchAuction');
+const Factory = artifacts.require('Factory');
+const KycAmbix = artifacts.require('KycAmbix');
+const XRT = artifacts.require('XRT');
+const ENS = artifacts.require('ENS');
 
 const namehash = require('eth-ens-namehash').hash;
-const sha3 = require('web3-utils').sha3;
+const sha3 = web3.utils.sha3;
 
-const robonomicsGen  = "3";
-const robonomicsRoot = robonomicsGen+".robonomics.eth";
+module.exports = async (deployer, network, accounts) => {
 
-function regNames(deployer, ens, accounts) {
-  let resolver
-  return deployer.deploy(PublicResolver, ens.address)
-   .then((r) => {
-      resolver = r
-      return ens.setSubnodeOwner(namehash("robonomics.eth"), sha3(robonomicsGen), accounts[0])
-   })
-   .then(() => {
-      return Promise.all([
-        ens.setSubnodeOwner(namehash(robonomicsRoot), sha3("xrt"), accounts[0]),
-        ens.setSubnodeOwner(namehash(robonomicsRoot), sha3("ambix"), accounts[0]),
-        ens.setSubnodeOwner(namehash(robonomicsRoot), sha3("auction"), accounts[0]),
-        ens.setSubnodeOwner(namehash(robonomicsRoot), sha3("factory"), accounts[0]),
-        ens.setSubnodeOwner(namehash(robonomicsRoot), sha3("lighthouse"), accounts[0])
-      ]);
-    }).then(() => { return Promise.all([
-        ens.setResolver(namehash(robonomicsRoot), resolver.address),
-        ens.setResolver(namehash("xrt."+robonomicsRoot), resolver.address),
-        ens.setResolver(namehash("ambix."+robonomicsRoot), resolver.address),
-        ens.setResolver(namehash("auction."+robonomicsRoot), resolver.address),
-        ens.setResolver(namehash("factory."+robonomicsRoot), resolver.address),
-        ens.setResolver(namehash("lighthouse."+robonomicsRoot), resolver.address),
-        resolver.setAddr(namehash("xrt."+robonomicsRoot), XRT.address),
-        resolver.setAddr(namehash("ambix."+robonomicsRoot), Ambix.address),
-        resolver.setAddr(namehash("auction."+robonomicsRoot), DutchAuction.address),
-        resolver.setAddr(namehash("factory."+robonomicsRoot), LiabilityFactory.address)
-      ]);
-    }).then(() => {
-      return ens.setSubnodeOwner(namehash(robonomicsRoot), sha3("lighthouse"), LiabilityFactory.address);
-    });
-}
+    const gen = require('../config')['generation'];
+    const robonomicsRoot = gen + '.robonomics.eth';
+    const ens_address = network == 'mainnet'
+                      ? '0x314159265dD8dbb310642f98f50C066173C1259b'
+                      : ENS.address; 
 
-module.exports = function(deployer, network, accounts) {
+    await deployer.deploy(PublicResolver, ens_address);
+    const resolver = await PublicResolver.deployed(); 
+    const ens = await ENS.at(ens_address);
 
-  if (network === 'development' || network === 'testing') {
-    regNames(deployer, ENS.at(ENS.address), accounts);
-  } else {
-	regNames(deployer, ENS.at('0x314159265dD8dbb310642f98f50C066173C1259b'), accounts);
-   };
+    await ens.setSubnodeOwner(namehash('robonomics.eth'), sha3(gen), accounts[0]);
 
+    await ens.setSubnodeOwner(namehash(robonomicsRoot), sha3('xrt'), accounts[0]);
+    await ens.setSubnodeOwner(namehash(robonomicsRoot), sha3('ambix'), accounts[0]);
+    await ens.setSubnodeOwner(namehash(robonomicsRoot), sha3('auction'), accounts[0]);
+    await ens.setSubnodeOwner(namehash(robonomicsRoot), sha3('factory'), accounts[0]);
+    await ens.setSubnodeOwner(namehash(robonomicsRoot), sha3('lighthouse'), accounts[0]);
+
+    await ens.setResolver(namehash(robonomicsRoot), resolver.address);
+    await ens.setResolver(namehash('xrt.'+robonomicsRoot), resolver.address);
+    await ens.setResolver(namehash('ambix.'+robonomicsRoot), resolver.address);
+    await ens.setResolver(namehash('auction.'+robonomicsRoot), resolver.address);
+    await ens.setResolver(namehash('factory.'+robonomicsRoot), resolver.address);
+    await ens.setResolver(namehash('lighthouse.'+robonomicsRoot), resolver.address);
+
+    await resolver.setAddr(namehash('xrt.'+robonomicsRoot), XRT.address);
+    await resolver.setAddr(namehash('ambix.'+robonomicsRoot), KycAmbix.address);
+    await resolver.setAddr(namehash('auction.'+robonomicsRoot), DutchAuction.address);
+    await resolver.setAddr(namehash('factory.'+robonomicsRoot), Factory.address);
+
+    await ens.setSubnodeOwner(namehash(robonomicsRoot), sha3('lighthouse'), Factory.address);
 };

@@ -8,19 +8,34 @@ module.exports = {
         development: {
             host: '127.0.0.1',
             port: 9545,
-            network_id: '*' // Match any network id
+            network_id: '420123',
+            websockets: true
         },
         mainnet: {
             host: '127.0.0.1',
             port: 8545,
-            network_id: '1' // Only mainnet
+            websockets: true,
+            network_id: '1',
+            confirmations: 2,
+            timeoutBlocks: 200,
+            gasPrice: 10000000000
         }
 	
     },
-    solc: {
-        optimizer: {
-            enabled: true,
-            runs: 200
+    compilers: {
+        solc: {
+            version: "0.4.25",
+            optimizer: {
+                enabled: true,
+                runs: 1000
+            }
+        }
+    },
+    mocha: {
+        reporter: 'eth-gas-reporter',
+        reporterOptions: {
+            currency: 'USD',
+            gasPrice: 10
         }
     }
 };

@@ -1,7 +1,5 @@
 language: node_js
-
-services:
-- docker
+sudo: false
 
 node_js:
 - "8"
@@ -10,6 +8,6 @@ install:
 - npm install
 
 script:
-- docker run --rm -d -p 9545:8545 foamspace/cliquebait:latest
-- sleep 30
+- npm run testrpc >/dev/null &
+- sleep 5
 - npm test

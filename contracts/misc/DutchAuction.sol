@@ -1,11 +1,15 @@
-pragma solidity 0.4.24;
+pragma solidity ^0.4.25;
 
-import "./XRT.sol";
+import 'openzeppelin-solidity/contracts/drafts/SignatureBouncer.sol';
+import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol';
+import 'openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol';
+
 
 /// @title Dutch auction contract - distribution of XRT tokens using an auction.
 /// @author Stefan George - <stefan.george@consensys.net>
 /// @author Airalab - <research@aira.life> 
-contract DutchAuction {
+contract DutchAuction is SignatureBouncer {
+    using SafeERC20 for ERC20Burnable;
 
     /*
      *  Events
@@ -21,7 +25,7 @@ contract DutchAuction {
     /*
      *  Storage
      */
-    XRT     public xrt;
+    ERC20Burnable public token;
     address public ambix;
     address public wallet;
     address public owner;
@@ -67,7 +71,7 @@ contract DutchAuction {
     }
 
     modifier isValidPayload() {
-        require(msg.data.length == 4 || msg.data.length == 36);
+        require(msg.data.length == 4 || msg.data.length == 164);
         _;
     }
 
@@ -99,21 +103,21 @@ contract DutchAuction {
     }
 
     /// @dev Setup function sets external contracts' addresses.
-    /// @param _xrt Robonomics token address.
+    /// @param _token Token address.
     /// @param _ambix Distillation cube address.
-    function setup(address _xrt, address _ambix)
+    function setup(ERC20Burnable _token, address _ambix)
         public
         isOwner
         atStage(Stages.AuctionDeployed)
     {
         // Validate argument
-        require(_xrt != 0 && _ambix != 0);
+        require(address(_token) != 0 && _ambix != 0);
 
-        xrt = XRT(_xrt);
+        token = _token;
         ambix = _ambix;
 
         // Validate token balance
-        require(xrt.balanceOf(this) == MAX_TOKENS_SOLD);
+        require(token.balanceOf(this) == MAX_TOKENS_SOLD);
 
         stage = Stages.AuctionSetUp;
     }
@@ -151,21 +155,20 @@ contract DutchAuction {
     }
 
     /// @dev Allows to send a bid to the auction.
-    /// @param receiver Bid will be assigned to this address if set.
-    function bid(address receiver)
+    /// @param signature KYC approvement
+    function bid(bytes signature)
         public
         payable
         isValidPayload
         timedTransitions
         atStage(Stages.AuctionStarted)
+        onlyValidSignature(signature)
         returns (uint amount)
     {
         require(msg.value > 0);
         amount = msg.value;
 
-        // If a bid is done on behalf of a user via ShapeShift, the receiver address is set.
-        if (receiver == 0)
-            receiver = msg.sender;
+        address receiver = msg.sender;
 
         // Prevent that more than 90% of tokens are sold. Only relevant if cap not reached.
         uint maxWei = MAX_TOKENS_SOLD * calcTokenPrice() / 10**9 - totalReceived;
@@ -176,7 +179,7 @@ contract DutchAuction {
         // Only invest maximum possible amount.
         if (amount > maxWei) {
             amount = maxWei;
-            // Send change back to receiver address. In case of a ShapeShift bid the user receives the change back directly.
+            // Send change back to receiver address.
             receiver.transfer(msg.value - amount);
         }
 
@@ -193,18 +196,16 @@ contract DutchAuction {
     }
 
     /// @dev Claims tokens for bidder after auction.
-    /// @param receiver Tokens will be assigned to this address if set.
-    function claimTokens(address receiver)
+    function claimTokens()
         public
         isValidPayload
         timedTransitions
         atStage(Stages.TradingStarted)
     {
-        if (receiver == 0)
-            receiver = msg.sender;
+        address receiver = msg.sender;
         uint tokenCount = bids[receiver] * 10**9 / finalPrice;
         bids[receiver] = 0;
-        require(xrt.transfer(receiver, tokenCount));
+        token.safeTransfer(receiver, tokenCount);
     }
 
     /// @dev Calculates stop price.
@@ -239,10 +240,10 @@ contract DutchAuction {
 
         if (totalReceived == ceiling) {
             // Auction contract transfers all unsold tokens to Ambix contract
-            require(xrt.transfer(ambix, MAX_TOKENS_SOLD - soldTokens));
+            token.safeTransfer(ambix, MAX_TOKENS_SOLD - soldTokens);
         } else {
             // Auction contract burn all unsold tokens
-            xrt.burn(MAX_TOKENS_SOLD - soldTokens);
+            token.burn(MAX_TOKENS_SOLD - soldTokens);
         }
 
         endTime = now;

@@ -1,17 +1,12 @@
-const XRT = artifacts.require("XRT");
-const Ambix = artifacts.require("Ambix");
-const DutchAuction = artifacts.require("DutchAuction");
-const ENS = artifacts.require("ENS");
 const PublicResolver = artifacts.require("PublicResolver");
-const LiabilityFactory = artifacts.require("LiabilityFactory");
-const LighthouseLib = artifacts.require("LighthouseLib");
+const DutchAuction = artifacts.require("DutchAuction");
+const Lighthouse = artifacts.require("Lighthouse");
+const Factory = artifacts.require("Factory");
+const ENS = artifacts.require("ENS");
+const XRT = artifacts.require("XRT");
 
 const namehash = require('eth-ens-namehash');
-const sha3 = require('web3-utils').sha3;
-
-
-const robonomicsGen  = "2";
-const robonomicsRoot = robonomicsGen+".robonomics.eth";
+const sha3 = web3.utils.sha3;
 
 function createTestLighthouse(factory, xrt, accounts) {
   var fs = require('fs');
@@ -28,7 +23,7 @@ function createTestLighthouse(factory, xrt, accounts) {
 
   return factory.createLighthouse(1000, 10, "test").then(async (tx) => {
     laddress = tx.logs[0].args.lighthouse;
-    l = LighthouseLib.at(laddress);
+    l = await Lighthouse.at(laddress);
     await xrt.approve(l.address,1000);
     await xrt.allowance(accounts[0],l.address);
     await l.refill(1000);
@@ -36,13 +31,12 @@ function createTestLighthouse(factory, xrt, accounts) {
   });
 }
 
-module.exports = function(deployer, network, accounts) {
+module.exports = (deployer, network, accounts) => {
+
   if (network === 'testing') {
-    deployer.then(function() {
-      return createTestLighthouse(LiabilityFactory.at(LiabilityFactory.address), XRT.at(XRT.address), accounts);
-    });
+    deployer.then(async () =>
+      await createTestLighthouse(await Factory.deployed(), await XRT.deployed(), accounts)
+    );
   } 
-  else {
-    console.log("Skip...")
-  }
+
 };

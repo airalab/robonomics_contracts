@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.25;
 
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol';
 import 'openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol';
@@ -22,7 +22,7 @@ import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
   This says that `Ambix` should receive (approve) left
   part of equation and send (transfer) right part.
 */
-contract Ambix is Ownable {
+contract AbstractAmbix is Ownable {
     using SafeERC20 for ERC20Burnable;
     using SafeERC20 for ERC20;
 
@@ -76,11 +76,7 @@ contract Ambix is Ownable {
         M = _m;
     }
 
-    /**
-     * @dev Run distillation process
-     * @param _ix Source alternative index
-     */
-    function run(uint256 _ix) public {
+    function _run(uint256 _ix) internal {
         require(_ix < A.length);
         uint256 i;
 

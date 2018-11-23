@@ -1,14 +1,17 @@
 {
   "name": "robonomics_contracts",
-  "version": "0.12.0",
+  "version": "1.0.0-rc1",
   "homepage": "https://github.com/airalab/robonomics_contracts#readme",
   "description": "Robonomics platform smart contracts",
   "main": "truffle.js",
   "directories": {
-    "ens": "ens",
     "test": "test"
   },
   "scripts": {
+    "compile": "truffle compile",
+    "migrate": "truffle migrate",
+    "console": "truffle console",
+    "testrpc": "ganache-cli -p 9545 -b 3 -i 420123",
     "test": "truffle test"
   },
   "repository": {
@@ -23,13 +26,15 @@
     "airalab"
   ],
   "dependencies": {
+    "chai": "^4.2.0",
+    "bn-chai": "^1.0.1",
+    "chai-as-promised": "^7.1.1",
+    "eth-gas-reporter": "^0.1.12",
     "eth-ens-namehash": "^2.0.8",
-    "ethereum-ens": "^0.7.4",
     "openzeppelin-solidity": "^2.0.0",
-    "truffle": "^4.1.14",
-    "truffle-flattener": "^1.2.9",
-    "web3-eth-abi": "^1.0.0-beta.36",
-    "web3-utils": "^1.0.0-beta.36"
+    "ganache-cli": "beta",
+    "truffle": "5.0.0-beta.2",
+    "truffle-flattener": "^1.2.9"
   },
   "author": "Airalab <research@aira.life>",
   "license": "BSD-3-Clause"

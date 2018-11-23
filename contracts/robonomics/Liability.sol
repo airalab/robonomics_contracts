@@ -1,21 +1,30 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.25;
 
 import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
 import 'openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol';
-import './RobotLiabilityABI.sol';
-import './RobotLiabilityAPI.sol';
 
-contract RobotLiabilityLib is RobotLiabilityABI
-                            , RobotLiabilityAPI {
+import './interface/ILiability.sol';
+import './interface/IValidator.sol';
+import './XRT.sol';
+
+contract Liability is ILiability {
+    constructor(XRT _xrt) public {
+        factory = msg.sender;
+        xrt = _xrt;
+    }
+
     using ECDSA for bytes32;
     using SafeERC20 for XRT;
     using SafeERC20 for ERC20;
+
+    address public factory;
+    XRT     public xrt;
 
     function demand(
         bytes   _model,
         bytes   _objective,
 
-        ERC20   _token,
+        address _token,
         uint256 _cost,
 
         address _lighthouse,
@@ -30,9 +39,8 @@ contract RobotLiabilityLib is RobotLiabilityABI
         external
         returns (bool)
     {
-        require(msg.sender == address(factory));
+        require(msg.sender == factory);
         require(block.number < _deadline);
-        require(factory.isLighthouse(_lighthouse));
 
         model        = _model;
         objective    = _objective;
@@ -64,7 +72,7 @@ contract RobotLiabilityLib is RobotLiabilityABI
         bytes   _model,
         bytes   _objective,
         
-        ERC20   _token,
+        address _token,
         uint256 _cost,
 
         address _validator,
@@ -79,7 +87,7 @@ contract RobotLiabilityLib is RobotLiabilityABI
         external
         returns (bool)
     {
-        require(msg.sender == address(factory));
+        require(msg.sender == factory);
         require(block.number < _deadline);
         require(keccak256(model) == keccak256(_model));
         require(keccak256(objective) == keccak256(_objective));
@@ -108,24 +116,15 @@ contract RobotLiabilityLib is RobotLiabilityABI
         return true;
     }
 
-    /**
-     * @dev Finalize this liability
-     * @param _result Result data hash
-     * @param _success Set 'true' when liability has success result
-     * @param _signature Result signature: liability address, result and success flag signed by promisor
-     * @param _agree Validator decision around liability
-     */
     function finalize(
         bytes _result,
         bool  _success,
-        bytes _signature,
-        bool  _agree
+        bytes _signature
     )
         external
         returns (bool)
     {
-        uint256 gasinit = gasleft();
-
+        require(msg.sender == lighthouse);
         require(!isFinalized);
 
         address resultSender = keccak256(abi.encodePacked(this, _result, _success))
@@ -133,24 +132,23 @@ contract RobotLiabilityLib is RobotLiabilityABI
             .recover(_signature);
         require(resultSender == promisor);
 
-        result      = _result;
-        isSuccess   = validator == 0 ? _success : _success && _agree;
-
         isFinalized = true;
-        emit Finalized(isSuccess, result);
+        result      = _result;
 
         if (validator == 0) {
-            require(msg.sender == lighthouse);
+            // Set state of liability according promisor report only
+            isSuccess = _success;
         } else {
-            require(msg.sender == validator);
-            if (validatorFee > 0)
-                factory.xrt().safeTransfer(validator, validatorFee);
+            // Validator can take a fee for decision
+            xrt.safeApprove(validator, validatorFee);
+            // Set state of liability considering validator decision
+            isSuccess = _success && IValidator(validator).decision();
         }
 
         if (cost > 0)
-            token.safeTransfer(_success ? promisor : promisee, cost);
+            ERC20(token).safeTransfer(isSuccess ? promisor : promisee, cost);
 
-        require(factory.liabilityFinalized(gasinit));
+        emit Finalized(isSuccess, result);
         return true;
     }
 }
