@@ -6,24 +6,35 @@ import '../ens/AbstractENS.sol';
 import '../ens/AbstractResolver.sol';
 import '../misc/SingletonHash.sol';
 import '../misc/DutchAuction.sol';
+import '../misc/SharedCode.sol';
+
 import './interface/IFactory.sol';
+
 import './Lighthouse.sol';
 import './Liability.sol';
 import './XRT.sol';
 
 contract Factory is IFactory, SingletonHash {
     constructor(
+        address _liability,
+        address _lighthouse,
         DutchAuction _auction,
         AbstractENS _ens,
         XRT _xrt
     ) public {
+        liabilityCode = _liability;
+        lighthouseCode = _lighthouse;
         auction = _auction;
         ens = _ens;
         xrt = _xrt;
     }
 
+    address public liabilityCode;
+    address public lighthouseCode;
+
     using SafeERC20 for XRT;
     using SafeERC20 for ERC20;
+    using SharedCode for address;
 
     /**
      * @dev Robonomics dutch auction contract
@@ -85,16 +96,6 @@ contract Factory is IFactory, SingletonHash {
         _;
     }
 
-    modifier endGasEstimation(address _liability, uint256 _start_gas) {
-        uint256 gas = _start_gas - gasleft();
-        require(gas < _start_gas);
-
-        totalGasConsumed          += gas;
-        gasConsumedOf[_liability] += gas;
-
-        _;
-    }
-
     function createLighthouse(
         uint256 _minimalStake,
         uint256 _timeoutInBlocks,
@@ -113,7 +114,9 @@ contract Factory is IFactory, SingletonHash {
         require(ens.resolver(subnode) == 0);
 
         // Create lighthouse
-        lighthouse = new Lighthouse(xrt, _minimalStake, _timeoutInBlocks);
+        lighthouse = ILighthouse(lighthouseCode.proxy());
+        require(Lighthouse(lighthouse).setup(xrt, _minimalStake, _timeoutInBlocks));
+
         emit NewLighthouse(lighthouse, _name);
         isLighthouse[lighthouse] = true;
 
@@ -135,7 +138,9 @@ contract Factory is IFactory, SingletonHash {
         returns (ILiability liability)
     {
         // Create liability
-        liability = new Liability(xrt);
+        liability = ILiability(liabilityCode.proxy());
+        require(Liability(liability).setup(xrt));
+
         emit NewLiability(liability);
 
         // Parse messages
@@ -170,27 +175,29 @@ contract Factory is IFactory, SingletonHash {
 
     function liabilityCreated(
         ILiability _liability,
-        uint256 _start_gas
+        uint256 _gas
     )
         external
         onlyLighthouse
         gasPriceEstimate
-        endGasEstimation(_liability, _start_gas)
         returns (bool)
     {
+        totalGasConsumed          += _gas;
+        gasConsumedOf[_liability] += _gas;
         return true;
     }
 
     function liabilityFinalized(
         ILiability _liability,
-        uint256 _start_gas
+        uint256 _gas
     )
         external
         onlyLighthouse
         gasPriceEstimate
-        endGasEstimation(_liability, _start_gas)
         returns (bool)
     {
+        totalGasConsumed          += _gas;
+        gasConsumedOf[_liability] += _gas;
         require(xrt.mint(tx.origin, wnFromGas(gasConsumedOf[_liability])));
         return true;
     }

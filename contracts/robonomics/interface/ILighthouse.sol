@@ -48,17 +48,17 @@ contract ILighthouse {
     /**
      * @dev Block number of last transaction from current provider
      */
-    uint256 public keepAliveBlock = 0;
+    uint256 public keepAliveBlock;
 
     /**
      * @dev Round robin provider list marker
      */
-    uint256 public marker = 0;
+    uint256 public marker;
 
     /**
      * @dev Current provider quota
      */
-    uint256 public quota = 0;
+    uint256 public quota;
 
     /**
      * @dev Get quota of provider

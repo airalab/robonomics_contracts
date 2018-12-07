@@ -14,8 +14,8 @@ module.exports = {
         mainnet: {
             host: '127.0.0.1',
             port: 8545,
-            websockets: true,
             network_id: '1',
+            websockets: true,
             confirmations: 2,
             timeoutBlocks: 200,
             gasPrice: 10000000000

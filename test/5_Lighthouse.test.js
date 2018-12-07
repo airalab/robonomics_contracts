@@ -240,13 +240,13 @@ contract('Lighthouse', (accounts) => {
 
             const factory = await Factory.deployed();
             const gas = await factory.gasConsumedOf(liability.address);
-            //chai.expect(await factory.wnFromGas(gas)).to.eq.BN(deltaB);
+            chai.expect(await factory.wnFromGas(gas)).to.eq.BN(deltaB);
         });
 
         async function markerLog() {
             const marker = await lighthouse.marker();
             const quota  = await lighthouse.quota();
-            const provider = await lighthouse.providers(marker);
+            const provider = await lighthouse.providers(marker - 1);
             const ka = await lighthouse.keepAliveBlock();
             const block = await web3.eth.getBlockNumber(); 
             const timeout = block - ka.toNumber();
@@ -255,37 +255,80 @@ contract('Lighthouse', (accounts) => {
 
         it('marker marathon', async () => {
             const xrt = await XRT.deployed();
+
+            for (let i = 0; i < 15; ++i) {
+                liability = await liabilityCreation(lighthouse, accounts[0], accounts[0], accounts[0]);
+                await markerLog();
+
+                await liabilityFinalization(liability, lighthouse, accounts[0], accounts[0]);
+                await markerLog();
+            }
+
             await xrt.transfer(accounts[1], 1000).should.be.fulfilled;
             await xrt.increaseAllowance(lighthouse.address, 1000, {from: accounts[1]}).should.be.fulfilled;
             await lighthouse.refill(1000, {from: accounts[1]}).should.be.fulfilled;
+
+            for (let i = 0; i < 15; ++i) {
+                liability = await liabilityCreation(lighthouse, accounts[0], accounts[0], accounts[0]);
+                await markerLog();
+
+                await liabilityFinalization(liability, lighthouse, accounts[1], accounts[0]);
+                await markerLog();
+            }
 
             await xrt.transfer(accounts[2], 2000).should.be.fulfilled;
             await xrt.increaseAllowance(lighthouse.address, 2000, {from: accounts[2]}).should.be.fulfilled;
             await lighthouse.refill(2000, {from: accounts[2]}).should.be.fulfilled;
 
-            liability = await liabilityCreation(lighthouse, accounts[0], accounts[0], accounts[0]);
-            await markerLog();
+            for (let i = 0; i < 5; ++i) {
+                liability = await liabilityCreation(lighthouse, accounts[0], accounts[0], accounts[0]);
+                await markerLog();
 
-            await liabilityFinalization(liability, lighthouse, accounts[1], accounts[0]);
-            await markerLog();
+                await liabilityFinalization(liability, lighthouse, accounts[1], accounts[0]);
+                await markerLog();
 
-            liability = await liabilityCreation(lighthouse, accounts[2], accounts[0], accounts[0]);
-            await markerLog();
+                liability = await liabilityCreation(lighthouse, accounts[2], accounts[0], accounts[0]);
+                await markerLog();
 
-            await liabilityFinalization(liability, lighthouse, accounts[2], accounts[0]);
-            await markerLog();
+                await liabilityFinalization(liability, lighthouse, accounts[2], accounts[0]);
+                await markerLog();
+            }
 
-            liability = await liabilityCreation(lighthouse, accounts[0], accounts[0], accounts[0]);
-            await markerLog();
+            await xrt.transfer(accounts[3], 1000).should.be.fulfilled;
+            await xrt.increaseAllowance(lighthouse.address, 1000, {from: accounts[3]}).should.be.fulfilled;
+            await lighthouse.refill(1000, {from: accounts[3]}).should.be.fulfilled;
 
-            await liabilityFinalization(liability, lighthouse, accounts[1], accounts[0]);
-            await markerLog();
+            for (let i = 0; i < 5; ++i) {
+                liability = await liabilityCreation(lighthouse, accounts[0], accounts[0], accounts[0]);
+                await markerLog();
 
-            liability = await liabilityCreation(lighthouse, accounts[2], accounts[0], accounts[0]);
-            await markerLog();
+                await liabilityFinalization(liability, lighthouse, accounts[1], accounts[0]);
+                await markerLog();
 
-            await liabilityFinalization(liability, lighthouse, accounts[2], accounts[0]);
-            await markerLog();
+                liability = await liabilityCreation(lighthouse, accounts[2], accounts[0], accounts[0]);
+                await markerLog();
+
+                await liabilityFinalization(liability, lighthouse, accounts[2], accounts[0]);
+                await markerLog();
+
+                liability = await liabilityCreation(lighthouse, accounts[3], accounts[0], accounts[0]);
+                await markerLog();
+
+                await liabilityFinalization(liability, lighthouse, accounts[0], accounts[0]);
+                await markerLog();
+
+                liability = await liabilityCreation(lighthouse, accounts[1], accounts[0], accounts[0]);
+                await markerLog();
+
+                await liabilityFinalization(liability, lighthouse, accounts[2], accounts[0]);
+                await markerLog();
+
+                liability = await liabilityCreation(lighthouse, accounts[2], accounts[0], accounts[0]);
+                await markerLog();
+
+                await liabilityFinalization(liability, lighthouse, accounts[3], accounts[0]);
+                await markerLog();
+            }
 
         });
 

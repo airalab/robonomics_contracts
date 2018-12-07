@@ -11,7 +11,7 @@
     "compile": "truffle compile",
     "migrate": "truffle migrate",
     "console": "truffle console",
-    "testrpc": "ganache-cli -p 9545 -b 3 -i 420123",
+    "testrpc": "ganache-cli -p 9545 -i 420123 -b 1",
     "test": "truffle test"
   },
   "repository": {

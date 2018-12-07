@@ -7,19 +7,21 @@ import './interface/IFactory.sol';
 import './XRT.sol';
 
 contract Lighthouse is ILighthouse {
-    constructor(XRT _xrt, uint256 _minimalStake, uint256 _timeoutInBlocks) public {
-        require(_minimalStake > 0 && _timeoutInBlocks > 0);
+    using SafeERC20 for XRT;
+
+    IFactory public factory;
+    XRT      public xrt;
+
+    function setup(XRT _xrt, uint256 _minimalStake, uint256 _timeoutInBlocks) external returns (bool) {
+        require(address(factory) == 0 && _minimalStake > 0 && _timeoutInBlocks > 0);
 
         minimalStake    = _minimalStake;
         timeoutInBlocks = _timeoutInBlocks;
-        xrt             = _xrt;
         factory         = IFactory(msg.sender);
+        xrt             = _xrt;
+
+        return true;
     }
-
-    using SafeERC20 for XRT;
-
-    XRT      public xrt;
-    IFactory public factory;
 
     /**
      * @dev Providers index, started from 1
@@ -65,39 +67,26 @@ contract Lighthouse is ILighthouse {
         return true;
     }
 
-    uint256 private startGas;
-
-    modifier startGasEstimation {
-        startGas = gasleft();
-
-        _;
-    }
-
-    function nextProvider() internal
-    { marker = (marker + 1) % providers.length; }
-
-    modifier keepAliveTransaction {
+    function keepAliveTransaction() internal {
         if (timeoutInBlocks < block.number - keepAliveBlock) {
-            // Thransaction sender should be a registered provider 
-            require(indexOf[msg.sender] > 0 && indexOf[msg.sender] <= providers.length);
-
             // Set up the marker according to provider index
-            marker = indexOf[msg.sender] - 1;
+            marker = indexOf[msg.sender];
+
+            // Thransaction sender should be a registered provider
+            require(marker > 0 && marker <= providers.length);
 
             // Allocate new quota
-            quota = quotaOf(providers[marker]);
+            quota = quotaOf(providers[marker - 1]);
 
             // Current provider signal
-            emit Current(providers[marker], quota);
+            emit Current(providers[marker - 1], quota);
         }
 
         // Store transaction sending block
         keepAliveBlock = block.number;
-
-        _;
     }
 
-    modifier quotedTransaction {
+    function quotedTransaction() internal {
         // Don't premit transactions without providers on board
         require(providers.length > 0);
 
@@ -106,23 +95,32 @@ contract Lighthouse is ILighthouse {
         require(quota > 0);
 
         // Only provider with marker can to send transaction
-        require(msg.sender == providers[marker]);
+        require(msg.sender == providers[marker - 1]);
 
         // Consume one quota for transaction sending
-        quota -= 1;
-
-        if (quota == 0) {
+        if (quota > 1) {
+            quota -= 1;
+        } else {
             // Step over marker
-            nextProvider();
+            marker = marker % providers.length + 1;
 
             // Allocate new quota
-            quota = quotaOf(providers[marker]);
+            quota = quotaOf(providers[marker - 1]);
 
             // Current provider signal
-            emit Current(providers[marker], quota);
+            emit Current(providers[marker - 1], quota);
         }
+    }
 
-        _;
+    function startGas() internal view returns (uint256 gas) {
+        // the total amount of gas the tx is DataFee + TxFee + ExecutionGas
+        // ExecutionGas
+        gas = gasleft();
+        // TxFee
+        gas += 21000;
+        // DataFee
+        for (uint256 i = 0; i < msg.data.length; ++i)
+            gas += msg.data[i] == 0 ? 4 : 68;
     }
 
     function createLiability(
@@ -130,14 +128,17 @@ contract Lighthouse is ILighthouse {
         bytes _offer
     )
         external
-        startGasEstimation
-        keepAliveTransaction
-        quotedTransaction
         returns (bool)
     {
+        // Gas with estimation error
+        uint256 gas = startGas() + 20311;
+
+        keepAliveTransaction();
+        quotedTransaction();
+
         ILiability liability = factory.createLiability(_demand, _offer);
         require(address(liability) != 0);
-        require(factory.liabilityCreated(liability, startGas));
+        require(factory.liabilityCreated(liability, gas - gasleft()));
         return true;
     }
 
@@ -148,16 +149,18 @@ contract Lighthouse is ILighthouse {
         bytes _signature
     )
         external
-        startGasEstimation
-        keepAliveTransaction
-        quotedTransaction
         returns (bool)
     {
-        ILiability liability = ILiability(_liability);
+        // Gas with estimation error
+        uint256 gas = startGas() + 23441;
 
+        keepAliveTransaction();
+        quotedTransaction();
+
+        ILiability liability = ILiability(_liability);
         require(factory.gasConsumedOf(_liability) > 0);
         require(liability.finalize(_result, _success, _signature));
-        require(factory.liabilityFinalized(liability, startGas));
+        require(factory.liabilityFinalized(liability, gas - gasleft()));
         return true;
     }
 }

@@ -8,17 +8,21 @@ import './interface/IValidator.sol';
 import './XRT.sol';
 
 contract Liability is ILiability {
-    constructor(XRT _xrt) public {
-        factory = msg.sender;
-        xrt = _xrt;
-    }
-
     using ECDSA for bytes32;
     using SafeERC20 for XRT;
     using SafeERC20 for ERC20;
 
     address public factory;
     XRT     public xrt;
+
+    function setup(XRT _xrt) external returns (bool) {
+        require(factory == 0);
+
+        factory = msg.sender;
+        xrt     = _xrt;
+
+        return true;
+    }
 
     function demand(
         bytes   _model,
