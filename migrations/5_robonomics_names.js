@@ -12,7 +12,7 @@ module.exports = async (deployer, network, accounts) => {
 
     const gen = require('../config')['generation'];
     const robonomicsRoot = gen + '.robonomics.eth';
-    const ens_address = network == 'mainnet'
+    const ens_address = network.startsWith('mainnet')
                       ? '0x314159265dD8dbb310642f98f50C066173C1259b'
                       : ENS.address; 
 

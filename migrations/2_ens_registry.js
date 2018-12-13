@@ -5,7 +5,7 @@ const sha3 = web3.utils.sha3;
 
 module.exports = async (deployer, network, accounts) => {
 
-    if (network !== 'mainnet') {
+    if (!network.startsWith('mainnet')) {
         await deployer.deploy(ENS);
 
         const ens = await ENS.deployed();

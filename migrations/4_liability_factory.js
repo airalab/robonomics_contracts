@@ -9,10 +9,10 @@ const ENS = artifacts.require('ENS');
 module.exports = async (deployer, network, accounts) => {
 
     config = require('../config');
-    const ens_address = network === 'mainnet'
+    const ens_address = network.startsWith('mainnet')
                       ? '0x314159265dD8dbb310642f98f50C066173C1259b'
                       : ENS.address; 
-    const foundation = network === 'mainnet'
+    const foundation = network.startsWith('mainnet')
                      ? config['foundation']
                      : accounts[0];
 

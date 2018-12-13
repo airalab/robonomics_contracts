@@ -1,5 +1,5 @@
-const PrivateKeyProvider = require("truffle-privatekey-provider");
-const privateKey = "62537136911bca3a7e2b....";
+const HDWalletProvider = require("truffle-hdwallet-provider");
+const privateKey = "<PRIVATE>";
 
 module.exports = {
     networks: {
@@ -13,12 +13,16 @@ module.exports = {
             port: 9545,
             network_id: 420123
         },
+        kovan: {
+            provider: new HDWalletProvider(privateKey, "https://kovan.infura.io/v3/<API_KEY>"),
+            network_id: 42,
+            skipDryRun: true
+        },
         mainnet: {
-            provider: new PrivateKeyProvider(privateKey, "http://localhost:8545"),
+            provider: new HDWalletProvider(privateKey, "https://mainnet.infura.io/v3/<API_KEY>"),
             network_id: 1,
-            confirmations: 2,
-            timeoutBlocks: 200,
-            gasPrice: 10000000000
+            gasPrice: 10000000000,
+            skipDryRun: true
         }
 	
     },
