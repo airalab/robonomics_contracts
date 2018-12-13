@@ -19,7 +19,6 @@ contract DutchAuction is SignatureBouncer {
     /*
      *  Constants
      */
-    uint constant public MAX_TOKENS_SOLD = 800 * 10**9; // 8M XRT = 10M - 1M (Foundation) - 1M (Early investors base)
     uint constant public WAITING_PERIOD = 0; // 1 days;
 
     /*
@@ -29,6 +28,7 @@ contract DutchAuction is SignatureBouncer {
     address public ambix;
     address public wallet;
     address public owner;
+    uint public maxTokenSold;
     uint public ceiling;
     uint public priceFactor;
     uint public startBlock;
@@ -88,15 +88,17 @@ contract DutchAuction is SignatureBouncer {
      */
     /// @dev Contract constructor function sets owner.
     /// @param _wallet Multisig wallet.
+    /// @param _maxTokenSold Auction token balance.
     /// @param _ceiling Auction ceiling.
     /// @param _priceFactor Auction price factor.
-    constructor(address _wallet, uint _ceiling, uint _priceFactor)
+    constructor(address _wallet, uint _maxTokenSold, uint _ceiling, uint _priceFactor)
         public
     {
         require(_wallet != 0 && _ceiling > 0 && _priceFactor > 0);
 
         owner = msg.sender;
         wallet = _wallet;
+        maxTokenSold = _maxTokenSold;
         ceiling = _ceiling;
         priceFactor = _priceFactor;
         stage = Stages.AuctionDeployed;
@@ -117,7 +119,7 @@ contract DutchAuction is SignatureBouncer {
         ambix = _ambix;
 
         // Validate token balance
-        require(token.balanceOf(this) == MAX_TOKENS_SOLD);
+        require(token.balanceOf(this) == maxTokenSold);
 
         stage = Stages.AuctionSetUp;
     }
@@ -171,7 +173,7 @@ contract DutchAuction is SignatureBouncer {
         address receiver = msg.sender;
 
         // Prevent that more than 90% of tokens are sold. Only relevant if cap not reached.
-        uint maxWei = MAX_TOKENS_SOLD * calcTokenPrice() / 10**9 - totalReceived;
+        uint maxWei = maxTokenSold * calcTokenPrice() / 10**9 - totalReceived;
         uint maxWeiBasedOnTotalReceived = ceiling - totalReceived;
         if (maxWeiBasedOnTotalReceived < maxWei)
             maxWei = maxWeiBasedOnTotalReceived;
@@ -215,7 +217,7 @@ contract DutchAuction is SignatureBouncer {
         public
         returns (uint)
     {
-        return totalReceived * 10**9 / MAX_TOKENS_SOLD + 1;
+        return totalReceived * 10**9 / maxTokenSold + 1;
     }
 
     /// @dev Calculates token price.
@@ -240,10 +242,10 @@ contract DutchAuction is SignatureBouncer {
 
         if (totalReceived == ceiling) {
             // Auction contract transfers all unsold tokens to Ambix contract
-            token.safeTransfer(ambix, MAX_TOKENS_SOLD - soldTokens);
+            token.safeTransfer(ambix, maxTokenSold - soldTokens);
         } else {
             // Auction contract burn all unsold tokens
-            token.burn(MAX_TOKENS_SOLD - soldTokens);
+            token.burn(maxTokenSold - soldTokens);
         }
 
         endTime = now;
