@@ -1,21 +1,21 @@
+const PrivateKeyProvider = require("truffle-privatekey-provider");
+const privateKey = "62537136911bca3a7e2b....";
+
 module.exports = {
     networks: {
         testing: {
             host: '127.0.0.1',
             port: 10545,
-            network_id: '*' // Match any network id
+            network_id: 420123
         },
         development: {
             host: '127.0.0.1',
             port: 9545,
-            network_id: '420123',
-            websockets: true
+            network_id: 420123
         },
         mainnet: {
-            host: '127.0.0.1',
-            port: 8545,
-            network_id: '1',
-            websockets: true,
+            provider: new PrivateKeyProvider(privateKey, "http://localhost:8545"),
+            network_id: 1,
             confirmations: 2,
             timeoutBlocks: 200,
             gasPrice: 10000000000

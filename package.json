@@ -8,11 +8,12 @@
     "test": "test"
   },
   "scripts": {
+    "test": "truffle test",
     "compile": "truffle compile",
     "migrate": "truffle migrate",
     "console": "truffle console",
     "testrpc": "ganache-cli -p 9545 -i 420123 -b 1",
-    "test": "truffle test"
+    "release": "truffle migrate --network mainnet"
   },
   "repository": {
     "type": "git",
@@ -26,15 +27,16 @@
     "airalab"
   ],
   "dependencies": {
-    "chai": "^4.2.0",
     "bn-chai": "^1.0.1",
+    "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "eth-gas-reporter": "^0.1.12",
     "eth-ens-namehash": "^2.0.8",
-    "openzeppelin-solidity": "^2.0.0",
+    "eth-gas-reporter": "^0.1.12",
     "ganache-cli": "beta",
+    "openzeppelin-solidity": "^2.0.0",
     "truffle": "5.0.0-beta.2",
-    "truffle-flattener": "^1.2.9"
+    "truffle-flattener": "^1.2.9",
+    "truffle-privatekey-provider": "^1.0.0"
   },
   "author": "Airalab <research@aira.life>",
   "license": "BSD-3-Clause"
