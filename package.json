@@ -1,6 +1,6 @@
 {
   "name": "robonomics_contracts",
-  "version": "1.0.0-rc1",
+  "version": "1.0.0-rc2",
   "homepage": "https://github.com/airalab/robonomics_contracts#readme",
   "description": "Robonomics platform smart contracts",
   "main": "truffle.js",
