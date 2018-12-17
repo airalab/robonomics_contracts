@@ -35,9 +35,7 @@
     "ganache-cli": "beta",
     "openzeppelin-solidity": "^2.0.0",
     "truffle": "5.0.0-beta.2",
-    "truffle-flattener": "^1.2.9",
-    "truffle-hdwallet-provider": "^1.0.0-web3one.4",
-    "any-promise": ""
+    "truffle-flattener": "^1.2.9"
   },
   "author": "Airalab <research@aira.life>",
   "license": "BSD-3-Clause"

@@ -1,5 +1,7 @@
+/*
 const HDWalletProvider = require("truffle-hdwallet-provider");
 const privateKey = "<PRIVATE>";
+*/
 
 module.exports = {
     networks: {
@@ -13,6 +15,7 @@ module.exports = {
             port: 9545,
             network_id: 420123
         },
+        /*
         kovan: {
             provider: new HDWalletProvider(privateKey, "https://kovan.infura.io/v3/<API_KEY>"),
             network_id: 42,
@@ -24,15 +27,11 @@ module.exports = {
             gasPrice: 10000000000,
             skipDryRun: true
         }
-	
+        */
     },
     compilers: {
         solc: {
-            version: "0.4.25",
-            optimizer: {
-                enabled: true,
-                runs: 200
-            }
+            version: "0.4.25"
         }
     },
     mocha: {
