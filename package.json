@@ -32,7 +32,7 @@
     "chai-as-promised": "^7.1.1",
     "eth-ens-namehash": "^2.0.8",
     "eth-gas-reporter": "^0.1.12",
-    "ganache-cli": "beta",
+    "ganache-cli": "^6.2.4",
     "openzeppelin-solidity": "^2.0.0",
     "truffle": "5.0.0",
     "truffle-flattener": "^1.2.9"
