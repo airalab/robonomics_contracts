@@ -34,7 +34,7 @@
     "eth-gas-reporter": "^0.1.12",
     "ganache-cli": "beta",
     "openzeppelin-solidity": "^2.0.0",
-    "truffle": "5.0.0-beta.2",
+    "truffle": "5.0.0",
     "truffle-flattener": "^1.2.9"
   },
   "author": "Airalab <research@aira.life>",
