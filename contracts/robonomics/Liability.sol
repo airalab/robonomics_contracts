@@ -131,22 +131,22 @@ contract Liability is ILiability {
         require(msg.sender == lighthouse);
         require(!isFinalized);
 
+        isFinalized = true;
+        result      = _result;
+        isSuccess   = _success;
+
         address resultSender = keccak256(abi.encodePacked(this, _result, _success))
             .toEthSignedMessageHash()
             .recover(_signature);
-        require(resultSender == promisor);
-
-        isFinalized = true;
-        result      = _result;
 
         if (validator == address(0)) {
-            // Set state of liability according promisor report only
-            isSuccess = _success;
+            require(resultSender == promisor);
         } else {
-            // Validator can take a fee for decision
-            xrt.safeApprove(validator, validatorFee);
-            // Set state of liability considering validator decision
-            isSuccess = _success && IValidator(validator).decision();
+            require(IValidator(validator).isValidator(resultSender));
+            // Transfer validator fee when is set
+            if (validatorFee > 0)
+                xrt.safeTransfer(validator, validatorFee);
+
         }
 
         if (cost > 0)
