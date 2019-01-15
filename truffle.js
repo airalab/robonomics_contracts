@@ -31,7 +31,14 @@ module.exports = {
     },
     compilers: {
         solc: {
-            version: "0.4.25"
+            version: "0.5.2",
+            settings: {
+                optimizer: {
+                    enabled: true,
+                    runs: 200
+                },
+                evmVersion: "byzantium"
+            }
         }
     },
     mocha: {
@@ -40,5 +47,5 @@ module.exports = {
             currency: 'USD',
             gasPrice: 10
         }
-    }
+    },
 };

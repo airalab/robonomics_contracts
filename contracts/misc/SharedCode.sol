@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 // Inspired by https://github.com/GNSPS/2DProxy
 library SharedCode {

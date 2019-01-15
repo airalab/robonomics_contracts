@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 /**
  * @title Robonomics lighthouse contract interface
@@ -86,7 +86,10 @@ contract ILighthouse {
      * @param _offer ABI-encoded offer message
      * @notice Only current provider can call it
      */
-    function createLiability(bytes _demand, bytes _offer) external returns (bool);
+    function createLiability(
+        bytes calldata _demand,
+        bytes calldata _offer
+    ) external returns (bool);
 
     /**
      * @dev Finalize liability smart contract assigned to this lighthouse
@@ -95,5 +98,10 @@ contract ILighthouse {
      * @param _success work success flag
      * @param _signature work signature
      */
-    function finalizeLiability(address _liability, bytes _result, bool _success, bytes _signature) external returns (bool);
+    function finalizeLiability(
+        address _liability,
+        bytes calldata _result,
+        bool _success,
+        bytes calldata _signature
+    ) external returns (bool);
 }

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol';
 import 'openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol';
@@ -37,15 +37,15 @@ contract AbstractAmbix is Ownable {
      * @param _n Token recipe source token counts
      **/
     function appendSource(
-        address[] _a,
-        uint256[] _n
+        address[] calldata _a,
+        uint256[] calldata _n
     ) external onlyOwner {
         uint256 i;
 
         require(_a.length == _n.length && _a.length > 0);
 
         for (i = 0; i < _a.length; ++i)
-            require(_a[i] != 0);
+            require(_a[i] != address(0));
 
         if (_n.length == 1 && _n[0] == 0) {
             require(B.length == 1);
@@ -64,13 +64,13 @@ contract AbstractAmbix is Ownable {
      * @param _m Token recipe sink token counts
      */
     function setSink(
-        address[] _b,
-        uint256[] _m
+        address[] calldata _b,
+        uint256[] calldata _m
     ) external onlyOwner{
         require(_b.length == _m.length);
 
         for (uint256 i = 0; i < _b.length; ++i)
-            require(_b[i] != 0);
+            require(_b[i] != address(0));
 
         B = _b;
         M = _m;
@@ -84,7 +84,7 @@ contract AbstractAmbix is Ownable {
             // Static conversion
 
             // Token count multiplier
-            uint256 mux = ERC20(A[_ix][0]).allowance(msg.sender, this) / N[_ix][0];
+            uint256 mux = ERC20(A[_ix][0]).allowance(msg.sender, address(this)) / N[_ix][0];
             require(mux > 0);
 
             // Burning run
@@ -107,9 +107,9 @@ contract AbstractAmbix is Ownable {
             ERC20Burnable source = ERC20Burnable(A[_ix][0]);
             ERC20 sink = ERC20(B[0]);
 
-            uint256 scale = 10 ** 18 * sink.balanceOf(this) / source.totalSupply();
+            uint256 scale = 10 ** 18 * sink.balanceOf(address(this)) / source.totalSupply();
 
-            uint256 allowance = source.allowance(msg.sender, this);
+            uint256 allowance = source.allowance(msg.sender, address(this));
             require(allowance > 0);
             source.burnFrom(msg.sender, allowance);
 

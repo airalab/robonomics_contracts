@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 import './ILiability.sol';
 import './ILighthouse.sol';
@@ -55,7 +55,11 @@ contract IFactory {
      * @param _name Lighthouse name,
      *              example: 'my-name' will create 'my-name.lighthouse.4.robonomics.eth' domain
      */
-    function createLighthouse(uint256 _minimalStake, uint256 _timeoutInBlocks, string _name) external returns (ILighthouse);
+    function createLighthouse(
+        uint256 _minimalStake,
+        uint256 _timeoutInBlocks,
+        string calldata _name
+    ) external returns (ILighthouse);
 
     /**
      * @dev Create robot liability smart contract
@@ -63,7 +67,10 @@ contract IFactory {
      * @param _offer ABI-encoded offer message
      * @notice This method is for lighthouse contract use only
      */
-    function createLiability(bytes _demand, bytes _offer) external returns (ILiability);
+    function createLiability(
+        bytes calldata _demand,
+        bytes calldata _offer
+    ) external returns (ILiability);
 
     /**
      * @dev Is called after liability creation

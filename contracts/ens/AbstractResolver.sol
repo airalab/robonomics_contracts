@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 contract AbstractResolver {
     function supportsInterface(bytes4 _interfaceID) public view returns (bool);

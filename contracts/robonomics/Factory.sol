@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 import 'openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol';
 
@@ -99,7 +99,7 @@ contract Factory is IFactory, SingletonHash {
     function createLighthouse(
         uint256 _minimalStake,
         uint256 _timeoutInBlocks,
-        string  _name
+        string  calldata _name
     )
         external
         returns (ILighthouse lighthouse)
@@ -111,27 +111,27 @@ contract Factory is IFactory, SingletonHash {
 
         // Name reservation check
         bytes32 subnode = keccak256(abi.encodePacked(LIGHTHOUSE_NODE, hname));
-        require(ens.resolver(subnode) == 0);
+        require(ens.resolver(subnode) == address(0));
 
         // Create lighthouse
         lighthouse = ILighthouse(lighthouseCode.proxy());
-        require(Lighthouse(lighthouse).setup(xrt, _minimalStake, _timeoutInBlocks));
+        require(Lighthouse(address(lighthouse)).setup(xrt, _minimalStake, _timeoutInBlocks));
 
-        emit NewLighthouse(lighthouse, _name);
-        isLighthouse[lighthouse] = true;
+        emit NewLighthouse(address(lighthouse), _name);
+        isLighthouse[address(lighthouse)] = true;
 
         // Register subnode
-        ens.setSubnodeOwner(LIGHTHOUSE_NODE, hname, this);
+        ens.setSubnodeOwner(LIGHTHOUSE_NODE, hname, address(this));
 
         // Register lighthouse address
         AbstractResolver resolver = AbstractResolver(ens.resolver(LIGHTHOUSE_NODE));
-        ens.setResolver(subnode, resolver);
-        resolver.setAddr(subnode, lighthouse);
+        ens.setResolver(subnode, address(resolver));
+        resolver.setAddr(subnode, address(lighthouse));
     }
 
     function createLiability(
-        bytes _demand,
-        bytes _offer
+        bytes calldata _demand,
+        bytes calldata _offer
     )
         external
         onlyLighthouse
@@ -139,15 +139,19 @@ contract Factory is IFactory, SingletonHash {
     {
         // Create liability
         liability = ILiability(liabilityCode.proxy());
-        require(Liability(liability).setup(xrt));
+        require(Liability(address(liability)).setup(xrt));
 
-        emit NewLiability(liability);
+        emit NewLiability(address(liability));
 
         // Parse messages
-        require(address(liability).call(abi.encodePacked(bytes4(0xd9ff764a), _demand))); // liability.demand(...)
+        (bool success, bytes memory returnData)
+            = address(liability).call(abi.encodePacked(bytes4(0xd9ff764a), _demand)); // liability.demand(...)
+        require(success);
         singletonHash(liability.demandHash());
 
-        require(address(liability).call(abi.encodePacked(bytes4(0xd5056962), _offer))); // liability.offer(...)
+        (success, returnData)
+            = address(liability).call(abi.encodePacked(bytes4(0xd5056962), _offer)); // liability.offer(...)
+        require(success);
         singletonHash(liability.offerHash());
 
         // Check lighthouse
@@ -163,13 +167,13 @@ contract Factory is IFactory, SingletonHash {
         ERC20 token = ERC20(liability.token());
         if (liability.cost() > 0)
             token.safeTransferFrom(liability.promisee(),
-                                   liability,
+                                   address(liability),
                                    liability.cost());
 
         // Transfer validator fee and hold on contract
-        if (liability.validator() != 0 && liability.validatorFee() > 0)
+        if (liability.validator() != address(0) && liability.validatorFee() > 0)
             xrt.safeTransferFrom(liability.promisee(),
-                                 liability,
+                                 address(liability),
                                  liability.validatorFee());
      }
 
@@ -182,8 +186,9 @@ contract Factory is IFactory, SingletonHash {
         gasPriceEstimate
         returns (bool)
     {
-        totalGasConsumed          += _gas;
-        gasConsumedOf[_liability] += _gas;
+        address liability = address(_liability);
+        totalGasConsumed         += _gas;
+        gasConsumedOf[liability] += _gas;
         return true;
     }
 
@@ -196,9 +201,10 @@ contract Factory is IFactory, SingletonHash {
         gasPriceEstimate
         returns (bool)
     {
-        totalGasConsumed          += _gas;
-        gasConsumedOf[_liability] += _gas;
-        require(xrt.mint(tx.origin, wnFromGas(gasConsumedOf[_liability])));
+        address liability = address(_liability);
+        totalGasConsumed         += _gas;
+        gasConsumedOf[liability] += _gas;
+        require(xrt.mint(tx.origin, wnFromGas(gasConsumedOf[liability])));
         return true;
     }
 }

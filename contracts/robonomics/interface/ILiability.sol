@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 /**
  * @title Standard liability smart contract interface
@@ -91,8 +91,8 @@ contract ILiability {
      * @notice It can be called by factory only
      */
     function demand(
-        bytes   _model,
-        bytes   _objective,
+        bytes   calldata _model,
+        bytes   calldata _objective,
 
         address _token,
         uint256 _cost,
@@ -104,7 +104,7 @@ contract ILiability {
 
         uint256 _deadline,
         bytes32 _nonce,
-        bytes   _signature
+        bytes   calldata _signature
     ) external returns (bool);
 
     /**
@@ -112,8 +112,8 @@ contract ILiability {
      * @notice It can be called by factory only
      */
     function offer(
-        bytes   _model,
-        bytes   _objective,
+        bytes   calldata _model,
+        bytes   calldata _objective,
         
         address _token,
         uint256 _cost,
@@ -125,7 +125,7 @@ contract ILiability {
 
         uint256 _deadline,
         bytes32 _nonce,
-        bytes   _signature
+        bytes   calldata _signature
     ) external returns (bool);
 
     /**
@@ -135,5 +135,9 @@ contract ILiability {
      * @param _signature Result signature: liability address, result and success flag signed by promisor
      * @notice It can be called by assigned lighthouse only
      */
-    function finalize(bytes _result, bool  _success, bytes _signature) external returns (bool);
+    function finalize(
+        bytes calldata _result,
+        bool  _success,
+        bytes calldata _signature
+    ) external returns (bool);
 }

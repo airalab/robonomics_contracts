@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 import 'openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol';
 
@@ -13,7 +13,7 @@ contract Lighthouse is ILighthouse {
     XRT      public xrt;
 
     function setup(XRT _xrt, uint256 _minimalStake, uint256 _timeoutInBlocks) external returns (bool) {
-        require(address(factory) == 0 && _minimalStake > 0 && _timeoutInBlocks > 0);
+        require(factory == IFactory(0) && _minimalStake > 0 && _timeoutInBlocks > 0);
 
         minimalStake    = _minimalStake;
         timeoutInBlocks = _timeoutInBlocks;
@@ -29,7 +29,7 @@ contract Lighthouse is ILighthouse {
     mapping(address => uint256) public indexOf;
 
     function refill(uint256 _value) external returns (bool) {
-        xrt.safeTransferFrom(msg.sender, this, _value);
+        xrt.safeTransferFrom(msg.sender, address(this), _value);
 
         if (stakes[msg.sender] == 0) {
             require(_value >= minimalStake);
@@ -124,8 +124,8 @@ contract Lighthouse is ILighthouse {
     }
 
     function createLiability(
-        bytes _demand,
-        bytes _offer
+        bytes calldata _demand,
+        bytes calldata _offer
     )
         external
         returns (bool)
@@ -137,16 +137,16 @@ contract Lighthouse is ILighthouse {
         quotedTransaction();
 
         ILiability liability = factory.createLiability(_demand, _offer);
-        require(address(liability) != 0);
+        require(liability != ILiability(0));
         require(factory.liabilityCreated(liability, gas - gasleft()));
         return true;
     }
 
     function finalizeLiability(
         address _liability,
-        bytes _result,
+        bytes calldata _result,
         bool _success,
-        bytes _signature
+        bytes calldata _signature
     )
         external
         returns (bool)

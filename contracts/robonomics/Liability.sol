@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
 import 'openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol';
@@ -16,7 +16,7 @@ contract Liability is ILiability {
     XRT     public xrt;
 
     function setup(XRT _xrt) external returns (bool) {
-        require(factory == 0);
+        require(factory == address(0));
 
         factory = msg.sender;
         xrt     = _xrt;
@@ -25,8 +25,8 @@ contract Liability is ILiability {
     }
 
     function demand(
-        bytes   _model,
-        bytes   _objective,
+        bytes   calldata _model,
+        bytes   calldata _objective,
 
         address _token,
         uint256 _cost,
@@ -38,7 +38,7 @@ contract Liability is ILiability {
 
         uint256 _deadline,
         bytes32 _nonce,
-        bytes   _signature
+        bytes   calldata _signature
     )
         external
         returns (bool)
@@ -73,8 +73,8 @@ contract Liability is ILiability {
     }
 
     function offer(
-        bytes   _model,
-        bytes   _objective,
+        bytes   calldata _model,
+        bytes   calldata _objective,
         
         address _token,
         uint256 _cost,
@@ -86,7 +86,7 @@ contract Liability is ILiability {
 
         uint256 _deadline,
         bytes32 _nonce,
-        bytes   _signature
+        bytes   calldata _signature
     )
         external
         returns (bool)
@@ -121,9 +121,9 @@ contract Liability is ILiability {
     }
 
     function finalize(
-        bytes _result,
+        bytes calldata _result,
         bool  _success,
-        bytes _signature
+        bytes calldata _signature
     )
         external
         returns (bool)
@@ -139,7 +139,7 @@ contract Liability is ILiability {
         isFinalized = true;
         result      = _result;
 
-        if (validator == 0) {
+        if (validator == address(0)) {
             // Set state of liability according promisor report only
             isSuccess = _success;
         } else {

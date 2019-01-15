@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 import 'openzeppelin-solidity/contracts/drafts/SignatureBouncer.sol';
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol';
@@ -26,7 +26,7 @@ contract DutchAuction is SignatureBouncer {
      */
     ERC20Burnable public token;
     address public ambix;
-    address public wallet;
+    address payable public wallet;
     address public owner;
     uint public maxTokenSold;
     uint public ceiling;
@@ -91,10 +91,10 @@ contract DutchAuction is SignatureBouncer {
     /// @param _maxTokenSold Auction token balance.
     /// @param _ceiling Auction ceiling.
     /// @param _priceFactor Auction price factor.
-    constructor(address _wallet, uint _maxTokenSold, uint _ceiling, uint _priceFactor)
+    constructor(address payable _wallet, uint _maxTokenSold, uint _ceiling, uint _priceFactor)
         public
     {
-        require(_wallet != 0 && _ceiling > 0 && _priceFactor > 0);
+        require(_wallet != address(0) && _ceiling > 0 && _priceFactor > 0);
 
         owner = msg.sender;
         wallet = _wallet;
@@ -113,13 +113,13 @@ contract DutchAuction is SignatureBouncer {
         atStage(Stages.AuctionDeployed)
     {
         // Validate argument
-        require(address(_token) != 0 && _ambix != 0);
+        require(_token != ERC20Burnable(0) && _ambix != address(0));
 
         token = _token;
         ambix = _ambix;
 
         // Validate token balance
-        require(token.balanceOf(this) == maxTokenSold);
+        require(token.balanceOf(address(this)) == maxTokenSold);
 
         stage = Stages.AuctionSetUp;
     }
@@ -158,8 +158,8 @@ contract DutchAuction is SignatureBouncer {
 
     /// @dev Allows to send a bid to the auction.
     /// @param signature KYC approvement
-    function bid(bytes signature)
-        public
+    function bid(bytes calldata signature)
+        external
         payable
         isValidPayload
         timedTransitions
@@ -170,7 +170,7 @@ contract DutchAuction is SignatureBouncer {
         require(msg.value > 0);
         amount = msg.value;
 
-        address receiver = msg.sender;
+        address payable receiver = msg.sender;
 
         // Prevent that more than 90% of tokens are sold. Only relevant if cap not reached.
         uint maxWei = maxTokenSold * calcTokenPrice() / 10**9 - totalReceived;
