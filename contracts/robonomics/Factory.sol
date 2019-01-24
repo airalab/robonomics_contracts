@@ -145,14 +145,16 @@ contract Factory is IFactory, SingletonHash {
 
         // Parse messages
         (bool success, bytes memory returnData)
-            = address(liability).call(abi.encodePacked(bytes4(0xd9ff764a), _demand)); // liability.demand(...)
+            = address(liability).call(abi.encodePacked(bytes4(0x48a984e4), _demand)); // liability.demand(...)
         require(success);
         singletonHash(liability.demandHash());
+        nonceOf[liability.promisee()] += 1;
 
         (success, returnData)
-            = address(liability).call(abi.encodePacked(bytes4(0xd5056962), _offer)); // liability.offer(...)
+            = address(liability).call(abi.encodePacked(bytes4(0x413781d2), _offer)); // liability.offer(...)
         require(success);
         singletonHash(liability.offerHash());
+        nonceOf[liability.promisor()] += 1;
 
         // Check lighthouse
         require(isLighthouse[liability.lighthouse()]);

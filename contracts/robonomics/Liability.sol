@@ -5,6 +5,7 @@ import 'openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol';
 
 import './interface/ILiability.sol';
 import './interface/IValidator.sol';
+import './interface/IFactory.sol';
 import './XRT.sol';
 
 contract Liability is ILiability {
@@ -37,7 +38,7 @@ contract Liability is ILiability {
         uint256 _validator_fee,
 
         uint256 _deadline,
-        bytes32 _nonce,
+        address _sender,
         bytes   calldata _signature
     )
         external
@@ -63,12 +64,14 @@ contract Liability is ILiability {
           , _validator
           , _validator_fee
           , _deadline
-          , _nonce
+          , IFactory(factory).nonceOf(_sender)
+          , _sender
         ));
 
         promisee = demandHash
             .toEthSignedMessageHash()
             .recover(_signature);
+        require(promisee == _sender);
         return true;
     }
 
@@ -85,7 +88,7 @@ contract Liability is ILiability {
         uint256 _lighthouse_fee,
 
         uint256 _deadline,
-        bytes32 _nonce,
+        address _sender,
         bytes   calldata _signature
     )
         external
@@ -111,12 +114,14 @@ contract Liability is ILiability {
           , _lighthouse
           , _lighthouse_fee
           , _deadline
-          , _nonce
+          , IFactory(factory).nonceOf(_sender)
+          , _sender
         ));
 
         promisor = offerHash
             .toEthSignedMessageHash()
             .recover(_signature);
+        require(promisor == _sender);
         return true;
     }
 

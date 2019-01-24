@@ -23,6 +23,11 @@ contract IFactory {
     mapping(address => bool) public isLighthouse;
 
     /**
+     * @dev Nonce accounting
+     */
+    mapping(address => uint256) public nonceOf;
+
+    /**
      * @dev Total GAS utilized by Robonomics network
      */
     uint256 public totalGasConsumed = 0;

@@ -103,7 +103,7 @@ contract ILiability {
         uint256 _validator_fee,
 
         uint256 _deadline,
-        bytes32 _nonce,
+        address _sender,
         bytes   calldata _signature
     ) external returns (bool);
 
@@ -124,7 +124,7 @@ contract ILiability {
         uint256 _lighthouse_fee,
 
         uint256 _deadline,
-        bytes32 _nonce,
+        address _sender,
         bytes   calldata _signature
     ) external returns (bool);
 
