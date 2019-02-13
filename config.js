@@ -1,7 +1,7 @@
 module.exports = {
-    'generation': '4',
+    'generation': '5',
 
-    'foundation': '0x97282A7a15f9bEaDC854E8793AAe43B089F14b4e',
+    'foundation': '0xda62c0a16145f2f5e922b2651934251269f82f74',
 
     'auction': {
         'ceilingWei': '40000000000000000000',

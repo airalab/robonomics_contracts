@@ -38,7 +38,6 @@ async function randomDemand(account, lighthouse, factory) {
         {t: 'uint256', v: demand.nonce},
         {t: 'address', v: demand.sender}
     );
-    console.log('demand-hash: ' + hash);
     demand.signature = await web3.eth.sign(hash, account);
 
     return demand;
@@ -62,7 +61,6 @@ async function pairOffer(demand, factory, account) {
         {t: 'uint256', v: offer.nonce},
         {t: 'address', v: offer.sender}
     );
-    console.log('offer-hash: ' + hash);
     offer.signature = await web3.eth.sign(hash, account);
 
     return offer;
@@ -128,8 +126,6 @@ async function liabilityCreation(lighthouse, account, promisee, promisor) {
 
     const demand = await randomDemand(promisee, lighthouse, factory);
     const offer = await pairOffer(demand, factory, promisor);
-    console.log(demand);
-    console.log(offer);
 
     await xrt.increaseAllowance(Factory.address, demand.cost, {from: promisee});
     await xrt.increaseAllowance(Factory.address, offer.lighthouseFee, {from: promisor});

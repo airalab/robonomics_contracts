@@ -105,8 +105,8 @@ contract Factory is IFactory, SingletonHash {
         returns (ILighthouse lighthouse)
     {
         bytes32 LIGHTHOUSE_NODE
-            // lighthouse.4.robonomics.eth
-            = 0xbb02fe616f0926339902db4d17f52c2dfdb337f2a010da2743a8dbdac12d56f9;
+            // lighthouse.5.robonomics.eth
+            = 0x8d6c004b56cbe83bbfd9dcbd8f45d1f76398267bbb130a4629d822abc1994b96;
         bytes32 hname = keccak256(bytes(_name));
 
         // Name reservation check
