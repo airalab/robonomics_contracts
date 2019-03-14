@@ -6,6 +6,7 @@ node_js:
 
 install:
 - npm install
+- ln -s config.js.example config.js
 
 script:
 - npm run testrpc >/dev/null &
