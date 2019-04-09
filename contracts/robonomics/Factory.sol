@@ -64,7 +64,7 @@ contract Factory is IFactory, SingletonHash {
     /**
      * @dev SMMA filter period
      */
-    uint256 private constant smmaPeriod = 100;
+    uint256 private constant smmaPeriod = 1000;
 
     /**
      * @dev XRT emission value for utilized gas
