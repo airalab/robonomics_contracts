@@ -3,12 +3,13 @@ pragma solidity ^0.5.0;
 import 'openzeppelin-solidity/contracts/drafts/SignatureBouncer.sol';
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol';
 import 'openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol';
+import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
 
 /// @title Dutch auction contract - distribution of XRT tokens using an auction.
 /// @author Stefan George - <stefan.george@consensys.net>
 /// @author Airalab - <research@aira.life> 
-contract DutchAuction is SignatureBouncer {
+contract DutchAuction is SignatureBouncer, Ownable {
     using SafeERC20 for ERC20Burnable;
 
     /*
@@ -27,7 +28,6 @@ contract DutchAuction is SignatureBouncer {
     ERC20Burnable public token;
     address public ambix;
     address payable public wallet;
-    address public owner;
     uint public maxTokenSold;
     uint public ceiling;
     uint public priceFactor;
@@ -58,18 +58,6 @@ contract DutchAuction is SignatureBouncer {
         _;
     }
 
-    modifier isOwner() {
-        // Only owner is allowed to proceed
-        require(msg.sender == owner);
-        _;
-    }
-
-    modifier isWallet() {
-        // Only wallet is allowed to proceed
-        require(msg.sender == wallet);
-        _;
-    }
-
     modifier isValidPayload() {
         require(msg.data.length == 4 || msg.data.length == 164);
         _;
@@ -96,7 +84,6 @@ contract DutchAuction is SignatureBouncer {
     {
         require(_wallet != address(0) && _ceiling > 0 && _priceFactor > 0);
 
-        owner = msg.sender;
         wallet = _wallet;
         maxTokenSold = _maxTokenSold;
         ceiling = _ceiling;
@@ -109,7 +96,7 @@ contract DutchAuction is SignatureBouncer {
     /// @param _ambix Distillation cube address.
     function setup(ERC20Burnable _token, address _ambix)
         public
-        isOwner
+        onlyOwner
         atStage(Stages.AuctionDeployed)
     {
         // Validate argument
@@ -127,7 +114,7 @@ contract DutchAuction is SignatureBouncer {
     /// @dev Starts auction and sets startBlock.
     function startAuction()
         public
-        isWallet
+        onlyOwner
         atStage(Stages.AuctionSetUp)
     {
         stage = Stages.AuctionStarted;

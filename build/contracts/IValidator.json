@@ -31,14 +31,14 @@
     "absolutePath": "/home/akru/devel/robonomics_contracts/contracts/robonomics/interface/IValidator.sol",
     "exportedSymbols": {
       "IValidator": [
-        3337
+        3311
       ]
     },
-    "id": 3338,
+    "id": 3312,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 3329,
+        "id": 3303,
         "literals": [
           "solidity",
           "^",
@@ -54,9 +54,9 @@
         "contractKind": "contract",
         "documentation": "@dev Observing network contract interface",
         "fullyImplemented": false,
-        "id": 3337,
+        "id": 3311,
         "linearizedBaseContracts": [
-          3337
+          3311
         ],
         "name": "IValidator",
         "nodeType": "ContractDefinition",
@@ -64,22 +64,22 @@
           {
             "body": null,
             "documentation": "@dev Be sure than address is really validator\n@return true when validator address in argument",
-            "id": 3336,
+            "id": 3310,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "isValidator",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3332,
+              "id": 3306,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3331,
+                  "id": 3305,
                   "name": "_validator",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3336,
+                  "scope": 3310,
                   "src": "249:18:18",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -88,7 +88,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3330,
+                    "id": 3304,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "249:7:18",
@@ -105,15 +105,15 @@
               "src": "248:20:18"
             },
             "returnParameters": {
-              "id": 3335,
+              "id": 3309,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3334,
+                  "id": 3308,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3336,
+                  "scope": 3310,
                   "src": "287:4:18",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -122,7 +122,7 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 3333,
+                    "id": 3307,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
                     "src": "287:4:18",
@@ -137,14 +137,14 @@
               ],
               "src": "286:6:18"
             },
-            "scope": 3337,
+            "scope": 3311,
             "src": "228:65:18",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 3338,
+        "scope": 3312,
         "src": "78:217:18"
       }
     ],
@@ -154,14 +154,14 @@
     "absolutePath": "/home/akru/devel/robonomics_contracts/contracts/robonomics/interface/IValidator.sol",
     "exportedSymbols": {
       "IValidator": [
-        3337
+        3311
       ]
     },
-    "id": 3338,
+    "id": 3312,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 3329,
+        "id": 3303,
         "literals": [
           "solidity",
           "^",
@@ -177,9 +177,9 @@
         "contractKind": "contract",
         "documentation": "@dev Observing network contract interface",
         "fullyImplemented": false,
-        "id": 3337,
+        "id": 3311,
         "linearizedBaseContracts": [
-          3337
+          3311
         ],
         "name": "IValidator",
         "nodeType": "ContractDefinition",
@@ -187,22 +187,22 @@
           {
             "body": null,
             "documentation": "@dev Be sure than address is really validator\n@return true when validator address in argument",
-            "id": 3336,
+            "id": 3310,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "isValidator",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3332,
+              "id": 3306,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3331,
+                  "id": 3305,
                   "name": "_validator",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3336,
+                  "scope": 3310,
                   "src": "249:18:18",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -211,7 +211,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3330,
+                    "id": 3304,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "249:7:18",
@@ -228,15 +228,15 @@
               "src": "248:20:18"
             },
             "returnParameters": {
-              "id": 3335,
+              "id": 3309,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3334,
+                  "id": 3308,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3336,
+                  "scope": 3310,
                   "src": "287:4:18",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -245,7 +245,7 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 3333,
+                    "id": 3307,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
                     "src": "287:4:18",
@@ -260,14 +260,14 @@
               ],
               "src": "286:6:18"
             },
-            "scope": 3337,
+            "scope": 3311,
             "src": "228:65:18",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 3338,
+        "scope": 3312,
         "src": "78:217:18"
       }
     ],
@@ -275,11 +275,11 @@
   },
   "compiler": {
     "name": "solc",
-    "version": "0.5.4+commit.9549d8ff.Emscripten.clang"
+    "version": "0.5.7+commit.6da8b019.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-04-01T11:43:53.003Z",
+  "updatedAt": "2019-04-10T11:03:06.798Z",
   "devdoc": {
     "details": "Observing network contract interface",
     "methods": {

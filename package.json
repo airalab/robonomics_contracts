@@ -32,10 +32,10 @@
     "chai-as-promised": "^7.1.1",
     "eth-ens-namehash": "^2.0.8",
     "eth-gas-reporter": "^0.1.12",
-    "ganache-cli": "^6.2.4",
-    "openzeppelin-solidity": "2.1.2",
-    "truffle": "5.0.4",
-    "truffle-flattener": "^1.2.9"
+    "ganache-cli": "6.4.2",
+    "truffle": "5.0.12",
+    "truffle-flattener": "1.3.0",
+    "openzeppelin-solidity": "2.1.3"
   },
   "author": "Airalab <research@aira.life>",
   "license": "BSD-3-Clause"

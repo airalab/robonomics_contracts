@@ -995,11 +995,11 @@
   },
   "compiler": {
     "name": "solc",
-    "version": "0.5.4+commit.9549d8ff.Emscripten.clang"
+    "version": "0.5.7+commit.6da8b019.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-04-01T11:43:52.988Z",
+  "updatedAt": "2019-04-10T11:03:06.783Z",
   "devdoc": {
     "methods": {}
   },
