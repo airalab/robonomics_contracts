@@ -1,7 +1,7 @@
 const PublicResolver = artifacts.require('PublicResolver');
 const DutchAuction = artifacts.require('DutchAuction');
 const Factory = artifacts.require('Factory');
-const KycAmbix = artifacts.require('KycAmbix');
+const PublicAmbix = artifacts.require('PublicAmbix');
 const XRT = artifacts.require('XRT');
 const ENS = artifacts.require('ENS');
 
@@ -36,7 +36,7 @@ module.exports = async (deployer, network, accounts) => {
     await ens.setResolver(namehash('lighthouse.'+robonomicsRoot), resolver.address);
 
     await resolver.setAddr(namehash('xrt.'+robonomicsRoot), XRT.address);
-    await resolver.setAddr(namehash('ambix.'+robonomicsRoot), KycAmbix.address);
+    await resolver.setAddr(namehash('ambix.'+robonomicsRoot), PublicAmbix.address);
     await resolver.setAddr(namehash('auction.'+robonomicsRoot), DutchAuction.address);
     await resolver.setAddr(namehash('factory.'+robonomicsRoot), Factory.address);
 

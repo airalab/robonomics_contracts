@@ -1,7 +1,7 @@
 const DutchAuction = artifacts.require('DutchAuction');
 const Lighthouse = artifacts.require('Lighthouse');
 const Liability = artifacts.require('Liability');
-const KycAmbix = artifacts.require('KycAmbix');
+const PublicAmbix = artifacts.require('PublicAmbix');
 const Factory = artifacts.require('Factory');
 const XRT = artifacts.require('XRT');
 const ENS = artifacts.require('ENS');
@@ -19,7 +19,7 @@ module.exports = async (deployer, network, accounts) => {
     await deployer.deploy(Liability);
     await deployer.deploy(Lighthouse);
     await deployer.deploy(XRT, config['xrt']['initialSupply']);
-    await deployer.deploy(KycAmbix);
+    await deployer.deploy(PublicAmbix);
     await deployer.deploy(Factory,
                           Liability.address,
                           Lighthouse.address,
@@ -30,11 +30,11 @@ module.exports = async (deployer, network, accounts) => {
     const xrt = await XRT.deployed();
     await xrt.addMinter(Factory.address);
     await xrt.transfer(foundation, config['xrt']['genesis']['foundation']);
-    await xrt.transfer(KycAmbix.address, config['xrt']['genesis']['ambix']);
+    await xrt.transfer(PublicAmbix.address, config['xrt']['genesis']['ambix']);
     await xrt.transfer(DutchAuction.address, config['xrt']['genesis']['auction']);
     await xrt.renounceMinter();
 
     const auction = await DutchAuction.deployed();
-    await auction.setup(XRT.address, KycAmbix.address);
+    await auction.setup(XRT.address, PublicAmbix.address);
 
 };

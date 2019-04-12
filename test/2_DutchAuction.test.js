@@ -1,5 +1,5 @@
 const DutchAuction = artifacts.require('DutchAuction');
-const KycAmbix = artifacts.require('KycAmbix');
+const PublicAmbix = artifacts.require('PublicAmbix');
 const XRT = artifacts.require('XRT');
 
 const { ensCheck, kyc } = require('./helpers/helpers')
@@ -27,7 +27,7 @@ contract('DutchAuction', (accounts) => {
         it('should have reference to XRT and Ambix contracts', async () => {
             const auction = await DutchAuction.deployed();
             (await auction.token()).should.equal(XRT.address);
-            (await auction.ambix()).should.equal(KycAmbix.address);
+            (await auction.ambix()).should.equal(PublicAmbix.address);
         });
 
         it('should have a signer for KYC validation', async () => {
