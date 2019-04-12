@@ -284,14 +284,14 @@
     "absolutePath": "/home/akru/devel/robonomics_contracts/contracts/misc/KycAmbix.sol",
     "exportedSymbols": {
       "KycAmbix": [
-        1453
+        1461
       ]
     },
-    "id": 1454,
+    "id": 1462,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1431,
+        "id": 1439,
         "literals": [
           "solidity",
           "^",
@@ -304,10 +304,10 @@
       {
         "absolutePath": "openzeppelin-solidity/contracts/drafts/SignatureBouncer.sol",
         "file": "openzeppelin-solidity/contracts/drafts/SignatureBouncer.sol",
-        "id": 1432,
+        "id": 1440,
         "nodeType": "ImportDirective",
-        "scope": 1454,
-        "sourceUnit": 4029,
+        "scope": 1462,
+        "sourceUnit": 4037,
         "src": "25:69:7",
         "symbolAliases": [],
         "unitAlias": ""
@@ -315,9 +315,9 @@
       {
         "absolutePath": "/home/akru/devel/robonomics_contracts/contracts/misc/AbstractAmbix.sol",
         "file": "./AbstractAmbix.sol",
-        "id": 1433,
+        "id": 1441,
         "nodeType": "ImportDirective",
-        "scope": 1454,
+        "scope": 1462,
         "sourceUnit": 911,
         "src": "96:29:7",
         "symbolAliases": [],
@@ -329,7 +329,7 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 1434,
+              "id": 1442,
               "name": "AbstractAmbix",
               "nodeType": "UserDefinedTypeName",
               "referencedDeclaration": 910,
@@ -339,7 +339,7 @@
                 "typeString": "contract AbstractAmbix"
               }
             },
-            "id": 1435,
+            "id": 1443,
             "nodeType": "InheritanceSpecifier",
             "src": "148:13:7"
           },
@@ -347,44 +347,44 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 1436,
+              "id": 1444,
               "name": "SignatureBouncer",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4028,
+              "referencedDeclaration": 4036,
               "src": "163:16:7",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SignatureBouncer_$4028",
+                "typeIdentifier": "t_contract$_SignatureBouncer_$4036",
                 "typeString": "contract SignatureBouncer"
               }
             },
-            "id": 1437,
+            "id": 1445,
             "nodeType": "InheritanceSpecifier",
             "src": "163:16:7"
           }
         ],
         "contractDependencies": [
           910,
-          3715,
-          4028,
-          4265
+          3723,
+          4036,
+          4273
         ],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 1453,
+        "id": 1461,
         "linearizedBaseContracts": [
-          1453,
-          4028,
-          3715,
+          1461,
+          4036,
+          3723,
           910,
-          4265
+          4273
         ],
         "name": "KycAmbix",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 1451,
+              "id": 1459,
               "nodeType": "Block",
               "src": "479:14:7",
               "statements": [
@@ -394,11 +394,11 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1448,
+                        "id": 1456,
                         "name": "_ix",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1439,
+                        "referencedDeclaration": 1447,
                         "src": "486:3:7",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
@@ -413,7 +413,7 @@
                           "typeString": "uint256"
                         }
                       ],
-                      "id": 1447,
+                      "id": 1455,
                       "name": "_run",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
@@ -424,7 +424,7 @@
                         "typeString": "function (uint256)"
                       }
                     },
-                    "id": 1449,
+                    "id": 1457,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -438,14 +438,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1450,
+                  "id": 1458,
                   "nodeType": "ExpressionStatement",
                   "src": "481:9:7"
                 }
               ]
             },
             "documentation": "@dev Run distillation process\n@param _ix Source alternative index\n@param _signature KYC indulgence (KYC signature of concatenated sender and contract address)",
-            "id": 1452,
+            "id": 1460,
             "implemented": true,
             "kind": "function",
             "modifiers": [
@@ -453,11 +453,11 @@
                 "arguments": [
                   {
                     "argumentTypes": null,
-                    "id": 1444,
+                    "id": 1452,
                     "name": "_signature",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 1441,
+                    "referencedDeclaration": 1449,
                     "src": "463:10:7",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_calldata_ptr",
@@ -465,14 +465,14 @@
                     }
                   }
                 ],
-                "id": 1445,
+                "id": 1453,
                 "modifierName": {
                   "argumentTypes": null,
-                  "id": 1443,
+                  "id": 1451,
                   "name": "onlyValidSignature",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 3829,
+                  "referencedDeclaration": 3837,
                   "src": "444:18:7",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$_t_bytes_memory_ptr_$",
@@ -486,15 +486,15 @@
             "name": "run",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1442,
+              "id": 1450,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1439,
+                  "id": 1447,
                   "name": "_ix",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1452,
+                  "scope": 1460,
                   "src": "395:11:7",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -503,7 +503,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1438,
+                    "id": 1446,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "395:7:7",
@@ -517,10 +517,10 @@
                 },
                 {
                   "constant": false,
-                  "id": 1441,
+                  "id": 1449,
                   "name": "_signature",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1452,
+                  "scope": 1460,
                   "src": "408:25:7",
                   "stateVariable": false,
                   "storageLocation": "calldata",
@@ -529,7 +529,7 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 1440,
+                    "id": 1448,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
                     "src": "408:5:7",
@@ -545,19 +545,19 @@
               "src": "394:40:7"
             },
             "returnParameters": {
-              "id": 1446,
+              "id": 1454,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "479:0:7"
             },
-            "scope": 1453,
+            "scope": 1461,
             "src": "382:111:7",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 1454,
+        "scope": 1462,
         "src": "127:368:7"
       }
     ],
@@ -567,14 +567,14 @@
     "absolutePath": "/home/akru/devel/robonomics_contracts/contracts/misc/KycAmbix.sol",
     "exportedSymbols": {
       "KycAmbix": [
-        1453
+        1461
       ]
     },
-    "id": 1454,
+    "id": 1462,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1431,
+        "id": 1439,
         "literals": [
           "solidity",
           "^",
@@ -587,10 +587,10 @@
       {
         "absolutePath": "openzeppelin-solidity/contracts/drafts/SignatureBouncer.sol",
         "file": "openzeppelin-solidity/contracts/drafts/SignatureBouncer.sol",
-        "id": 1432,
+        "id": 1440,
         "nodeType": "ImportDirective",
-        "scope": 1454,
-        "sourceUnit": 4029,
+        "scope": 1462,
+        "sourceUnit": 4037,
         "src": "25:69:7",
         "symbolAliases": [],
         "unitAlias": ""
@@ -598,9 +598,9 @@
       {
         "absolutePath": "/home/akru/devel/robonomics_contracts/contracts/misc/AbstractAmbix.sol",
         "file": "./AbstractAmbix.sol",
-        "id": 1433,
+        "id": 1441,
         "nodeType": "ImportDirective",
-        "scope": 1454,
+        "scope": 1462,
         "sourceUnit": 911,
         "src": "96:29:7",
         "symbolAliases": [],
@@ -612,7 +612,7 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 1434,
+              "id": 1442,
               "name": "AbstractAmbix",
               "nodeType": "UserDefinedTypeName",
               "referencedDeclaration": 910,
@@ -622,7 +622,7 @@
                 "typeString": "contract AbstractAmbix"
               }
             },
-            "id": 1435,
+            "id": 1443,
             "nodeType": "InheritanceSpecifier",
             "src": "148:13:7"
           },
@@ -630,44 +630,44 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 1436,
+              "id": 1444,
               "name": "SignatureBouncer",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4028,
+              "referencedDeclaration": 4036,
               "src": "163:16:7",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SignatureBouncer_$4028",
+                "typeIdentifier": "t_contract$_SignatureBouncer_$4036",
                 "typeString": "contract SignatureBouncer"
               }
             },
-            "id": 1437,
+            "id": 1445,
             "nodeType": "InheritanceSpecifier",
             "src": "163:16:7"
           }
         ],
         "contractDependencies": [
           910,
-          3715,
-          4028,
-          4265
+          3723,
+          4036,
+          4273
         ],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 1453,
+        "id": 1461,
         "linearizedBaseContracts": [
-          1453,
-          4028,
-          3715,
+          1461,
+          4036,
+          3723,
           910,
-          4265
+          4273
         ],
         "name": "KycAmbix",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 1451,
+              "id": 1459,
               "nodeType": "Block",
               "src": "479:14:7",
               "statements": [
@@ -677,11 +677,11 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1448,
+                        "id": 1456,
                         "name": "_ix",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1439,
+                        "referencedDeclaration": 1447,
                         "src": "486:3:7",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
@@ -696,7 +696,7 @@
                           "typeString": "uint256"
                         }
                       ],
-                      "id": 1447,
+                      "id": 1455,
                       "name": "_run",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
@@ -707,7 +707,7 @@
                         "typeString": "function (uint256)"
                       }
                     },
-                    "id": 1449,
+                    "id": 1457,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -721,14 +721,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1450,
+                  "id": 1458,
                   "nodeType": "ExpressionStatement",
                   "src": "481:9:7"
                 }
               ]
             },
             "documentation": "@dev Run distillation process\n@param _ix Source alternative index\n@param _signature KYC indulgence (KYC signature of concatenated sender and contract address)",
-            "id": 1452,
+            "id": 1460,
             "implemented": true,
             "kind": "function",
             "modifiers": [
@@ -736,11 +736,11 @@
                 "arguments": [
                   {
                     "argumentTypes": null,
-                    "id": 1444,
+                    "id": 1452,
                     "name": "_signature",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 1441,
+                    "referencedDeclaration": 1449,
                     "src": "463:10:7",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_calldata_ptr",
@@ -748,14 +748,14 @@
                     }
                   }
                 ],
-                "id": 1445,
+                "id": 1453,
                 "modifierName": {
                   "argumentTypes": null,
-                  "id": 1443,
+                  "id": 1451,
                   "name": "onlyValidSignature",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 3829,
+                  "referencedDeclaration": 3837,
                   "src": "444:18:7",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$_t_bytes_memory_ptr_$",
@@ -769,15 +769,15 @@
             "name": "run",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1442,
+              "id": 1450,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1439,
+                  "id": 1447,
                   "name": "_ix",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1452,
+                  "scope": 1460,
                   "src": "395:11:7",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -786,7 +786,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1438,
+                    "id": 1446,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "395:7:7",
@@ -800,10 +800,10 @@
                 },
                 {
                   "constant": false,
-                  "id": 1441,
+                  "id": 1449,
                   "name": "_signature",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1452,
+                  "scope": 1460,
                   "src": "408:25:7",
                   "stateVariable": false,
                   "storageLocation": "calldata",
@@ -812,7 +812,7 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 1440,
+                    "id": 1448,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
                     "src": "408:5:7",
@@ -828,19 +828,19 @@
               "src": "394:40:7"
             },
             "returnParameters": {
-              "id": 1446,
+              "id": 1454,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "479:0:7"
             },
-            "scope": 1453,
+            "scope": 1461,
             "src": "382:111:7",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 1454,
+        "scope": 1462,
         "src": "127:368:7"
       }
     ],
@@ -852,7 +852,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-04-10T11:03:06.789Z",
+  "updatedAt": "2019-04-12T12:09:55.602Z",
   "devdoc": {
     "methods": {
       "appendSource(address[],uint256[])": {

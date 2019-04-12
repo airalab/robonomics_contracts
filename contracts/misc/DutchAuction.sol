@@ -173,7 +173,8 @@ contract DutchAuction is SignatureBouncer, Ownable {
         }
 
         // Forward funding to ether wallet
-        wallet.transfer(amount);
+        (bool success,) = wallet.call.value(amount)("");
+        require(success);
 
         bids[receiver] += amount;
         totalReceived += amount;

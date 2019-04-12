@@ -395,7 +395,7 @@
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 5043,
+                            "referencedDeclaration": 5051,
                             "src": "358:3:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_magic_message",
@@ -434,10 +434,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        5046,
-                        5047
+                        5054,
+                        5055
                       ],
-                      "referencedDeclaration": 5046,
+                      "referencedDeclaration": 5054,
                       "src": "330:7:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -2306,7 +2306,7 @@
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 5043,
+                            "referencedDeclaration": 5051,
                             "src": "358:3:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_magic_message",
@@ -2345,10 +2345,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        5046,
-                        5047
+                        5054,
+                        5055
                       ],
-                      "referencedDeclaration": 5046,
+                      "referencedDeclaration": 5054,
                       "src": "330:7:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -3963,7 +3963,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-04-10T11:03:06.783Z",
+  "updatedAt": "2019-04-12T12:09:55.597Z",
   "devdoc": {
     "methods": {
       "addr(bytes32)": {

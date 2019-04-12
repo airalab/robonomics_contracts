@@ -214,14 +214,14 @@
     "absolutePath": "/home/akru/devel/robonomics_contracts/contracts/misc/PublicAmbix.sol",
     "exportedSymbols": {
       "PublicAmbix": [
-        1469
+        1477
       ]
     },
-    "id": 1470,
+    "id": 1478,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1455,
+        "id": 1463,
         "literals": [
           "solidity",
           "^",
@@ -234,9 +234,9 @@
       {
         "absolutePath": "/home/akru/devel/robonomics_contracts/contracts/misc/AbstractAmbix.sol",
         "file": "./AbstractAmbix.sol",
-        "id": 1456,
+        "id": 1464,
         "nodeType": "ImportDirective",
-        "scope": 1470,
+        "scope": 1478,
         "sourceUnit": 911,
         "src": "25:29:8",
         "symbolAliases": [],
@@ -248,7 +248,7 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 1457,
+              "id": 1465,
               "name": "AbstractAmbix",
               "nodeType": "UserDefinedTypeName",
               "referencedDeclaration": 910,
@@ -258,30 +258,30 @@
                 "typeString": "contract AbstractAmbix"
               }
             },
-            "id": 1458,
+            "id": 1466,
             "nodeType": "InheritanceSpecifier",
             "src": "80:13:8"
           }
         ],
         "contractDependencies": [
           910,
-          4265
+          4273
         ],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 1469,
+        "id": 1477,
         "linearizedBaseContracts": [
-          1469,
+          1477,
           910,
-          4265
+          4273
         ],
         "name": "PublicAmbix",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 1467,
+              "id": 1475,
               "nodeType": "Block",
               "src": "231:26:8",
               "statements": [
@@ -291,11 +291,11 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1464,
+                        "id": 1472,
                         "name": "_ix",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1460,
+                        "referencedDeclaration": 1468,
                         "src": "246:3:8",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
@@ -310,7 +310,7 @@
                           "typeString": "uint256"
                         }
                       ],
-                      "id": 1463,
+                      "id": 1471,
                       "name": "_run",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
@@ -321,7 +321,7 @@
                         "typeString": "function (uint256)"
                       }
                     },
-                    "id": 1465,
+                    "id": 1473,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -335,29 +335,29 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1466,
+                  "id": 1474,
                   "nodeType": "ExpressionStatement",
                   "src": "241:9:8"
                 }
               ]
             },
             "documentation": "@dev Run distillation process\n@param _ix Source alternative index",
-            "id": 1468,
+            "id": 1476,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "run",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1461,
+              "id": 1469,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1460,
+                  "id": 1468,
                   "name": "_ix",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1468,
+                  "scope": 1476,
                   "src": "209:11:8",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -366,7 +366,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1459,
+                    "id": 1467,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "209:7:8",
@@ -382,19 +382,19 @@
               "src": "208:13:8"
             },
             "returnParameters": {
-              "id": 1462,
+              "id": 1470,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "231:0:8"
             },
-            "scope": 1469,
+            "scope": 1477,
             "src": "196:61:8",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 1470,
+        "scope": 1478,
         "src": "56:203:8"
       }
     ],
@@ -404,14 +404,14 @@
     "absolutePath": "/home/akru/devel/robonomics_contracts/contracts/misc/PublicAmbix.sol",
     "exportedSymbols": {
       "PublicAmbix": [
-        1469
+        1477
       ]
     },
-    "id": 1470,
+    "id": 1478,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1455,
+        "id": 1463,
         "literals": [
           "solidity",
           "^",
@@ -424,9 +424,9 @@
       {
         "absolutePath": "/home/akru/devel/robonomics_contracts/contracts/misc/AbstractAmbix.sol",
         "file": "./AbstractAmbix.sol",
-        "id": 1456,
+        "id": 1464,
         "nodeType": "ImportDirective",
-        "scope": 1470,
+        "scope": 1478,
         "sourceUnit": 911,
         "src": "25:29:8",
         "symbolAliases": [],
@@ -438,7 +438,7 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 1457,
+              "id": 1465,
               "name": "AbstractAmbix",
               "nodeType": "UserDefinedTypeName",
               "referencedDeclaration": 910,
@@ -448,30 +448,30 @@
                 "typeString": "contract AbstractAmbix"
               }
             },
-            "id": 1458,
+            "id": 1466,
             "nodeType": "InheritanceSpecifier",
             "src": "80:13:8"
           }
         ],
         "contractDependencies": [
           910,
-          4265
+          4273
         ],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 1469,
+        "id": 1477,
         "linearizedBaseContracts": [
-          1469,
+          1477,
           910,
-          4265
+          4273
         ],
         "name": "PublicAmbix",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 1467,
+              "id": 1475,
               "nodeType": "Block",
               "src": "231:26:8",
               "statements": [
@@ -481,11 +481,11 @@
                     "arguments": [
                       {
                         "argumentTypes": null,
-                        "id": 1464,
+                        "id": 1472,
                         "name": "_ix",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1460,
+                        "referencedDeclaration": 1468,
                         "src": "246:3:8",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
@@ -500,7 +500,7 @@
                           "typeString": "uint256"
                         }
                       ],
-                      "id": 1463,
+                      "id": 1471,
                       "name": "_run",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
@@ -511,7 +511,7 @@
                         "typeString": "function (uint256)"
                       }
                     },
-                    "id": 1465,
+                    "id": 1473,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -525,29 +525,29 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 1466,
+                  "id": 1474,
                   "nodeType": "ExpressionStatement",
                   "src": "241:9:8"
                 }
               ]
             },
             "documentation": "@dev Run distillation process\n@param _ix Source alternative index",
-            "id": 1468,
+            "id": 1476,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "run",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1461,
+              "id": 1469,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1460,
+                  "id": 1468,
                   "name": "_ix",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1468,
+                  "scope": 1476,
                   "src": "209:11:8",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -556,7 +556,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1459,
+                    "id": 1467,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "209:7:8",
@@ -572,19 +572,19 @@
               "src": "208:13:8"
             },
             "returnParameters": {
-              "id": 1462,
+              "id": 1470,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "231:0:8"
             },
-            "scope": 1469,
+            "scope": 1477,
             "src": "196:61:8",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 1470,
+        "scope": 1478,
         "src": "56:203:8"
       }
     ],
@@ -596,7 +596,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-04-10T11:03:06.789Z",
+  "updatedAt": "2019-04-12T12:09:55.603Z",
   "devdoc": {
     "methods": {
       "appendSource(address[],uint256[])": {
