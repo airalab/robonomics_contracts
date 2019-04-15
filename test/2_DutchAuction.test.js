@@ -51,7 +51,7 @@ contract('DutchAuction', (accounts) => {
 
         it('should accept bid with valid KYC', async () => {
             const auction = await DutchAuction.deployed();
-            const payment = web3.utils.toWei('10', 'ether');
+            const payment = web3.utils.toWei('70', 'ether');
             const signature = await kyc(web3, kyc_account, DutchAuction.address, accounts[1]);
             await auction.bid(signature, {value: payment, from: accounts[1]}).should.be.fulfilled;
             chai.expect(await auction.bids(accounts[1])).to.eq.BN(payment);
