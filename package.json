@@ -33,9 +33,10 @@
     "eth-ens-namehash": "^2.0.8",
     "eth-gas-reporter": "^0.1.12",
     "ganache-cli": "6.4.2",
+    "openzeppelin-solidity": "2.1.3",
     "truffle": "5.0.12",
     "truffle-flattener": "1.3.0",
-    "openzeppelin-solidity": "2.1.3"
+    "truffle-hdwallet-provider": "^1.0.6"
   },
   "author": "Airalab <research@aira.life>",
   "license": "BSD-3-Clause"
