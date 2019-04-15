@@ -51,7 +51,7 @@ contract('DutchAuction', (accounts) => {
 
         it('should accept bid with valid KYC', async () => {
             const auction = await DutchAuction.deployed();
-            const payment = web3.utils.toWei('70', 'ether');
+            const payment = web3.utils.toWei('7000', 'ether');
             const signature = await kyc(web3, kyc_account, DutchAuction.address, accounts[1]);
             await auction.bid(signature, {value: payment, from: accounts[1]}).should.be.fulfilled;
             chai.expect(await auction.bids(accounts[1])).to.eq.BN(payment);
@@ -59,13 +59,13 @@ contract('DutchAuction', (accounts) => {
 
         it('should accept finalize bid', async () => {
             const auction = await DutchAuction.deployed();
-            const payment = web3.utils.toWei('2', 'ether');
+            const payment = web3.utils.toWei('200', 'ether');
             const signature = await kyc(web3, kyc_account, DutchAuction.address, accounts[2]);
 
             for (let i = 0; i < 15; i += 1)
                 await auction.bid(signature, {value: payment, from: accounts[2]}).should.be.fulfilled;
 
-            const balance = web3.utils.toWei('30', 'ether');
+            const balance = web3.utils.toWei('3000', 'ether');
             chai.expect(await auction.bids(accounts[2])).to.eq.BN(balance);
 
             (await auction.stage()).toNumber().should.equal(3);

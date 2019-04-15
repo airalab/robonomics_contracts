@@ -279,7 +279,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-04-12T12:09:55.614Z",
+  "updatedAt": "2019-04-15T14:27:15.585Z",
   "devdoc": {
     "details": "Observing network contract interface",
     "methods": {
