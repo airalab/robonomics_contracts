@@ -540,7 +540,7 @@
         "id": 913,
         "nodeType": "ImportDirective",
         "scope": 1438,
-        "sourceUnit": 4037,
+        "sourceUnit": 4039,
         "src": "25:69:6",
         "symbolAliases": [],
         "unitAlias": ""
@@ -551,7 +551,7 @@
         "id": 914,
         "nodeType": "ImportDirective",
         "scope": 1438,
-        "sourceUnit": 4737,
+        "sourceUnit": 4739,
         "src": "95:71:6",
         "symbolAliases": [],
         "unitAlias": ""
@@ -562,7 +562,7 @@
         "id": 915,
         "nodeType": "ImportDirective",
         "scope": 1438,
-        "sourceUnit": 5037,
+        "sourceUnit": 5039,
         "src": "167:67:6",
         "symbolAliases": [],
         "unitAlias": ""
@@ -573,7 +573,7 @@
         "id": 916,
         "nodeType": "ImportDirective",
         "scope": 1438,
-        "sourceUnit": 4274,
+        "sourceUnit": 4276,
         "src": "235:63:6",
         "symbolAliases": [],
         "unitAlias": ""
@@ -587,10 +587,10 @@
               "id": 917,
               "name": "SignatureBouncer",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4036,
+              "referencedDeclaration": 4038,
               "src": "509:16:6",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SignatureBouncer_$4036",
+                "typeIdentifier": "t_contract$_SignatureBouncer_$4038",
                 "typeString": "contract SignatureBouncer"
               }
             },
@@ -605,10 +605,10 @@
               "id": 919,
               "name": "Ownable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4273,
+              "referencedDeclaration": 4275,
               "src": "527:7:6",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Ownable_$4273",
+                "typeIdentifier": "t_contract$_Ownable_$4275",
                 "typeString": "contract Ownable"
               }
             },
@@ -618,9 +618,9 @@
           }
         ],
         "contractDependencies": [
-          3723,
-          4036,
-          4273
+          3725,
+          4038,
+          4275
         ],
         "contractKind": "contract",
         "documentation": "@title Dutch auction contract - distribution of XRT tokens using an auction.\n @author Stefan George - <stefan.george@consensys.net>\n @author Airalab - <research@aira.life> ",
@@ -628,9 +628,9 @@
         "id": 1437,
         "linearizedBaseContracts": [
           1437,
-          4273,
-          4036,
-          3723
+          4275,
+          4038,
+          3725
         ],
         "name": "DutchAuction",
         "nodeType": "ContractDefinition",
@@ -642,10 +642,10 @@
               "id": 921,
               "name": "SafeERC20",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 5036,
+              "referencedDeclaration": 5038,
               "src": "547:9:6",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SafeERC20_$5036",
+                "typeIdentifier": "t_contract$_SafeERC20_$5038",
                 "typeString": "library SafeERC20"
               }
             },
@@ -656,10 +656,10 @@
               "id": 922,
               "name": "ERC20Burnable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4736,
+              "referencedDeclaration": 4738,
               "src": "561:13:6",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                 "typeString": "contract ERC20Burnable"
               }
             }
@@ -787,7 +787,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+              "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
               "typeString": "contract ERC20Burnable"
             },
             "typeName": {
@@ -795,10 +795,10 @@
               "id": 933,
               "name": "ERC20Burnable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4736,
+              "referencedDeclaration": 4738,
               "src": "798:13:6",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                 "typeString": "contract ERC20Burnable"
               }
             },
@@ -1220,10 +1220,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        5054,
-                        5055
+                        5056,
+                        5057
                       ],
-                      "referencedDeclaration": 5054,
+                      "referencedDeclaration": 5056,
                       "src": "1430:7:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -1339,7 +1339,7 @@
                                 "name": "msg",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 5051,
+                                "referencedDeclaration": 5053,
                                 "src": "1522:3:6",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_magic_message",
@@ -1423,7 +1423,7 @@
                                 "name": "msg",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 5051,
+                                "referencedDeclaration": 5053,
                                 "src": "1546:3:6",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_magic_message",
@@ -1502,10 +1502,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        5054,
-                        5055
+                        5056,
+                        5057
                       ],
-                      "referencedDeclaration": 5054,
+                      "referencedDeclaration": 5056,
                       "src": "1514:7:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -1848,7 +1848,7 @@
                         "name": "now",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 5053,
+                        "referencedDeclaration": 5055,
                         "src": "1781:3:6",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
@@ -2249,10 +2249,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        5054,
-                        5055
+                        5056,
+                        5057
                       ],
-                      "referencedDeclaration": 5054,
+                      "referencedDeclaration": 5056,
                       "src": "2276:7:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -2680,7 +2680,7 @@
                         "leftExpression": {
                           "argumentTypes": null,
                           "commonType": {
-                            "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                            "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                             "typeString": "contract ERC20Burnable"
                           },
                           "id": 1095,
@@ -2697,7 +2697,7 @@
                             "referencedDeclaration": 1079,
                             "src": "2851:6:6",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                              "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                               "typeString": "contract ERC20Burnable"
                             }
                           },
@@ -2736,10 +2736,10 @@
                               "name": "ERC20Burnable",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 4736,
+                              "referencedDeclaration": 4738,
                               "src": "2861:13:6",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_ERC20Burnable_$4736_$",
+                                "typeIdentifier": "t_type$_t_contract$_ERC20Burnable_$4738_$",
                                 "typeString": "type(contract ERC20Burnable)"
                               }
                             },
@@ -2753,7 +2753,7 @@
                             "nodeType": "FunctionCall",
                             "src": "2861:16:6",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                              "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                               "typeString": "contract ERC20Burnable"
                             }
                           },
@@ -2871,10 +2871,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        5054,
-                        5055
+                        5056,
+                        5057
                       ],
-                      "referencedDeclaration": 5054,
+                      "referencedDeclaration": 5056,
                       "src": "2843:7:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -2916,7 +2916,7 @@
                       "referencedDeclaration": 934,
                       "src": "2913:5:6",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                        "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                         "typeString": "contract ERC20Burnable"
                       }
                     },
@@ -2931,13 +2931,13 @@
                       "referencedDeclaration": 1079,
                       "src": "2921:6:6",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                        "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                         "typeString": "contract ERC20Burnable"
                       }
                     },
                     "src": "2913:14:6",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                      "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                       "typeString": "contract ERC20Burnable"
                     }
                   },
@@ -3018,7 +3018,7 @@
                                   "name": "this",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 5097,
+                                  "referencedDeclaration": 5099,
                                   "src": "3028:4:6",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_contract$_DutchAuction_$1437",
@@ -3077,7 +3077,7 @@
                               "referencedDeclaration": 934,
                               "src": "3004:5:6",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                                "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                                 "typeString": "contract ERC20Burnable"
                               }
                             },
@@ -3088,7 +3088,7 @@
                             "lValueRequested": false,
                             "memberName": "balanceOf",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 4314,
+                            "referencedDeclaration": 4316,
                             "src": "3004:15:6",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_external_view$_t_address_$returns$_t_uint256_$",
@@ -3142,10 +3142,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        5054,
-                        5055
+                        5056,
+                        5057
                       ],
-                      "referencedDeclaration": 5054,
+                      "referencedDeclaration": 5056,
                       "src": "2996:7:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -3248,7 +3248,7 @@
                   "name": "onlyOwner",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 4207,
+                  "referencedDeclaration": 4209,
                   "src": "2750:9:6",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -3324,7 +3324,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                    "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                     "typeString": "contract ERC20Burnable"
                   },
                   "typeName": {
@@ -3332,10 +3332,10 @@
                     "id": 1078,
                     "name": "ERC20Burnable",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 4736,
+                    "referencedDeclaration": 4738,
                     "src": "2689:13:6",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                      "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                       "typeString": "contract ERC20Burnable"
                     }
                   },
@@ -3483,7 +3483,7 @@
                         "name": "block",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 5041,
+                        "referencedDeclaration": 5043,
                         "src": "3311:5:6",
                         "typeDescriptions": {
                           "typeIdentifier": "t_magic_block",
@@ -3530,7 +3530,7 @@
                   "name": "onlyOwner",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 4207,
+                  "referencedDeclaration": 4209,
                   "src": "3198:9:6",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -4022,7 +4022,7 @@
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 5051,
+                            "referencedDeclaration": 5053,
                             "src": "4300:3:6",
                             "typeDescriptions": {
                               "typeIdentifier": "t_magic_message",
@@ -4081,10 +4081,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        5054,
-                        5055
+                        5056,
+                        5057
                       ],
-                      "referencedDeclaration": 5054,
+                      "referencedDeclaration": 5056,
                       "src": "4292:7:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -4140,7 +4140,7 @@
                         "name": "msg",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 5051,
+                        "referencedDeclaration": 5053,
                         "src": "4333:3:6",
                         "typeDescriptions": {
                           "typeIdentifier": "t_magic_message",
@@ -4213,7 +4213,7 @@
                       "name": "msg",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5051,
+                      "referencedDeclaration": 5053,
                       "src": "4380:3:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_magic_message",
@@ -4743,7 +4743,7 @@
                                   "name": "msg",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 5051,
+                                  "referencedDeclaration": 5053,
                                   "src": "4921:3:6",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_magic_message",
@@ -5030,10 +5030,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        5054,
-                        5055
+                        5056,
+                        5057
                       ],
-                      "referencedDeclaration": 5054,
+                      "referencedDeclaration": 5056,
                       "src": "5061:7:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -5451,7 +5451,7 @@
                   "name": "onlyValidSignature",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 3837,
+                  "referencedDeclaration": 3839,
                   "src": "4218:18:6",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$_t_bytes_memory_ptr_$",
@@ -5584,7 +5584,7 @@
                       "name": "msg",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5051,
+                      "referencedDeclaration": 5053,
                       "src": "5525:3:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_magic_message",
@@ -5919,7 +5919,7 @@
                         "referencedDeclaration": 934,
                         "src": "5636:5:6",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                          "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                           "typeString": "contract ERC20Burnable"
                         }
                       },
@@ -5930,10 +5930,10 @@
                       "lValueRequested": false,
                       "memberName": "safeTransfer",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 4916,
+                      "referencedDeclaration": 4918,
                       "src": "5636:18:6",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_IERC20_$4891_$_t_address_$_t_uint256_$returns$__$bound_to$_t_contract$_IERC20_$4891_$",
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_IERC20_$4893_$_t_address_$_t_uint256_$returns$__$bound_to$_t_contract$_IERC20_$4893_$",
                         "typeString": "function (contract IERC20,address,uint256)"
                       }
                     },
@@ -6443,7 +6443,7 @@
                                   "name": "block",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 5041,
+                                  "referencedDeclaration": 5043,
                                   "src": "6107:5:6",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_magic_block",
@@ -7108,7 +7108,7 @@
                               "referencedDeclaration": 934,
                               "src": "6699:5:6",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                                "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                                 "typeString": "contract ERC20Burnable"
                               }
                             },
@@ -7119,7 +7119,7 @@
                             "lValueRequested": false,
                             "memberName": "burn",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 4722,
+                            "referencedDeclaration": 4724,
                             "src": "6699:10:6",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_external_nonpayable$_t_uint256_$returns$__$",
@@ -7237,7 +7237,7 @@
                               "referencedDeclaration": 934,
                               "src": "6561:5:6",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                                "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                                 "typeString": "contract ERC20Burnable"
                               }
                             },
@@ -7248,10 +7248,10 @@
                             "lValueRequested": false,
                             "memberName": "safeTransfer",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 4916,
+                            "referencedDeclaration": 4918,
                             "src": "6561:18:6",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_IERC20_$4891_$_t_address_$_t_uint256_$returns$__$bound_to$_t_contract$_IERC20_$4891_$",
+                              "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_IERC20_$4893_$_t_address_$_t_uint256_$returns$__$bound_to$_t_contract$_IERC20_$4893_$",
                               "typeString": "function (contract IERC20,address,uint256)"
                             }
                           },
@@ -7305,7 +7305,7 @@
                       "name": "now",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5053,
+                      "referencedDeclaration": 5055,
                       "src": "6767:3:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -7383,7 +7383,7 @@
         "id": 913,
         "nodeType": "ImportDirective",
         "scope": 1438,
-        "sourceUnit": 4037,
+        "sourceUnit": 4039,
         "src": "25:69:6",
         "symbolAliases": [],
         "unitAlias": ""
@@ -7394,7 +7394,7 @@
         "id": 914,
         "nodeType": "ImportDirective",
         "scope": 1438,
-        "sourceUnit": 4737,
+        "sourceUnit": 4739,
         "src": "95:71:6",
         "symbolAliases": [],
         "unitAlias": ""
@@ -7405,7 +7405,7 @@
         "id": 915,
         "nodeType": "ImportDirective",
         "scope": 1438,
-        "sourceUnit": 5037,
+        "sourceUnit": 5039,
         "src": "167:67:6",
         "symbolAliases": [],
         "unitAlias": ""
@@ -7416,7 +7416,7 @@
         "id": 916,
         "nodeType": "ImportDirective",
         "scope": 1438,
-        "sourceUnit": 4274,
+        "sourceUnit": 4276,
         "src": "235:63:6",
         "symbolAliases": [],
         "unitAlias": ""
@@ -7430,10 +7430,10 @@
               "id": 917,
               "name": "SignatureBouncer",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4036,
+              "referencedDeclaration": 4038,
               "src": "509:16:6",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SignatureBouncer_$4036",
+                "typeIdentifier": "t_contract$_SignatureBouncer_$4038",
                 "typeString": "contract SignatureBouncer"
               }
             },
@@ -7448,10 +7448,10 @@
               "id": 919,
               "name": "Ownable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4273,
+              "referencedDeclaration": 4275,
               "src": "527:7:6",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Ownable_$4273",
+                "typeIdentifier": "t_contract$_Ownable_$4275",
                 "typeString": "contract Ownable"
               }
             },
@@ -7461,9 +7461,9 @@
           }
         ],
         "contractDependencies": [
-          3723,
-          4036,
-          4273
+          3725,
+          4038,
+          4275
         ],
         "contractKind": "contract",
         "documentation": "@title Dutch auction contract - distribution of XRT tokens using an auction.\n @author Stefan George - <stefan.george@consensys.net>\n @author Airalab - <research@aira.life> ",
@@ -7471,9 +7471,9 @@
         "id": 1437,
         "linearizedBaseContracts": [
           1437,
-          4273,
-          4036,
-          3723
+          4275,
+          4038,
+          3725
         ],
         "name": "DutchAuction",
         "nodeType": "ContractDefinition",
@@ -7485,10 +7485,10 @@
               "id": 921,
               "name": "SafeERC20",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 5036,
+              "referencedDeclaration": 5038,
               "src": "547:9:6",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SafeERC20_$5036",
+                "typeIdentifier": "t_contract$_SafeERC20_$5038",
                 "typeString": "library SafeERC20"
               }
             },
@@ -7499,10 +7499,10 @@
               "id": 922,
               "name": "ERC20Burnable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4736,
+              "referencedDeclaration": 4738,
               "src": "561:13:6",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                 "typeString": "contract ERC20Burnable"
               }
             }
@@ -7630,7 +7630,7 @@
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+              "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
               "typeString": "contract ERC20Burnable"
             },
             "typeName": {
@@ -7638,10 +7638,10 @@
               "id": 933,
               "name": "ERC20Burnable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4736,
+              "referencedDeclaration": 4738,
               "src": "798:13:6",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                 "typeString": "contract ERC20Burnable"
               }
             },
@@ -8063,10 +8063,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        5054,
-                        5055
+                        5056,
+                        5057
                       ],
-                      "referencedDeclaration": 5054,
+                      "referencedDeclaration": 5056,
                       "src": "1430:7:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -8182,7 +8182,7 @@
                                 "name": "msg",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 5051,
+                                "referencedDeclaration": 5053,
                                 "src": "1522:3:6",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_magic_message",
@@ -8266,7 +8266,7 @@
                                 "name": "msg",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 5051,
+                                "referencedDeclaration": 5053,
                                 "src": "1546:3:6",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_magic_message",
@@ -8345,10 +8345,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        5054,
-                        5055
+                        5056,
+                        5057
                       ],
-                      "referencedDeclaration": 5054,
+                      "referencedDeclaration": 5056,
                       "src": "1514:7:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -8691,7 +8691,7 @@
                         "name": "now",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 5053,
+                        "referencedDeclaration": 5055,
                         "src": "1781:3:6",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
@@ -9092,10 +9092,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        5054,
-                        5055
+                        5056,
+                        5057
                       ],
-                      "referencedDeclaration": 5054,
+                      "referencedDeclaration": 5056,
                       "src": "2276:7:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -9523,7 +9523,7 @@
                         "leftExpression": {
                           "argumentTypes": null,
                           "commonType": {
-                            "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                            "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                             "typeString": "contract ERC20Burnable"
                           },
                           "id": 1095,
@@ -9540,7 +9540,7 @@
                             "referencedDeclaration": 1079,
                             "src": "2851:6:6",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                              "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                               "typeString": "contract ERC20Burnable"
                             }
                           },
@@ -9579,10 +9579,10 @@
                               "name": "ERC20Burnable",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 4736,
+                              "referencedDeclaration": 4738,
                               "src": "2861:13:6",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_type$_t_contract$_ERC20Burnable_$4736_$",
+                                "typeIdentifier": "t_type$_t_contract$_ERC20Burnable_$4738_$",
                                 "typeString": "type(contract ERC20Burnable)"
                               }
                             },
@@ -9596,7 +9596,7 @@
                             "nodeType": "FunctionCall",
                             "src": "2861:16:6",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                              "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                               "typeString": "contract ERC20Burnable"
                             }
                           },
@@ -9714,10 +9714,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        5054,
-                        5055
+                        5056,
+                        5057
                       ],
-                      "referencedDeclaration": 5054,
+                      "referencedDeclaration": 5056,
                       "src": "2843:7:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -9759,7 +9759,7 @@
                       "referencedDeclaration": 934,
                       "src": "2913:5:6",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                        "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                         "typeString": "contract ERC20Burnable"
                       }
                     },
@@ -9774,13 +9774,13 @@
                       "referencedDeclaration": 1079,
                       "src": "2921:6:6",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                        "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                         "typeString": "contract ERC20Burnable"
                       }
                     },
                     "src": "2913:14:6",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                      "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                       "typeString": "contract ERC20Burnable"
                     }
                   },
@@ -9861,7 +9861,7 @@
                                   "name": "this",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 5097,
+                                  "referencedDeclaration": 5099,
                                   "src": "3028:4:6",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_contract$_DutchAuction_$1437",
@@ -9920,7 +9920,7 @@
                               "referencedDeclaration": 934,
                               "src": "3004:5:6",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                                "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                                 "typeString": "contract ERC20Burnable"
                               }
                             },
@@ -9931,7 +9931,7 @@
                             "lValueRequested": false,
                             "memberName": "balanceOf",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 4314,
+                            "referencedDeclaration": 4316,
                             "src": "3004:15:6",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_external_view$_t_address_$returns$_t_uint256_$",
@@ -9985,10 +9985,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        5054,
-                        5055
+                        5056,
+                        5057
                       ],
-                      "referencedDeclaration": 5054,
+                      "referencedDeclaration": 5056,
                       "src": "2996:7:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -10091,7 +10091,7 @@
                   "name": "onlyOwner",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 4207,
+                  "referencedDeclaration": 4209,
                   "src": "2750:9:6",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -10167,7 +10167,7 @@
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                    "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                     "typeString": "contract ERC20Burnable"
                   },
                   "typeName": {
@@ -10175,10 +10175,10 @@
                     "id": 1078,
                     "name": "ERC20Burnable",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 4736,
+                    "referencedDeclaration": 4738,
                     "src": "2689:13:6",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                      "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                       "typeString": "contract ERC20Burnable"
                     }
                   },
@@ -10326,7 +10326,7 @@
                         "name": "block",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 5041,
+                        "referencedDeclaration": 5043,
                         "src": "3311:5:6",
                         "typeDescriptions": {
                           "typeIdentifier": "t_magic_block",
@@ -10373,7 +10373,7 @@
                   "name": "onlyOwner",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 4207,
+                  "referencedDeclaration": 4209,
                   "src": "3198:9:6",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -10865,7 +10865,7 @@
                             "name": "msg",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 5051,
+                            "referencedDeclaration": 5053,
                             "src": "4300:3:6",
                             "typeDescriptions": {
                               "typeIdentifier": "t_magic_message",
@@ -10924,10 +10924,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        5054,
-                        5055
+                        5056,
+                        5057
                       ],
-                      "referencedDeclaration": 5054,
+                      "referencedDeclaration": 5056,
                       "src": "4292:7:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -10983,7 +10983,7 @@
                         "name": "msg",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 5051,
+                        "referencedDeclaration": 5053,
                         "src": "4333:3:6",
                         "typeDescriptions": {
                           "typeIdentifier": "t_magic_message",
@@ -11056,7 +11056,7 @@
                       "name": "msg",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5051,
+                      "referencedDeclaration": 5053,
                       "src": "4380:3:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_magic_message",
@@ -11586,7 +11586,7 @@
                                   "name": "msg",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 5051,
+                                  "referencedDeclaration": 5053,
                                   "src": "4921:3:6",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_magic_message",
@@ -11873,10 +11873,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        5054,
-                        5055
+                        5056,
+                        5057
                       ],
-                      "referencedDeclaration": 5054,
+                      "referencedDeclaration": 5056,
                       "src": "5061:7:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
@@ -12294,7 +12294,7 @@
                   "name": "onlyValidSignature",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 3837,
+                  "referencedDeclaration": 3839,
                   "src": "4218:18:6",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$_t_bytes_memory_ptr_$",
@@ -12427,7 +12427,7 @@
                       "name": "msg",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5051,
+                      "referencedDeclaration": 5053,
                       "src": "5525:3:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_magic_message",
@@ -12762,7 +12762,7 @@
                         "referencedDeclaration": 934,
                         "src": "5636:5:6",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                          "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                           "typeString": "contract ERC20Burnable"
                         }
                       },
@@ -12773,10 +12773,10 @@
                       "lValueRequested": false,
                       "memberName": "safeTransfer",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 4916,
+                      "referencedDeclaration": 4918,
                       "src": "5636:18:6",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_IERC20_$4891_$_t_address_$_t_uint256_$returns$__$bound_to$_t_contract$_IERC20_$4891_$",
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_IERC20_$4893_$_t_address_$_t_uint256_$returns$__$bound_to$_t_contract$_IERC20_$4893_$",
                         "typeString": "function (contract IERC20,address,uint256)"
                       }
                     },
@@ -13286,7 +13286,7 @@
                                   "name": "block",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 5041,
+                                  "referencedDeclaration": 5043,
                                   "src": "6107:5:6",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_magic_block",
@@ -13951,7 +13951,7 @@
                               "referencedDeclaration": 934,
                               "src": "6699:5:6",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                                "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                                 "typeString": "contract ERC20Burnable"
                               }
                             },
@@ -13962,7 +13962,7 @@
                             "lValueRequested": false,
                             "memberName": "burn",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 4722,
+                            "referencedDeclaration": 4724,
                             "src": "6699:10:6",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_external_nonpayable$_t_uint256_$returns$__$",
@@ -14080,7 +14080,7 @@
                               "referencedDeclaration": 934,
                               "src": "6561:5:6",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_ERC20Burnable_$4736",
+                                "typeIdentifier": "t_contract$_ERC20Burnable_$4738",
                                 "typeString": "contract ERC20Burnable"
                               }
                             },
@@ -14091,10 +14091,10 @@
                             "lValueRequested": false,
                             "memberName": "safeTransfer",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 4916,
+                            "referencedDeclaration": 4918,
                             "src": "6561:18:6",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_IERC20_$4891_$_t_address_$_t_uint256_$returns$__$bound_to$_t_contract$_IERC20_$4891_$",
+                              "typeIdentifier": "t_function_internal_nonpayable$_t_contract$_IERC20_$4893_$_t_address_$_t_uint256_$returns$__$bound_to$_t_contract$_IERC20_$4893_$",
                               "typeString": "function (contract IERC20,address,uint256)"
                             }
                           },
@@ -14148,7 +14148,7 @@
                       "name": "now",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 5053,
+                      "referencedDeclaration": 5055,
                       "src": "6767:3:6",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -14207,12 +14207,12 @@
     "1": {
       "events": {},
       "links": {},
-      "address": "0xf396dE9A6B0a9f29E01e28E4d61c68EAF5448514",
-      "transactionHash": "0x7f7178b5c7a4037f3a3beb30c5278ff98bb5db09972222312a3f5c176904e11f"
+      "address": "0x86Da63B3341924c88BaA5adbB2b8F930cc02E586",
+      "transactionHash": "0x82966cb86e28341465070fda2d1f717d9f64f7b6cebf8e458b4bc3362652a74f"
     }
   },
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-04-16T07:58:46.347Z",
+  "updatedAt": "2019-04-17T09:48:26.651Z",
   "devdoc": {
     "author": "Stefan George - <stefan.george@consensys.net>Airalab - <research@aira.life> ",
     "methods": {

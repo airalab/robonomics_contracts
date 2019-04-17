@@ -277,7 +277,7 @@
         ],
         "contractDependencies": [
           910,
-          4273
+          4275
         ],
         "contractKind": "contract",
         "documentation": null,
@@ -286,7 +286,7 @@
         "linearizedBaseContracts": [
           1477,
           910,
-          4273
+          4275
         ],
         "name": "PublicAmbix",
         "nodeType": "ContractDefinition",
@@ -467,7 +467,7 @@
         ],
         "contractDependencies": [
           910,
-          4273
+          4275
         ],
         "contractKind": "contract",
         "documentation": null,
@@ -476,7 +476,7 @@
         "linearizedBaseContracts": [
           1477,
           910,
-          4273
+          4275
         ],
         "name": "PublicAmbix",
         "nodeType": "ContractDefinition",
@@ -610,12 +610,12 @@
     "1": {
       "events": {},
       "links": {},
-      "address": "0x8a015679e15fa98F6f871dc452215727822DE8f3",
-      "transactionHash": "0x853b8c2222335984c57be9e03000f4fb485cd8cbefc91c0ff58a6a4dc0158208"
+      "address": "0x06d77D039a6bD049fc9E651b7ecBB2694AC1F96f",
+      "transactionHash": "0xf3bb538c49e9d7500cdc3f04a01670e0ec9dcc6264170bd927d4c08ca37f2ead"
     }
   },
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-04-16T07:58:46.335Z",
+  "updatedAt": "2019-04-17T09:48:26.639Z",
   "devdoc": {
     "methods": {
       "appendSource(address[],uint256[])": {

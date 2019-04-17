@@ -154,7 +154,7 @@
                         "name": "abi",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 5038,
+                        "referencedDeclaration": 5040,
                         "src": "313:3:9",
                         "typeDescriptions": {
                           "typeIdentifier": "t_magic_abi",
@@ -464,7 +464,7 @@
                         "name": "abi",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 5038,
+                        "referencedDeclaration": 5040,
                         "src": "313:3:9",
                         "typeDescriptions": {
                           "typeIdentifier": "t_magic_abi",
@@ -633,7 +633,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-04-15T14:27:15.575Z",
+  "updatedAt": "2019-04-17T08:53:51.185Z",
   "devdoc": {
     "methods": {}
   },

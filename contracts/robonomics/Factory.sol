@@ -70,9 +70,9 @@ contract Factory is IFactory, SingletonHash {
      * @dev XRT emission value for utilized gas
      */
     function wnFromGas(uint256 _gas) public view returns (uint256) {
-        // Just return wn=gas when auction isn't finish
+        // Just return wn=gas*150 when auction isn't finish
         if (auction.finalPrice() == 0)
-            return _gas;
+            return _gas * 150;
 
         // Current gas utilization epoch
         uint256 epoch = totalGasConsumed / gasEpoch;

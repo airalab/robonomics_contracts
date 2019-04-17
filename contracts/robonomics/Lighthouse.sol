@@ -152,7 +152,7 @@ contract Lighthouse is ILighthouse {
         returns (bool)
     {
         // Gas with estimation error
-        uint256 gas = startGas() + 22327;
+        uint256 gas = startGas() + 22335;
 
         keepAliveTransaction();
         quotedTransaction();

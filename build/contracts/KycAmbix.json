@@ -307,7 +307,7 @@
         "id": 1440,
         "nodeType": "ImportDirective",
         "scope": 1462,
-        "sourceUnit": 4037,
+        "sourceUnit": 4039,
         "src": "25:69:7",
         "symbolAliases": [],
         "unitAlias": ""
@@ -350,10 +350,10 @@
               "id": 1444,
               "name": "SignatureBouncer",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4036,
+              "referencedDeclaration": 4038,
               "src": "163:16:7",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SignatureBouncer_$4036",
+                "typeIdentifier": "t_contract$_SignatureBouncer_$4038",
                 "typeString": "contract SignatureBouncer"
               }
             },
@@ -364,9 +364,9 @@
         ],
         "contractDependencies": [
           910,
-          3723,
-          4036,
-          4273
+          3725,
+          4038,
+          4275
         ],
         "contractKind": "contract",
         "documentation": null,
@@ -374,10 +374,10 @@
         "id": 1461,
         "linearizedBaseContracts": [
           1461,
-          4036,
-          3723,
+          4038,
+          3725,
           910,
-          4273
+          4275
         ],
         "name": "KycAmbix",
         "nodeType": "ContractDefinition",
@@ -472,7 +472,7 @@
                   "name": "onlyValidSignature",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 3837,
+                  "referencedDeclaration": 3839,
                   "src": "444:18:7",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$_t_bytes_memory_ptr_$",
@@ -590,7 +590,7 @@
         "id": 1440,
         "nodeType": "ImportDirective",
         "scope": 1462,
-        "sourceUnit": 4037,
+        "sourceUnit": 4039,
         "src": "25:69:7",
         "symbolAliases": [],
         "unitAlias": ""
@@ -633,10 +633,10 @@
               "id": 1444,
               "name": "SignatureBouncer",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4036,
+              "referencedDeclaration": 4038,
               "src": "163:16:7",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SignatureBouncer_$4036",
+                "typeIdentifier": "t_contract$_SignatureBouncer_$4038",
                 "typeString": "contract SignatureBouncer"
               }
             },
@@ -647,9 +647,9 @@
         ],
         "contractDependencies": [
           910,
-          3723,
-          4036,
-          4273
+          3725,
+          4038,
+          4275
         ],
         "contractKind": "contract",
         "documentation": null,
@@ -657,10 +657,10 @@
         "id": 1461,
         "linearizedBaseContracts": [
           1461,
-          4036,
-          3723,
+          4038,
+          3725,
           910,
-          4273
+          4275
         ],
         "name": "KycAmbix",
         "nodeType": "ContractDefinition",
@@ -755,7 +755,7 @@
                   "name": "onlyValidSignature",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 3837,
+                  "referencedDeclaration": 3839,
                   "src": "444:18:7",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$_t_bytes_memory_ptr_$",
@@ -852,7 +852,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-04-15T14:27:15.575Z",
+  "updatedAt": "2019-04-17T08:53:51.185Z",
   "devdoc": {
     "methods": {
       "appendSource(address[],uint256[])": {
