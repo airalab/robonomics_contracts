@@ -16,7 +16,7 @@ contract('XRT', () => {
 
         it('should have factory as a minter', async () => {
             const xrt = await XRT.deployed();
-            (await xrt.isMinter(Factory.address)).should.equal(true);
+            chai.expect((await xrt.isMinter(Factory.address))).equal(true);
         });
     });
 

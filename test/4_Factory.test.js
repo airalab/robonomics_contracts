@@ -17,8 +17,8 @@ contract('Factory', () => {
 
     it('should have correct contract refs', async () => {
         const factory = await Factory.deployed();
-        (await factory.xrt()).should.equal(XRT.address);
-        (await factory.ens()).should.equal(ENS.address);
+        chai.expect((await factory.xrt())).equal(XRT.address);
+        chai.expect((await factory.ens())).equal(ENS.address);
     });
 
 });

@@ -1,33 +1,15 @@
-/*
+
 const HDWalletProvider = require("truffle-hdwallet-provider");
-const privateKey = "<PRIVATE>";
-*/
+const privateKey = "0x618e90bb05c847d0be7158fb3420e6f74c0a99195db496d41aec554825d43862";
+
 
 module.exports = {
     networks: {
-        testing: {
-            host: '127.0.0.1',
-            port: 10545,
-            network_id: 420123
-        },
-        development: {
-            host: '127.0.0.1',
-            port: 9545,
-            network_id: 420123
-        },
-        /*
-        kovan: {
-            provider: new HDWalletProvider(privateKey, "https://kovan.infura.io/v3/<API_KEY>"),
-            network_id: 42,
+        neon: {
+            provider: new HDWalletProvider(privateKey, "https://devnet.neonevm.org/solana "),
+            network_id: 245022926,
             skipDryRun: true
         },
-        mainnet: {
-            provider: new HDWalletProvider(privateKey, "https://mainnet.infura.io/v3/<API_KEY>"),
-            network_id: 1,
-            gasPrice: 10000000000,
-            skipDryRun: true
-        }
-        */
     },
     compilers: {
         solc: {
@@ -42,10 +24,6 @@ module.exports = {
         }
     },
     mocha: {
-        reporter: 'eth-gas-reporter',
-        reporterOptions: {
-            currency: 'USD',
-            gasPrice: 10
-        }
+        timeout: 60000
     },
 };

@@ -2,6 +2,7 @@ const DutchAuction = artifacts.require('DutchAuction');
 const Lighthouse = artifacts.require('Lighthouse');
 const Liability = artifacts.require('Liability');
 const PublicAmbix = artifacts.require('PublicAmbix');
+const KycAmbix = artifacts.require('KycAmbix');
 const Factory = artifacts.require('Factory');
 const XRT = artifacts.require('XRT');
 const ENS = artifacts.require('ENS');
@@ -20,6 +21,7 @@ module.exports = async (deployer, network, accounts) => {
     await deployer.deploy(Lighthouse);
     await deployer.deploy(XRT, config['xrt']['initialSupply']);
     await deployer.deploy(PublicAmbix);
+    await deployer.deploy(KycAmbix);
     await deployer.deploy(Factory,
                           Liability.address,
                           Lighthouse.address,
