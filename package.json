@@ -27,6 +27,7 @@
     "airalab"
   ],
   "dependencies": {
+    "@truffle/hdwallet-provider": "^2.1.12",
     "bn-chai": "^1.0.1",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",

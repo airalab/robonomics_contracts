@@ -1,14 +1,29 @@
+const HDWalletProvider = require("@truffle/hdwallet-provider");
+const Web3 = require("web3");
 
-const HDWalletProvider = require("truffle-hdwallet-provider");
-const privateKey = "0x618e90bb05c847d0be7158fb3420e6f74c0a99195db496d41aec554825d43862";
+Web3.providers.HttpProvider.prototype.sendAsync = Web3.providers.HttpProvider.prototype.send
 
+const privateKeys = [
+    "0x09fb68d632c2b227cc6da77696de362fa38cb94e1c62d8a07db82e7d5e754f10",
+    "0x7efe7d68906dd6fb3487f411aafb8e558863bf1d2f60372a47186d151eae625a"
+];
+const provider = new Web3.providers.HttpProvider("https://devnet.neonevm.org");
 
 module.exports = {
     networks: {
-        neon: {
-            provider: new HDWalletProvider(privateKey, "https://devnet.neonevm.org/solana "),
-            network_id: 245022926,
-            skipDryRun: true
+        neonlabs: {
+            provider: () => {
+                return new HDWalletProvider(
+                  privateKeys,
+                  provider,
+                );
+            },
+            network_id: "*",
+            skipDryRun: true,
+            networkCheckTimeout: 180000,
+            timeoutBlocks: 10,
+            deploymentPollingInterval: 10000,
+            // disableConfirmationListener: true
         },
     },
     compilers: {
@@ -18,8 +33,7 @@ module.exports = {
                 optimizer: {
                     enabled: true,
                     runs: 200
-                },
-                evmVersion: "petersburg"
+                }
             }
         }
     },
