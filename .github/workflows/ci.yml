@@ -17,7 +17,4 @@ jobs:
         node-version: '16'
     # fix for forcing git to use https when pulling deps
     - run: 'git config --global --replace-all url."https://github.com/".insteadOf ssh://git@github.com/'
-    - run: npm install -g truffle
-    - run: npm install
-    - run: truffle compile
-    - run: truffle test
+    - run: docker-compose -p robonomics-tests-{{ github.run_id }} up -d

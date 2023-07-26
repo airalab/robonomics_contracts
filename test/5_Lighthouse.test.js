@@ -1,23 +1,32 @@
-const Factory = artifacts.require('Factory');
-const Liability = artifacts.require('Liability');
-const Lighthouse = artifacts.require('Lighthouse');
-const ENS = artifacts.require('ENS');
-const XRT = artifacts.require('XRT');
-
-const { ensCheck, kyc } = require('./helpers/helpers')
-const config = require('../config');
-
+const { ensCheck } = require('./helpers/helpers')
+const web3 = require('web3');
 const chai = require('chai');
 chai.use(require('chai-as-promised'))
 chai.use(require("bn-chai")(web3.utils.BN));
 chai.should();
+
+let contracts;
+let lighthouse;
+let liability;
+const [accounts] = hre.network.config.accounts;
+
+before(async function () {
+    await deployments.fixture();
+    contracts = {
+        XRT: (await ethers.getContract('XRT')),
+        ENS: (await ethers.getContract('ENS')),
+        Liability: (await ethers.getContract('Liability')),
+        Lighthouse: (await ethers.getContract('Lighthouse')),
+        Factory: (await ethers.getContract('Factory')),
+    };
+});
 
 async function randomDemand(account, lighthouse, factory) {
     let demand =
     {
         model: web3.utils.randomHex(34)
         , objective: web3.utils.randomHex(34)
-        , token: XRT.address
+        , token: contracts.XRT.address
         , cost: 1
         , lighthouse: lighthouse.address
         , validator: '0x0000000000000000000000000000000000000000'
@@ -122,16 +131,13 @@ function encodeOffer(offer) {
 }
 
 async function liabilityCreation(lighthouse, account, promisee, promisor) {
-    const factory = await Factory.deployed();
-    const xrt = await XRT.deployed();
-
-    const demand = await randomDemand(promisee, lighthouse, factory);
+    const demand = await randomDemand(promisee, lighthouse, contracts.Factory);
     const offer = await pairOffer(demand, factory, promisor);
 
-    await xrt.increaseAllowance(Factory.address, demand.cost, { from: promisee });
-    await xrt.increaseAllowance(Factory.address, offer.lighthouseFee, { from: promisor });
+    await contracts.XRT.increaseAllowance(contracts.Factory.address, demand.cost, { from: promisee });
+    await contracts.XRT.increaseAllowance(contracts.Factory.address, offer.lighthouseFee, { from: promisor });
 
-    const builder = await Factory.at(lighthouse.address);
+    const builder = await contracts.Factory.at(lighthouse.address);
     const tx = await builder.createLiability(
         encodeDemand(demand),
         encodeOffer(offer),
@@ -139,22 +145,18 @@ async function liabilityCreation(lighthouse, account, promisee, promisor) {
     );
     assert.equal(tx.logs[0].event, 'NewLiability');
 
-    const liability = await Liability.at(tx.logs[0].args.liability);
+    const liability = await contracts.Liability.at(tx.logs[0].args.liability);
 
     const txgas = tx.receipt.gasUsed;
-    const gas = await factory.gasConsumedOf(liability.address);
+    const gas = await contracts.Factory.gasConsumedOf(liability.address);
     const delta = txgas - gas.toNumber();
     console.log('gas:' + ' tx = ' + txgas + ', factory = ' + gas.toNumber() + ', delta = ' + delta);
-
-    //assert.equal(delta, 0);
 
     return liability;
 }
 
 async function liabilityFinalization(liability, lighthouse, account, promisor) {
-    const factory = await Factory.deployed();
-    const xrt = await XRT.deployed();
-    let gas = await factory.gasConsumedOf(liability.address);
+    let gas = await contracts.Factory.gasConsumedOf(liability.address);
 
     const result = web3.utils.randomHex(34);
     const hash = web3.utils.soliditySha3(
@@ -173,42 +175,33 @@ async function liabilityFinalization(liability, lighthouse, account, promisor) {
     );
 
     const txgas = tx.receipt.gasUsed;
-    gas = (await factory.gasConsumedOf(liability.address)).sub(gas).toNumber();
+    gas = (await contracts.Factory.gasConsumedOf(liability.address)).sub(gas).toNumber();
 
     const delta = txgas - gas;
     console.log('gas:' + ' tx = ' + txgas + ', factory = ' + gas + ', delta = ' + delta);
 
     const totalgas = await factory.totalGasConsumed();
     console.log('total gas: ' + totalgas.toNumber());
-
-    //assert.equal(delta, 0);
 }
-
-contract('Lighthouse', (accounts) => {
-    let lighthouse;
-    let liability;
 
     describe('factory interface', () => {
         it('should be able to create lighthouse', async () => {
-            const factory = await Factory.deployed();
-            const result = await factory.createLighthouse(1000, 10, 'test');
+            const result = await contracts.Factory.createLighthouse(1000, 10, 'test');
             assert.equal(result.logs[0].event, 'NewLighthouse');
 
-            lighthouse = await Lighthouse.at(result.logs[0].args.lighthouse);
-
-            chai.expect((await factory.isLighthouse(lighthouse.address))).equal(true);
+            lighthouse = await contracts.Lighthouse.at(result.logs[0].args.lighthouse);
+            chai.expect((await contracts.Factory.isLighthouse(lighthouse.address))).equal(true);
         });
 
 
         it('should register lighthouse in ENS', async () => {
-            await ensCheck('test.lighthouse', ENS.address);
+            await ensCheck('test.lighthouse', contracts.ENS.address);
         });
     });
 
     describe('lighthouse staking', () => {
         it('stake placement', async () => {
-            const xrt = await XRT.deployed();
-            await xrt.increaseAllowance(lighthouse.address, 2000, { from: accounts[0] });
+            await contracts.XRT.increaseAllowance(lighthouse.address, 2000, { from: accounts[0] });
             await lighthouse.refill(2000, { from: accounts[0] });
             chai.expect(await lighthouse.stakes(accounts[0])).to.eq.BN(new web3.utils.BN('2000'));
         });
@@ -226,27 +219,24 @@ contract('Lighthouse', (accounts) => {
 
     describe('robot liability scenario', () => {
         it('liability creation', async () => {
-            const xrt = await XRT.deployed();
-            await xrt.increaseAllowance(lighthouse.address, 1000, { from: accounts[0] });
+            await contracts.XRT.increaseAllowance(lighthouse.address, 1000, { from: accounts[0] });
             await lighthouse.refill(1000, { from: accounts[0] });
 
-            await xrt.transfer(accounts[1], 1000);
+            await contracts.XRT.transfer(accounts[1], 1000);
             liability = await liabilityCreation(lighthouse, accounts[0], accounts[0], accounts[1]);
         });
 
         it('liability finalization', async () => {
-            const xrt = await XRT.deployed();
-            const originBalance = await xrt.balanceOf(accounts[0]);
+            const originBalance = await contracts.XRT.balanceOf(accounts[0]);
 
             await liabilityFinalization(liability, lighthouse, accounts[0], accounts[1]);
 
-            const currentBalance = await xrt.balanceOf(accounts[0]);
+            const currentBalance = await contracts.XRT.balanceOf(accounts[0]);
             const deltaB = currentBalance.sub(originBalance);
             console.log('emission: ' + deltaB.toNumber() + ' wn');
 
-            const factory = await Factory.deployed();
-            const gas = await factory.gasConsumedOf(liability.address);
-            chai.expect(await factory.wnFromGas(gas)).to.eq.BN(deltaB);
+            const gas = await contracts.Factory.gasConsumedOf(liability.address);
+            chai.expect(await contracts.Factory.wnFromGas(gas)).to.eq.BN(deltaB);
         });
 
         async function markerLog() {
@@ -260,8 +250,6 @@ contract('Lighthouse', (accounts) => {
         }
 
         it('marker marathon', async () => {
-            const xrt = await XRT.deployed();
-
             for (let i = 0; i < 15; ++i) {
                 liability = await liabilityCreation(lighthouse, accounts[0], accounts[0], accounts[1]);
                 await markerLog();
@@ -270,8 +258,8 @@ contract('Lighthouse', (accounts) => {
                 await markerLog();
             }
 
-            await xrt.transfer(accounts[1], 1000);
-            await xrt.increaseAllowance(lighthouse.address, 1000, { from: accounts[1] });
+            await contracts.XRT.transfer(accounts[1], 1000);
+            await contracts.XRT.increaseAllowance(lighthouse.address, 1000, { from: accounts[1] });
             await lighthouse.refill(1000, { from: accounts[1] });
 
             for (let i = 0; i < 5; ++i) {
@@ -282,8 +270,8 @@ contract('Lighthouse', (accounts) => {
                 await markerLog();
             }
 
-            await xrt.transfer(accounts[2], 2000);
-            await xrt.increaseAllowance(lighthouse.address, 2000, { from: accounts[2] });
+            await contracts.XRT.transfer(accounts[2], 2000);
+            await contracts.XRT.increaseAllowance(lighthouse.address, 2000, { from: accounts[2] });
             await lighthouse.refill(2000, { from: accounts[2] });
 
             for (let i = 0; i < 2; ++i) {
@@ -300,8 +288,8 @@ contract('Lighthouse', (accounts) => {
                 await markerLog();
             }
 
-            await xrt.transfer(accounts[3], 1000);
-            await xrt.increaseAllowance(lighthouse.address, 1000, { from: accounts[3] });
+            await contracts.XRT.transfer(accounts[3], 1000);
+            await contracts.XRT.increaseAllowance(lighthouse.address, 1000, { from: accounts[3] });
             await lighthouse.refill(1000, { from: accounts[3] });
 
             for (let i = 0; i < 2; ++i) {
@@ -338,38 +326,37 @@ contract('Lighthouse', (accounts) => {
 
         });
 
-        // it('keepalive marathon', async () => {
-        //     async function waitTimeoutBlocks(blocks) {
-        //         const timeoutBlock = await web3.eth.getBlockNumber() + blocks;
-        //         console.log('waiting for block ' + timeoutBlock + '...');
-        //         while (await web3.eth.getBlockNumber() < timeoutBlock) { }
-        //     }
+        it('keepalive marathon', async () => {
+            async function waitTimeoutBlocks(blocks) {
+                const timeoutBlock = await web3.eth.getBlockNumber() + blocks;
+                console.log('waiting for block ' + timeoutBlock + '...');
+                while (await web3.eth.getBlockNumber() < timeoutBlock) { }
+            }
 
-        //     const timeout = (await lighthouse.timeoutInBlocks()).toNumber();
-        //     await new Promise((resolve) => { console.log('Timeout: ', timeout); resolve(); });
-        //     liability = await liabilityCreation(lighthouse, accounts[0], accounts[0], accounts[1]);
-        //     await markerLog();
-        //     await waitTimeoutBlocks(timeout);
-        //     await liabilityFinalization(liability, lighthouse, accounts[0], accounts[1]);
-        //     await markerLog();
+            const timeout = (await lighthouse.timeoutInBlocks()).toNumber();
+            await new Promise((resolve) => { console.log('Timeout: ', timeout); resolve(); });
+            liability = await liabilityCreation(lighthouse, accounts[0], accounts[0], accounts[1]);
+            await markerLog();
+            await waitTimeoutBlocks(timeout);
+            await liabilityFinalization(liability, lighthouse, accounts[0], accounts[1]);
+            await markerLog();
 
-        //     liability = await liabilityCreation(lighthouse, accounts[1], accounts[0], accounts[1]);
-        //     await markerLog();
-        //     await waitTimeoutBlocks(timeout);
-        //     await liabilityFinalization(liability, lighthouse, accounts[0], accounts[1]);
-        //     await markerLog();
+            liability = await liabilityCreation(lighthouse, accounts[1], accounts[0], accounts[1]);
+            await markerLog();
+            await waitTimeoutBlocks(timeout);
+            await liabilityFinalization(liability, lighthouse, accounts[0], accounts[1]);
+            await markerLog();
 
-        //     liability = await liabilityCreation(lighthouse, accounts[1], accounts[0], accounts[1]);
-        //     await markerLog();
-        //     await waitTimeoutBlocks(timeout);
-        //     await liabilityFinalization(liability, lighthouse, accounts[0], accounts[1]);
-        //     await markerLog();
+            liability = await liabilityCreation(lighthouse, accounts[1], accounts[0], accounts[1]);
+            await markerLog();
+            await waitTimeoutBlocks(timeout);
+            await liabilityFinalization(liability, lighthouse, accounts[0], accounts[1]);
+            await markerLog();
 
-        //     liability = await liabilityCreation(lighthouse, accounts[1], accounts[0], accounts[1]);
-        //     await markerLog();
-        //     await waitTimeoutBlocks(timeout);
-        //     await liabilityFinalization(liability, lighthouse, accounts[0], accounts[1]);
-        //     await markerLog();
-        // });
+            liability = await liabilityCreation(lighthouse, accounts[1], accounts[0], accounts[1]);
+            await markerLog();
+            await waitTimeoutBlocks(timeout);
+            await liabilityFinalization(liability, lighthouse, accounts[0], accounts[1]);
+            await markerLog();
+        });
     });
-});
