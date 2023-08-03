@@ -1,5 +1,5 @@
 const hre = require("hardhat");
-const { ensCheck, kyc } = require('./helpers/helpers')
+const { ensCheck, kyc, waiter } = require('./helpers/helpers')
 const chai = require('chai');
 const web3 = require('web3');
 chai.use(require('chai-as-promised'))
@@ -20,28 +20,12 @@ before(async function () {
 });
 
 beforeEach(async function () {
-    // const [deployer] = await hre.ethers.getSigners();
+    const token = await ethers.getContractFactory('XRT');
+    source = await token.deploy(100);
+    sink = await token.deploy(1000);
 
-    // source = await deployments.deploy('XRT', {
-    //     from: deployer.address,
-    //     args: [100],
-    //     log: true,
-    // });
-    
-    // sink = await deployments.deploy('XRT', {
-    //     from: deployer.address,
-    //     args: [1000],
-    //     log: true,
-    // });
-
-    // const Token = await ethers.getContractFactory('XRT');
-    // source = await Token.deploy(100);
-
-    // const Token2 = await ethers.getContractFactory('XRT');
-    // sink = await Token2.deploy(1000);
-
-    await deployments.fixture();
-    contracts.ambix = await ethers.getContract('PublicAmbix');
+    const tokenAmbix = await ethers.getContractFactory('PublicAmbix');
+    ambix = await tokenAmbix.deploy();
 });
 
 describe('ambix', () => {
@@ -51,75 +35,100 @@ describe('ambix', () => {
 
     it('static recipe', async () => {
         const accounts = await hre.ethers.getSigners();
-        source = await deployments.deploy('XRT', {
-            from: accounts[0].address,
-            args: [100],
-            log: true,
-        });
-        
-        sink = await deployments.deploy('XRT', {
-            from: accounts[0].address,
-            args: [1000],
-            log: true,
-        });
 
-        await contracts.PublicAmbix.setSink([sink.address], [3]);
+        let resultInitial = await waiter({ func: sink.balanceOf, args: [accounts[0].address], value: 1000, retries: 50 });
+        chai.expect(resultInitial).equal(1000);
+
+        await contracts.PublicAmbix.setSink([sink.address], [1]);
         await contracts.PublicAmbix.appendSource([source.address], [10]);
 
-        await source.transfer(accounts[1].address, 100);
+        await source.transfer(accounts[0].address, 100);
         await sink.transfer(contracts.PublicAmbix.address, 100);
 
-        await source.approve(contracts.PublicAmbix.address, 100, { from: accounts[1].address });
-        await contracts.PublicAmbix.run(0, { from: accounts[1].address });
+        let resultIntermediate = await waiter({ func: sink.balanceOf, args: [accounts[0].address], value: 900, retries: 50 });
+        chai.expect(resultIntermediate).equal(resultInitial - 100);
 
-        chai.expect((await sink.balanceOf(accounts[1].address)).toNumber()).equal(30);
+        let sourceResult = await waiter({ func: source.balanceOf, args: [accounts[0].address], value: 100, retries: 50 });
+        chai.expect(sourceResult).equal(100);
 
-        await new Promise((resolve) => { resolve(); return; });
+        let sinkResult = await waiter({ func: sink.balanceOf, args: [contracts.PublicAmbix.address], value: 100, retries: 50 });
+        chai.expect(sinkResult).equal(100);
+
+        await source.approve(contracts.PublicAmbix.address, 100);
+        await contracts.PublicAmbix.run(0);
+
+        let result = await waiter({ func: sink.balanceOf, args: [accounts[0].address], value: 910, retries: 50 });
+        chai.expect(result - resultIntermediate).equal(10);
     });
 
     it('dynamic recipe', async () => {
-        await new Promise((resolve) => setTimeout(resolve, 10000));
         const accounts = await hre.ethers.getSigners();
+        let resultInitial = await waiter({ func: sink.balanceOf, args: [accounts[0].address], value: 1000, retries: 50 });
+        chai.expect(resultInitial).equal(1000);
+
         await ambix.setSink([sink.address], [0]);
         await ambix.appendSource([source.address], [0]);
 
-        await source.transfer(accounts[1].address, 100);
+        await source.transfer(accounts[0].address, 100);
         await sink.transfer(ambix.address, 1000);
 
-        await source.approve(ambix.address, 100, { from: accounts[1].address });
-        await ambix.run(0, { from: accounts[1].address });
+        let sourceResult = await waiter({ func: source.balanceOf, args: [accounts[0].address], value: 100, retries: 50 });
+        chai.expect(sourceResult).equal(100);
 
-        chai.expect((await sink.balanceOf(accounts[1].address)).toNumber()).equal(1000);
+        let sinkResult = await waiter({ func: sink.balanceOf, args: [ambix.address], value: 1000, retries: 50 });
+        chai.expect(sinkResult).equal(1000);
+
+        await source.approve(ambix.address, 100);
+        await ambix.run(0);
+        let result = await waiter({ func: sink.balanceOf, args: [accounts[0].address], value: 1000, retries: 50 });
+        chai.expect(result).equal(1000);
     });
 
     it('static recipe with KYC', async () => {
         const accounts = await hre.ethers.getSigners();
+
         await contracts.PublicAmbix.setSink([sink.address], [1]);
         await contracts.PublicAmbix.appendSource([source.address], [10]);
 
         await source.transfer(accounts[1].address, 100);
         await sink.transfer(contracts.PublicAmbix.address, 100);
 
+        let sourceResult = await waiter({ func: source.balanceOf, args: [accounts[1].address], value: 100, retries: 50 });
+        chai.expect(sourceResult).equal(100);
+
+        let sinkResult = await waiter({ func: sink.balanceOf, args: [contracts.PublicAmbix.address], value: 100, retries: 50 });
+        chai.expect(sinkResult).equal(100)
+
         await source.approve(contracts.PublicAmbix.address, 100, { from: accounts[1].address });
 
-        const signature = kyc(web3, kyc_account, contracts.PublicAmbix.address, accounts[1].address);
+        const signature = kyc(accounts[0].address, contracts.PublicAmbix.address, accounts[1].address);
         await contracts.PublicAmbix.run(0, signature, { from: accounts[1].address });
 
-        chai.expect((await sink.balanceOf(accounts[1].address)).toNumber()).equal(10);
+        let result = await waiter({ func: sink.balanceOf, args: [accounts[1].address], value: 10, retries: 50 });
+        chai.expect(result).equal(10);
     });
 
     it('dynamic recipe with KYC', async () => {
         const accounts = await hre.ethers.getSigners();
+
         await ambix.setSink([sink.address], [0]);
         await ambix.appendSource([source.address], [0]);
 
         await source.transfer(accounts[1].address, 100);
         await sink.transfer(ambix.address, 1000);
+        let sourceResult = await waiter({ func: source.balanceOf, args: [accounts[1].address], value: 100, retries: 50 });
+        chai.expect(sourceResult).equal(100);
+
+        let sinkResult = await waiter({ func: sink.balanceOf, args: [contracts.PublicAmbix.address], value: 1000, retries: 50 });
+        chai.expect(sinkResult).equal(1000)
+
         await source.approve(ambix.address, 100, { from: accounts[1].address });
 
-        const signature = await kyc(web3, kyc_account, ambix.address, accounts[1].address);
+        const signature = await kyc(accounts[0].address, ambix.address, accounts[1].address);
+
         await ambix.run(0, signature, { from: accounts[1].address });
-        chai.expect((await sink.balanceOf(accounts[1].address)).toNumber()).equal(1000);
+        let result = await waiter({ func: sink.balanceOf, args: [accounts[1].address], value: 1000, retries: 50 });
+        chai.expect(result).equal(1000);
     });
 
 });

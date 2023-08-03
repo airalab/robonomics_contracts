@@ -32,12 +32,15 @@ before(async function () {
         : accounts[0].address;
 
     contracts.XRT.network = networkName;
+    const maxTokenSold = config['xrt']['genesis']['auction'];
     await contracts.XRT.addMinter(contracts.Factory.address);
     await contracts.XRT.transfer(foundation, config['xrt']['genesis']['foundation']);
     await contracts.XRT.transfer(contracts.PublicAmbix.address, config['xrt']['genesis']['ambix']);
-    await contracts.XRT.transfer(contracts.DutchAuction.address, config['xrt']['genesis']['auction']);
+    await contracts.XRT.transfer(contracts.DutchAuction.address, maxTokenSold);
     await contracts.XRT.renounceMinter();
 
+    let result = await waiter({ func: contracts.XRT.balanceOf, args: [contracts.DutchAuction.address], value: maxTokenSold, retries: 50 });
+    chai.expect(result).equal(config['xrt']['genesis']['auction']);
     await contracts.DutchAuction.setup(contracts.XRT.address, contracts.PublicAmbix.address);
 });
 
@@ -53,8 +56,10 @@ describe('when deployed', () => {
     });
 
     it('should have reference to XRT and Ambix contracts', async () => {
-        chai.expect((await contracts.DutchAuction.token())).equal(contracts.XRT.address);
-        chai.expect((await contracts.DutchAuction.ambix())).equal(contracts.PublicAmbix.address);
+        let token = await waiter({ func: contracts.DutchAuction.token, value: contracts.XRT.address, retries: 50 });
+        let ambix = await waiter({ func: contracts.DutchAuction.ambix, value: contracts.PublicAmbix.address, retries: 50 });
+        chai.expect(token).equal(contracts.XRT.address);
+        chai.expect(ambix).equal(contracts.PublicAmbix.address);
     });
 
     it('should have a signer for KYC validation', async () => {
@@ -81,7 +86,7 @@ describe('when started', () => {
     it('should accept bid with valid KYC', async () => {
         const accounts = await hre.ethers.getSigners();
         const payment = web3.utils.toWei('10', 'ether');
-        const signature = kyc(accounts[0].address, contracts.DutchAuction.address, accounts[1].address);
+        const signature = await kyc(accounts[0].address, contracts.DutchAuction.address, accounts[1].address);
         await contracts.DutchAuction.bid(signature, { value: payment });
         chai.expect(await contracts.DutchAuction.bids(accounts[1].address)).equal(payment);
     });
@@ -89,7 +94,7 @@ describe('when started', () => {
     it('should accept finalize bid', async () => {
         const accounts = await hre.ethers.getSigners();
         const payment = web3.utils.toWei('2', 'ether');
-        const signature = kyc(accounts[0].address, contracts.DutchAuction.address, accounts[2].address);
+        const signature = await kyc(accounts[0].address, contracts.DutchAuction.address, accounts[2].address);
 
         for (let i = 0; i < 15; i += 1)
             await contracts.DutchAuction.bid(signature, { value: payment });
