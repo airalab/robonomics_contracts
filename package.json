@@ -3,17 +3,17 @@
   "version": "1.0.0",
   "homepage": "https://github.com/airalab/robonomics_contracts#readme",
   "description": "Robonomics platform smart contracts",
-  "main": "truffle.js",
+  "main": "hardhat.config.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "truffle test",
-    "compile": "truffle compile",
-    "migrate": "truffle migrate",
-    "console": "truffle console",
+    "test": "npx hardhat test --network neonlabs",
+    "compile": "npx hardha compile",
+    "migrate": "npx hardha migrate",
+    "console": "npx hardha console",
     "testrpc": "ganache-cli -p 9545 -i 420123 -b 1 -e 10000",
-    "release": "truffle migrate --network mainnet"
+    "release": "npx hardha migrate --network mainnet"
   },
   "repository": {
     "type": "git",
