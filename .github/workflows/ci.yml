@@ -17,4 +17,4 @@ jobs:
         node-version: '16'
     # fix for forcing git to use https when pulling deps
     - run: 'git config --global --replace-all url."https://github.com/".insteadOf ssh://git@github.com/'
-    - run: docker-compose -p robonomics-tests-{{ github.run_id }} up -d
+    #- run: docker-compose -p robonomics-tests-{{ github.run_id }} up -d
