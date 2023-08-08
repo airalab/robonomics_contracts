@@ -176,13 +176,14 @@ contract DutchAuction is SignatureBouncer, Ownable {
         totalReceived += amount;
         emit BidSubmission(receiver, amount);
 
+        // To test auction finalization
+        if (amount == testFinal) {
+            amount = maxWei;
+        }
+
         // Finalize auction when maxWei reached
         if (amount == maxWei) finalizeAuction();
 
-        // To test auction finalization
-        if (amount == testFinal) {
-            finalizeAuction();
-        }
     }
 
     /// @dev Claims tokens for bidder after auction.
@@ -231,6 +232,5 @@ contract DutchAuction is SignatureBouncer, Ownable {
         }
 
         endTime = now;
-
     }
 }

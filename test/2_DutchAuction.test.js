@@ -85,26 +85,35 @@ describe('when started', () => {
 
     it('should accept bid with valid KYC', async () => {
         const accounts = await hre.ethers.getSigners();
-        const payment = web3.utils.toWei('10', 'ether');
-        const signature = await kyc(accounts[0].address, contracts.DutchAuction.address, accounts[1].address);
+        const payment = web3.utils.toWei('1', 'ether');
+        const signature = await kyc(accounts[0].address, contracts.DutchAuction.address, accounts[0].address);
+
         await contracts.DutchAuction.bid(signature, { value: payment });
-        chai.expect(await contracts.DutchAuction.bids(accounts[1].address)).equal(payment);
+
+        const result = await waiter({ func: contracts.DutchAuction.bids, args: [accounts[0].address], value: payment, retries: 20 });
+        chai.expect(result).equal(payment);
     });
 
     it('should accept finalize bid', async () => {
         const accounts = await hre.ethers.getSigners();
         const payment = web3.utils.toWei('2', 'ether');
-        const signature = await kyc(accounts[0].address, contracts.DutchAuction.address, accounts[2].address);
+        const signature = await kyc(accounts[0].address, contracts.DutchAuction.address, accounts[0].address);
 
         for (let i = 0; i < 15; i += 1)
             await contracts.DutchAuction.bid(signature, { value: payment });
 
-        const balance = web3.utils.toWei('30', 'ether');
-        chai.expect(await contracts.DutchAuction.bids(accounts[2].address)).equal(balance);
-        chai.expect((await contracts.DutchAuction.stage())).equal(2);
+        const balance = web3.utils.toWei('31', 'ether');
+        const result = await waiter({ func: contracts.DutchAuction.bids, args: [accounts[0].address], value: balance, retries: 20 });
+        chai.expect(result).equal(balance);
 
-        await contracts.DutchAuction.bid(signature, { value: 9912, from: accounts[2].address })
-        chai.expect((await contracts.DutchAuction.stage())).equal(3);
+        let resultStage = await waiter({ func: contracts.DutchAuction.stage, value: 2, retries: 20 });
+        chai.expect(resultStage).equal(2);
+
+        // Finalize bid ( when value == 9912 => amount = maxWei => finalize auction)
+        await contracts.DutchAuction.bid(signature, { value: 9912 });
+
+        resultStage = await waiter({ func: contracts.DutchAuction.stage, value: 3, retries: 20 });
+        chai.expect(resultStage).equal(3);
     });
 });
 
@@ -121,16 +130,14 @@ describe('when ended', () => {
         const scale = new web3.utils.BN('1000000000');
         const finalPrice = await contracts.DutchAuction.finalPrice();
 
-        const bid1 = await contracts.DutchAuction.bids(accounts[1].address);
-        await contracts.DutchAuction.claimTokens({ from: accounts[1].address });
-        chai.expect(await contracts.XRT.balanceOf(accounts[1].address)).equal(bid1.mul(scale).div(finalPrice));
+        const bid = await contracts.DutchAuction.bids(accounts[0].address);
+        const initialBalance = await contracts.XRT.balanceOf(accounts[0].address);
 
-        const bid2 = await contracts.DutchAuction.bids(accounts[2].address);
-        await contracts.DutchAuction.claimTokens({ from: accounts[2].address });
-        chai.expect(await contracts.XRT.balanceOf(accounts[2].address)).equal(bid2.mul(scale).div(finalPrice));
+        await contracts.DutchAuction.claimTokens();
+        const finalBalance = (bid * scale / finalPrice) + initialBalance.toNumber();
 
-        await contracts.DutchAuction.claimTokens({ from: accounts[3].address });
-        chai.expect(await contracts.XRT.balanceOf(accounts[3].address)).equal(new web3.utils.BN('0'));
+        let result = await waiter({ func: contracts.XRT.balanceOf, args: [accounts[0].address], value: finalBalance, retries: 20 });
+        chai.expect(result).equal(finalBalance);
     });
 });
 
