@@ -66,7 +66,7 @@ contract AbstractAmbix is Ownable {
     function setSink(
         address[] calldata _b,
         uint256[] calldata _m
-    ) external onlyOwner{
+    ) external onlyOwner {
         require(_b.length == _m.length);
 
         for (uint256 i = 0; i < _b.length; ++i)
