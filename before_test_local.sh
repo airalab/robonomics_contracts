@@ -1,3 +1,5 @@
+#!/bin/bash
+
 while getopts s:p: option
 do
   case "${option}" in
