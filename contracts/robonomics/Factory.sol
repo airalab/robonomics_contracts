@@ -1,18 +1,19 @@
 pragma solidity ^0.5.0;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol';
+import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
 
-import '../ens/AbstractENS.sol';
-import '../ens/AbstractResolver.sol';
-import '../misc/SingletonHash.sol';
-import '../misc/DutchAuction.sol';
-import '../misc/SharedCode.sol';
+import "../ens/AbstractENS.sol";
+import "../ens/AbstractResolver.sol";
+import "../misc/SingletonHash.sol";
+import "../misc/DutchAuction.sol";
+import "../misc/SharedCode.sol";
 
-import './interface/IFactory.sol';
+import "./interface/IFactory.sol";
+import "./interface/ILighthouse.sol";
 
-import './Lighthouse.sol';
-import './Liability.sol';
-import './XRT.sol';
+import "./Lighthouse.sol";
+import "./Liability.sol";
+import "./XRT.sol";
 
 contract Factory is IFactory, SingletonHash {
     constructor(
@@ -31,6 +32,8 @@ contract Factory is IFactory, SingletonHash {
 
     address public liabilityCode;
     address public lighthouseCode;
+    address public lighthouseAddress;
+    address public liabilityAddress;
 
     using SafeERC20 for XRT;
     using SafeERC20 for ERC20;
@@ -127,6 +130,12 @@ contract Factory is IFactory, SingletonHash {
         AbstractResolver resolver = AbstractResolver(ens.resolver(LIGHTHOUSE_NODE));
         ens.setResolver(subnode, address(resolver));
         resolver.setAddr(subnode, address(lighthouse));
+
+        lighthouseAddress = address(lighthouse);
+    }
+
+    function getLastCreatedLighthouseAddress() external view returns (address) {
+        return lighthouseAddress;
     }
 
     function createLiability(
@@ -174,22 +183,25 @@ contract Factory is IFactory, SingletonHash {
 
         // Transfer validator fee and hold on contract
         if (liability.validator() != address(0) && liability.validatorFee() > 0)
-            xrt.safeTransferFrom(liability.promisee(),
-                                 address(liability),
-                                 liability.validatorFee());
-     }
+            xrt.safeTransferFrom(
+                liability.promisee(),
+                address(liability),
+                liability.validatorFee()
+            );
+        
+        liabilityAddress = address(liability);
+    }
+
+    function getLastCreatedLiabilityAddress() external view returns (address) {
+        return liabilityAddress;
+    }
 
     function liabilityCreated(
         ILiability _liability,
         uint256 _gas
-    )
-        external
-        onlyLighthouse
-        gasPriceEstimate
-        returns (bool)
-    {
+    ) external onlyLighthouse gasPriceEstimate returns (bool) {
         address liability = address(_liability);
-        totalGasConsumed         += _gas;
+        totalGasConsumed += _gas;
         gasConsumedOf[liability] += _gas;
         return true;
     }
@@ -197,14 +209,9 @@ contract Factory is IFactory, SingletonHash {
     function liabilityFinalized(
         ILiability _liability,
         uint256 _gas
-    )
-        external
-        onlyLighthouse
-        gasPriceEstimate
-        returns (bool)
-    {
+    ) external onlyLighthouse gasPriceEstimate returns (bool) {
         address liability = address(_liability);
-        totalGasConsumed         += _gas;
+        totalGasConsumed += _gas;
         gasConsumedOf[liability] += _gas;
         require(xrt.mint(tx.origin, wnFromGas(gasConsumedOf[liability])));
         return true;

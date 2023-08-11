@@ -24,8 +24,13 @@ before(async function () {
         Factory: (await ethers.getContract('Factory', accounts[0].address)),
     };
 
-    await contracts.ENS.setSubnodeOwner('0x0000000000000000000000000000000000000000000000000000000000000000', web3.utils.sha3('eth'), accounts[0].address);
+    await contracts.ENS.setSubnodeOwner(namehash(0), web3.utils.sha3('eth'), accounts[0].address);
+    let result = await waiter({ func: contracts.ENS.owner, args: [namehash('eth')], value: accounts[0].address, retries: 50 });
+    chai.expect(result).equal(accounts[0].address);
+
     await contracts.ENS.setSubnodeOwner(namehash('eth'), web3.utils.sha3('robonomics'), accounts[0].address);
+    result = await waiter({ func: contracts.ENS.owner, args: [namehash('robonomics.eth')], value: accounts[0].address, retries: 50 });
+    chai.expect(result).equal(accounts[0].address);
 
     const foundation = networkName.startsWith('mainnet')
         ? config['foundation']
@@ -39,7 +44,7 @@ before(async function () {
     await contracts.XRT.transfer(contracts.DutchAuction.address, maxTokenSold);
     await contracts.XRT.renounceMinter();
 
-    let result = await waiter({ func: contracts.XRT.balanceOf, args: [contracts.DutchAuction.address], value: maxTokenSold, retries: 50 });
+    result = await waiter({ func: contracts.XRT.balanceOf, args: [contracts.DutchAuction.address], value: maxTokenSold, retries: 50 });
     chai.expect(result).equal(config['xrt']['genesis']['auction']);
     await contracts.DutchAuction.setup(contracts.XRT.address, contracts.PublicAmbix.address);
 });

@@ -1,6 +1,5 @@
 const hardhat = require('hardhat');
 const networkName = hardhat.network.name
-// const [accounts] = hardhat.network.config.accounts
 const config = require('../config');
 const auction = config['auction'];
 
@@ -76,6 +75,12 @@ module.exports = async ({ deployments }) => {
         xrt.address],
         log: true,
     });
+
+    await deploy('PublicResolver', {
+        from: accounts[0].address,
+        args: [ens_address],
+        log: true,
+    });
 };
-module.exports.tags = ['Migrations', 'ENS', 'DutchAuction', 'Liability', 'Lighthouse', 'XRT', 'PublicAmbix', 'KycAmbix', 'Factory'];
+module.exports.tags = ['Migrations', 'ENS', 'DutchAuction', 'Liability', 'Lighthouse', 'XRT', 'PublicAmbix', 'KycAmbix', 'Factory', 'PublicResolver'];
   
