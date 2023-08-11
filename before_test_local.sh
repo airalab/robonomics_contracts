@@ -37,7 +37,7 @@ done
 echo "Requesting neons for accounts"
 for (( i=0; i<$len; i++ ))
 do
-    request="./proxy-cli.sh account import --private-key "${accounts_private_keys_list[$i]}""
+    request=${accounts_list[$i]}
     echo $request
-    docker exec -it $proxy /bin/bash -c "$request"
+    curl -i -d '{"amount": 20000, "wallet":"'"$request"'"}' -H "Content-Type: application/json" -X POST $request_neon_url
 done
