@@ -9,7 +9,8 @@ library SharedCode {
     function proxy(address _shared) internal returns (address instance) {
         bytes memory code = abi.encodePacked(
             hex"603160008181600b9039f3600080808080368092803773",
-            _shared, hex"5af43d828181803e808314603057f35bfd"
+            _shared,
+            hex"5af43d828181803e808314602F57f35bfd"
         );
         assembly {
             instance := create(0, add(code, 0x20), 60)

@@ -29,9 +29,9 @@ done
 echo "Create accounts in proxy"
 for (( i=0; i<$len; i++ ))
 do
-    request="neon-cli create-ether-account "${accounts_list[$i]}" --url="$solana_url" --evm_loader="$evm_loader""
+    request="./proxy-cli.sh account import --private-key "${accounts_private_keys_list[$i]}""
     echo $request
-    docker exec -it $solana /bin/bash -c "$request"
+    docker exec -it $proxy /bin/bash -c "$request"
 done
 
 echo "Requesting neons for accounts"

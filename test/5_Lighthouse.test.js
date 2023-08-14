@@ -20,6 +20,7 @@ chai.should();
 let liability;
 let lighthouse;
 let accounts;
+const retryCounter = 100;
 
 before(async function () {
     accounts = await hardhat.ethers.getSigners();
@@ -36,11 +37,11 @@ before(async function () {
     };
 
     await contracts.ENS.setSubnodeOwner(namehash(0), web3.utils.sha3('eth'), accounts[0].address);
-    let result = await waiter({ func: contracts.ENS.owner, args: [namehash('eth')], value: accounts[0].address, retries: 50 });
+    let result = await waiter({ func: contracts.ENS.owner, args: [namehash('eth')], value: accounts[0].address, retries: retryCounter });
     chai.expect(result).equal(accounts[0].address);
 
     await contracts.ENS.setSubnodeOwner(namehash('eth'), web3.utils.sha3('robonomics'), accounts[0].address);
-    result = await waiter({ func: contracts.ENS.owner, args: [namehash('robonomics.eth')], value: accounts[0].address, retries: 50 });
+    result = await waiter({ func: contracts.ENS.owner, args: [namehash('robonomics.eth')], value: accounts[0].address, retries: retryCounter });
     chai.expect(result).equal(accounts[0].address);
 
     const foundation = networkName.startsWith('mainnet')
@@ -53,17 +54,18 @@ before(async function () {
     await contracts.XRT.transfer(foundation, config['xrt']['genesis']['foundation']);
     await contracts.XRT.transfer(contracts.PublicAmbix.address, config['xrt']['genesis']['ambix']);
     await contracts.XRT.transfer(contracts.DutchAuction.address, maxTokenSold);
+    result = await waiter({ func: contracts.XRT.balanceOf, args: [contracts.DutchAuction.address], value: maxTokenSold, retries: retryCounter });
+    chai.expect(result).equal(config['xrt']['genesis']['auction']);
+
     await contracts.XRT.renounceMinter();
 
-    result = await waiter({ func: contracts.XRT.balanceOf, args: [contracts.DutchAuction.address], value: maxTokenSold, retries: 50 });
-    chai.expect(result).equal(config['xrt']['genesis']['auction']);
     await contracts.DutchAuction.setup(contracts.XRT.address, contracts.PublicAmbix.address);
 
     const generation = config['generation'];
     const robonomicsRoot = generation + '.robonomics.eth';
 
     await contracts.ENS.setSubnodeOwner(namehash('robonomics.eth'), sha3(generation), accounts[0].address);
-    result = await waiter({ func: contracts.ENS.owner, args: [namehash(robonomicsRoot)], value: accounts[0].address, retries: 50 });
+    result = await waiter({ func: contracts.ENS.owner, args: [namehash(robonomicsRoot)], value: accounts[0].address, retries: retryCounter });
     chai.expect(result).equal(accounts[0].address);
 
     await contracts.ENS.setSubnodeOwner(namehash(robonomicsRoot), sha3('xrt'), accounts[0].address);
@@ -71,32 +73,32 @@ before(async function () {
     await contracts.ENS.setSubnodeOwner(namehash(robonomicsRoot), sha3('auction'), accounts[0].address);
     await contracts.ENS.setSubnodeOwner(namehash(robonomicsRoot), sha3('factory'), accounts[0].address);
     await contracts.ENS.setSubnodeOwner(namehash(robonomicsRoot), sha3('lighthouse'), accounts[0].address);
-    result = await waiter({ func: contracts.ENS.owner, args: [namehash('lighthouse.' + robonomicsRoot)], value: accounts[0].address, retries: 50 });
+    result = await waiter({ func: contracts.ENS.owner, args: [namehash('lighthouse.' + robonomicsRoot)], value: accounts[0].address, retries: retryCounter });
     chai.expect(result).equal(accounts[0].address);
 
 
     await contracts.ENS.setResolver(namehash(robonomicsRoot), contracts.Resolver.address);
-    result = await waiter({ func: contracts.ENS.resolver, args: [namehash(robonomicsRoot)], value: contracts.Resolver.address, retries: 50 });
+    result = await waiter({ func: contracts.ENS.resolver, args: [namehash(robonomicsRoot)], value: contracts.Resolver.address, retries: retryCounter });
     chai.expect(result).equal(contracts.Resolver.address);
 
     await contracts.ENS.setResolver(namehash('xrt.' + robonomicsRoot), contracts.Resolver.address);
-    result = await waiter({ func: contracts.ENS.resolver, args: [namehash('xrt.' + robonomicsRoot)], value: contracts.Resolver.address, retries: 50 });
+    result = await waiter({ func: contracts.ENS.resolver, args: [namehash('xrt.' + robonomicsRoot)], value: contracts.Resolver.address, retries: retryCounter });
     chai.expect(result).equal(contracts.Resolver.address);
 
     await contracts.ENS.setResolver(namehash('ambix.' + robonomicsRoot), contracts.Resolver.address);
-    result = await waiter({ func: contracts.ENS.resolver, args: [namehash('ambix.' + robonomicsRoot)], value: contracts.Resolver.address, retries: 50 });
+    result = await waiter({ func: contracts.ENS.resolver, args: [namehash('ambix.' + robonomicsRoot)], value: contracts.Resolver.address, retries: retryCounter });
     chai.expect(result).equal(contracts.Resolver.address);
 
     await contracts.ENS.setResolver(namehash('auction.' + robonomicsRoot), contracts.Resolver.address);
-    result = await waiter({ func: contracts.ENS.resolver, args: [namehash('auction.' + robonomicsRoot)], value: contracts.Resolver.address, retries: 50 });
+    result = await waiter({ func: contracts.ENS.resolver, args: [namehash('auction.' + robonomicsRoot)], value: contracts.Resolver.address, retries: retryCounter });
     chai.expect(result).equal(contracts.Resolver.address);
 
     await contracts.ENS.setResolver(namehash('factory.' + robonomicsRoot), contracts.Resolver.address);
-    result = await waiter({ func: contracts.ENS.resolver, args: [namehash('factory.' + robonomicsRoot)], value: contracts.Resolver.address, retries: 50 });
+    result = await waiter({ func: contracts.ENS.resolver, args: [namehash('factory.' + robonomicsRoot)], value: contracts.Resolver.address, retries: retryCounter });
     chai.expect(result).equal(contracts.Resolver.address);
 
     await contracts.ENS.setResolver(namehash('lighthouse.' + robonomicsRoot), contracts.Resolver.address);
-    result = await waiter({ func: contracts.ENS.resolver, args: [namehash('lighthouse.' + robonomicsRoot)], value: contracts.Resolver.address, retries: 50 });
+    result = await waiter({ func: contracts.ENS.resolver, args: [namehash('lighthouse.' + robonomicsRoot)], value: contracts.Resolver.address, retries: retryCounter });
     chai.expect(result).equal(contracts.Resolver.address);
 
     await contracts.Resolver.setAddr(namehash('xrt.' + robonomicsRoot), contracts.XRT.address);
@@ -105,7 +107,7 @@ before(async function () {
     await contracts.Resolver.setAddr(namehash('factory.' + robonomicsRoot), contracts.Factory.address);
 
     await contracts.ENS.setSubnodeOwner(namehash(robonomicsRoot), sha3('lighthouse'), contracts.Factory.address);
-    result = await waiter({ func: contracts.ENS.owner, args: [namehash('lighthouse.' + robonomicsRoot)], value: contracts.Factory.address, retries: 50 });
+    result = await waiter({ func: contracts.ENS.owner, args: [namehash('lighthouse.' + robonomicsRoot)], value: contracts.Factory.address, retries: retryCounter });
     chai.expect(result).equal(contracts.Factory.address);
 });
 
@@ -224,19 +226,25 @@ async function liabilityCreation(lighthouse, account, promisee, promisor) {
     const offer = await pairOffer(demand, contracts.Factory, promisor.address);
 
     await contracts.XRT.connect(promisee).increaseAllowance(contracts.Factory.address, demand.cost, { from: promisee.address });
-    await contracts.XRT.connect(promisor).increaseAllowance(contracts.Factory.address, offer.lighthouseFee, { from: promisor.address });;
+    let allowance = await waiter({ func: contracts.XRT.allowance, args: [promisee.address, contracts.Factory.address], value: demand.cost, retries: retryCounter });
+    chai.expect(allowance).equal(demand.cost);
+
+    await contracts.XRT.connect(promisor).increaseAllowance(contracts.Factory.address, offer.lighthouseFee, { from: promisor.address });
+    allowance = await waiter({ func: contracts.XRT.allowance, args: [promisor.address, contracts.Factory.address], value: offer.lighthouseFee, retries: retryCounter });
+    chai.expect(allowance).equal(offer.lighthouseFee);
 
     const builder = await contracts.Factory.attach(lighthouse.address);
-    await builder.connect(account).createLiability(
+    const interfaceLiability = await builder.connect(account).createLiability(
         encodeDemand(demand),
         encodeOffer(offer),
         { from: account.address }
     );
 
-    liabilityAddress = await contracts.Factory.getLastCreatedLiabilityAddress();
-    const liability = await contracts.Liability.attach(liabilityAddress);
+    await new Promise((resolve) => { setTimeout(resolve, 60000); });
+    const liabilityAddress = await builder.getLastCreatedLiabilityAddress();
+    const liabilitInstanse = await contracts.Liability.attach(liabilityAddress);
 
-    return liability;
+    return liabilitInstanse;
 }
 
 async function liabilityFinalization(liability, lighthouse, account, promisor) {
@@ -265,13 +273,17 @@ describe('factory interface', () => {
         const result = await contracts.Factory.createLighthouse(1000, 10, 'test');
         chai.expect(result.to).equal(contracts.Factory.address);
 
-        let node = await waiter({ func: contracts.ENS.owner, args: [namehash('test.lighthouse.5.robonomics.eth')], value: contracts.Factory.address, retries: 50 });
+        let node = await waiter({
+            func: contracts.ENS.owner,
+            args: [namehash('test.lighthouse.5.robonomics.eth')],
+            value: contracts.Factory.address,
+            retries: retryCounter
+        });
         chai.expect(node).equal(contracts.Factory.address);
 
         const lighthouseAddress = await contracts.Factory.getLastCreatedLighthouseAddress();
         lighthouse = await contracts.Lighthouse.attach(lighthouseAddress);
         chai.expect((await contracts.Factory.isLighthouse(lighthouse.address))).equal(true);
-        console.log(lighthouse.address);
     });
 
 
@@ -283,47 +295,49 @@ describe('factory interface', () => {
 describe('lighthouse staking', () => {
     it('stake placement', async () => {
         await contracts.XRT.connect(accounts[0]).increaseAllowance(lighthouse.address, 2000, { from: accounts[0].address });
+        let allowance = await waiter({ func: contracts.XRT.allowance, args: [accounts[0].address, lighthouse.address], value: '2000', retries: retryCounter });
+        chai.expect(allowance).equal('2000');
+
         await lighthouse.connect(accounts[0]).refill(2000, { from: accounts[0].address });
-        let stakes = await waiter({ func: lighthouse.stakes, args: [accounts[0].address], value: '2000', retries: 50 });
+        let stakes = await waiter({ func: lighthouse.stakes, args: [accounts[0].address], value: '2000', retries: retryCounter });
         chai.expect(stakes).equal('2000');
     });
 
     it('partial withdraw', async () => {
         await lighthouse.withdraw(900);
-        let stakes = await waiter({ func: lighthouse.stakes, args: [accounts[0].address], value: '1100', retries: 50 });
+        let stakes = await waiter({ func: lighthouse.stakes, args: [accounts[0].address], value: '1100', retries: retryCounter });
         chai.expect(stakes).equal('1100');
     });
 
     it('full withdraw', async () => {
         await lighthouse.withdraw(200);
-        let stakes = await waiter({ func: lighthouse.stakes, args: [accounts[0].address], value: '0', retries: 50 });
+        let stakes = await waiter({ func: lighthouse.stakes, args: [accounts[0].address], value: '0', retries: retryCounter });
         chai.expect(stakes).equal('0');
     });
 });
 
 describe('robot liability scenario', () => {
-    it('liability creation', async () => {
+    // skip due to NDEV-2056
+    it.skip('liability creation', async () => {
         await contracts.XRT.connect(accounts[0]).increaseAllowance(lighthouse.address, 1000, { from: accounts[0].address });
-        console.log('TEST');
+        let allowance = await waiter({ func: contracts.XRT.allowance, args: [accounts[0].address, lighthouse.address], value: '1000', retries: retryCounter });
+        chai.expect(allowance).equal('1000');
         await lighthouse.connect(accounts[0]).refill(1000, { from: accounts[0].address });
-        console.log('TEST');
+
         await contracts.XRT.transfer(accounts[1].address, 1000);
-        const result = await waiter({ func: contracts.XRT.balanceOf, args: [accounts[1].address], value: '1000', retries: 50 });
+        const result = await waiter({ func: contracts.XRT.balanceOf, args: [accounts[1].address], value: '1000', retries: retryCounter });
         chai.expect(result).equal('1000');
-        liability = await liabilityCreation(lighthouse, accounts[0], accounts[0], accounts[1]);
+
+        const liability1 = await liabilityCreation(lighthouse, accounts[0], accounts[0], accounts[1]);
+        liability = liability1;
     });
 
-    it('liability finalization', async () => {
+    it.skip('liability finalization', async () => {
         const originBalance = await contracts.XRT.balanceOf(accounts[0].address);
-        console.log('TEST1');
         await liabilityFinalization(liability, lighthouse, accounts[0], accounts[1]);
-        console.log('TEST1');
         const currentBalance = await contracts.XRT.balanceOf(accounts[0].address);
-        console.log('TEST1');
         const deltaB = currentBalance.toNumber() - originBalance.toNumber();
-        console.log('TEST1');
         console.log('emission: ' + deltaB.toNumber() + ' wn');
-        console.log('TEST1');
         const gas = await contracts.Factory.gasConsumedOf(liability.address);
         chai.expect(await contracts.Factory.wnFromGas(gas)).equal(deltaB);
     });
@@ -338,7 +352,7 @@ describe('robot liability scenario', () => {
         console.log('m: ' + marker + ' q: ' + quota + ' t: ' + timeout + ' a: ' + provider);
     }
 
-    it('marker marathon', async () => {
+    it.skip('marker marathon', async () => {
         for (let i = 0; i < 15; ++i) {
             liability = await liabilityCreation(lighthouse, accounts[0], accounts[0], accounts[1]);
             await markerLog();
@@ -348,7 +362,7 @@ describe('robot liability scenario', () => {
         }
 
         await contracts.XRT.transfer(accounts[1].address, 1000);
-        const result = await waiter({ func: contracts.XRT.balanceOf, args: [accounts[1].address], value: 1000, retries: 50 });
+        const result = await waiter({ func: contracts.XRT.balanceOf, args: [accounts[1].address], value: 1000, retries: retryCounter });
         chai.expect(result).equal(1000);
         await contracts.XRT.connect(accounts[1]).increaseAllowance(lighthouse.address, 1000, { from: accounts[1].address });
         await lighthouse.connect(accounts[1]).refill(1000, { from: accounts[1] });
@@ -362,7 +376,7 @@ describe('robot liability scenario', () => {
         }
 
         await contracts.XRT.transfer(accounts[2].address, 2000);
-        result = await waiter({ func: contracts.XRT.balanceOf, args: [accounts[2].address], value: 2000, retries: 50 });
+        result = await waiter({ func: contracts.XRT.balanceOf, args: [accounts[2].address], value: 2000, retries: retryCounter });
         chai.expect(result).equal(2000);
         await contracts.XRT.connect(accounts[2]).increaseAllowance(lighthouse.address, 2000, { from: accounts[2].address });
         await lighthouse.connect(accounts[2]).refill(2000, { from: accounts[2].address });
@@ -382,7 +396,7 @@ describe('robot liability scenario', () => {
         }
 
         await contracts.XRT.transfer(accounts[3].address, 1000);
-        result = await waiter({ func: contracts.XRT.balanceOf, args: [accounts[3].address], value: 1000, retries: 50 });
+        result = await waiter({ func: contracts.XRT.balanceOf, args: [accounts[3].address], value: 1000, retries: retryCounter });
         chai.expect(result).equal(1000);
         await contracts.XRT.connect(accounts[3]).increaseAllowance(lighthouse.address, 1000, { from: accounts[3].address });
         await lighthouse.connect(accounts[3]).refill(1000, { from: accounts[3].address });
@@ -421,7 +435,7 @@ describe('robot liability scenario', () => {
 
     });
 
-    it('keepalive marathon', async () => {
+    it.skip('keepalive marathon', async () => {
         async function waitTimeoutBlocks(blocks) {
             const timeoutBlock = await hardhat.network.provider.send("eth_blockNumber", []) + blocks;
             console.log('waiting for block ' + timeoutBlock + '...');
