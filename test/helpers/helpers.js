@@ -1,5 +1,8 @@
 const hardhat = require('hardhat');
 const web3 = require('web3');
+const eth = require('web3-eth-accounts');
+const accounts = new eth();
+
 
 async function ensCheck(subdomain) {
     // TODO
@@ -12,8 +15,8 @@ async function kyc(signer, contract, sender) {
         { t: 'address', v: sender }
     );
 
-    const signature = await hardhat.network.provider.send("eth_sign", [signer, hash]);
-    return signature;
+    const result = await accounts.sign(hash, signer);
+    return result.signature;
 }
 
 async function waiter({ func, args, value, retries = 10 }) {

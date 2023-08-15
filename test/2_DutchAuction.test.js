@@ -5,7 +5,7 @@ const web3 = require('web3');
 const { ensCheck, kyc, waiter } = require('./helpers/helpers');
 const config = require('../config');
 const networkName = hardhat.network.name
-
+const privateKeys = hardhat.network.config.accounts;
 const chai = require('chai');
 chai.use(require('chai-as-promised'));
 chai.use(require("bn-chai")(web3.utils.BN));
@@ -92,8 +92,8 @@ describe('DutchAuction when started', () => {
     it('should accept bid with valid KYC', async () => {
         const accounts = await hardhat.ethers.getSigners();
         const payment = web3.utils.toWei('1', 'ether');
-        const signature = await kyc(accounts[0].address, contracts.DutchAuction.address, accounts[0].address);
 
+        const signature = await kyc(privateKeys[0], contracts.DutchAuction.address, accounts[0].address);
         await contracts.DutchAuction.bid(signature, { value: payment });
 
         const result = await waiter({ func: contracts.DutchAuction.bids, args: [accounts[0].address], value: payment, retries: retryCounter });
@@ -103,8 +103,8 @@ describe('DutchAuction when started', () => {
     it('should accept finalize bid', async () => {
         const accounts = await hardhat.ethers.getSigners();
         const payment = web3.utils.toWei('2', 'ether');
-        const signature = await kyc(accounts[0].address, contracts.DutchAuction.address, accounts[0].address);
-
+        
+        const signature = await kyc(privateKeys[0], contracts.DutchAuction.address, accounts[0].address);
         for (let i = 0; i < 15; i += 1)
             await contracts.DutchAuction.bid(signature, { value: payment });
 
