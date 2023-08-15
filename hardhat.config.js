@@ -3,7 +3,7 @@ require('hardhat-deploy');
 require('hardhat-deploy-ethers');
 
 const proxyUrl = process.env.NEON_PROXY_URL || "http://127.0.0.1:9090/solana";
-const accounts = process.env.NEON_ACCOUNTS;
+const accounts = process.env.NEON_ACCOUNTS.split(",");
 const chainId = parseInt(process.env.NEON_CHAIN_ID) || 111;
 
 module.exports = {
