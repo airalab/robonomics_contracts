@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol';
-import 'openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol';
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /**
   @dev Ambix contract is used for morph Token set to another
@@ -42,16 +42,14 @@ contract AbstractAmbix is Ownable {
     ) external onlyOwner {
         uint256 i;
 
-        require(_a.length == _n.length && _a.length > 0);
+        require(_a.length == _n.length && _a.length > 0, "source token addresses and counts mismatch");
 
-        for (i = 0; i < _a.length; ++i)
-            require(_a[i] != address(0));
+        for (i = 0; i < _a.length; ++i) require(_a[i] != address(0), "source zero address");
 
         if (_n.length == 1 && _n[0] == 0) {
-            require(B.length == 1);
+            require(B.length == 1, "output token length mismatch");
         } else {
-            for (i = 0; i < _n.length; ++i)
-                require(_n[i] > 0);
+            for (i = 0; i < _n.length; ++i) require(_n[i] > 0, "source zero counts");
         }
 
         A.push(_a);
@@ -67,17 +65,17 @@ contract AbstractAmbix is Ownable {
         address[] calldata _b,
         uint256[] calldata _m
     ) external onlyOwner {
-        require(_b.length == _m.length);
+        require(_b.length == _m.length, "sink token addresses and counts mismatch");
 
         for (uint256 i = 0; i < _b.length; ++i)
-            require(_b[i] != address(0));
+            require(_b[i] != address(0), "sink zero address");
 
         B = _b;
         M = _m;
     }
 
     function _run(uint256 _ix) internal {
-        require(_ix < A.length);
+        require(_ix < A.length, "input token lenght mismatch");
         uint256 i;
 
         if (N[_ix][0] > 0) {
@@ -85,7 +83,7 @@ contract AbstractAmbix is Ownable {
 
             // Token count multiplier
             uint256 mux = ERC20(A[_ix][0]).allowance(msg.sender, address(this)) / N[_ix][0];
-            require(mux > 0);
+            require(mux > 0, "sender zero allowance");
 
             // Burning run
             for (i = 0; i < A[_ix].length; ++i)
@@ -102,7 +100,7 @@ contract AbstractAmbix is Ownable {
             //         dynamicRate = balance(sink) / total(source)
 
             // Is available for single source and single sink only
-            require(A[_ix].length == 1 && B.length == 1);
+            require(A[_ix].length == 1 && B.length == 1, "Dynamic conversion is available for single source and single sink only");
 
             ERC20Burnable source = ERC20Burnable(A[_ix][0]);
             ERC20 sink = ERC20(B[0]);
@@ -110,11 +108,11 @@ contract AbstractAmbix is Ownable {
             uint256 scale = 10 ** 18 * sink.balanceOf(address(this)) / source.totalSupply();
 
             uint256 allowance = source.allowance(msg.sender, address(this));
-            require(allowance > 0);
+            require(allowance > 0, "sender zero allowance(2)");
             source.burnFrom(msg.sender, allowance);
 
             uint256 reward = scale * allowance / 10 ** 18;
-            require(reward > 0);
+            require(reward > 0, "zero reward");
             sink.safeTransfer(msg.sender, reward);
         }
     }

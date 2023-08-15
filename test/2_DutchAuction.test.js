@@ -12,9 +12,10 @@ chai.use(require("bn-chai")(web3.utils.BN));
 chai.should();
 
 let contracts;
+const retryCounter = 100;
 
 before(async function () {
-    const accounts = await hre.ethers.getSigners();
+    const accounts = await hardhat.ethers.getSigners();
     await deployments.fixture();
     contracts = {
         ENS: (await ethers.getContract('ENS', accounts[0].address)),
@@ -25,11 +26,11 @@ before(async function () {
     };
 
     await contracts.ENS.setSubnodeOwner(namehash(0), web3.utils.sha3('eth'), accounts[0].address);
-    let result = await waiter({ func: contracts.ENS.owner, args: [namehash('eth')], value: accounts[0].address, retries: 50 });
+    let result = await waiter({ func: contracts.ENS.owner, args: [namehash('eth')], value: accounts[0].address, retries: retryCounter });
     chai.expect(result).equal(accounts[0].address);
 
     await contracts.ENS.setSubnodeOwner(namehash('eth'), web3.utils.sha3('robonomics'), accounts[0].address);
-    result = await waiter({ func: contracts.ENS.owner, args: [namehash('robonomics.eth')], value: accounts[0].address, retries: 50 });
+    result = await waiter({ func: contracts.ENS.owner, args: [namehash('robonomics.eth')], value: accounts[0].address, retries: retryCounter });
     chai.expect(result).equal(accounts[0].address);
 
     const foundation = networkName.startsWith('mainnet')
@@ -44,12 +45,12 @@ before(async function () {
     await contracts.XRT.transfer(contracts.DutchAuction.address, maxTokenSold);
     await contracts.XRT.renounceMinter();
 
-    result = await waiter({ func: contracts.XRT.balanceOf, args: [contracts.DutchAuction.address], value: maxTokenSold, retries: 50 });
+    result = await waiter({ func: contracts.XRT.balanceOf, args: [contracts.DutchAuction.address], value: maxTokenSold, retries: retryCounter });
     chai.expect(result).equal(config['xrt']['genesis']['auction']);
     await contracts.DutchAuction.setup(contracts.XRT.address, contracts.PublicAmbix.address);
 });
 
-describe('when deployed', () => {
+describe('DutchAuction when deployed', () => {
     it('should be resolved via ENS', async () => {
         await ensCheck('auction', contracts.DutchAuction.address);
     });
@@ -61,46 +62,46 @@ describe('when deployed', () => {
     });
 
     it('should have reference to XRT and Ambix contracts', async () => {
-        let token = await waiter({ func: contracts.DutchAuction.token, value: contracts.XRT.address, retries: 50 });
-        let ambix = await waiter({ func: contracts.DutchAuction.ambix, value: contracts.PublicAmbix.address, retries: 50 });
+        let token = await waiter({ func: contracts.DutchAuction.token, value: contracts.XRT.address, retries: retryCounter });
+        let ambix = await waiter({ func: contracts.DutchAuction.ambix, value: contracts.PublicAmbix.address, retries: retryCounter });
         chai.expect(token).equal(contracts.XRT.address);
         chai.expect(ambix).equal(contracts.PublicAmbix.address);
     });
 
     it('should have a signer for KYC validation', async () => {
-        const accounts = await hre.ethers.getSigners();
+        const accounts = await hardhat.ethers.getSigners();
         chai.expect((await contracts.DutchAuction.isSigner(accounts[0].address))).equal(true);
     });
 
     it('should be able to start', async () => {
-        let result = await waiter({ func: contracts.DutchAuction.stage, value: 1, retries: 20 });
+        let result = await waiter({ func: contracts.DutchAuction.stage, value: 1, retries: retryCounter });
         chai.expect(result).equal(1);
         await contracts.DutchAuction.startAuction();
-        result = await waiter({ func: contracts.DutchAuction.stage, value: 2, retries: 20 });
+        result = await waiter({ func: contracts.DutchAuction.stage, value: 2, retries: retryCounter });
         chai.expect(result).equal(2);
     });
 });
 
-describe('when started', () => {
+describe('DutchAuction when started', () => {
     it('should fail with invalid KYC signature', async () => {
-        const accounts = await hre.ethers.getSigners();
+        const accounts = await hardhat.ethers.getSigners();
         const payment = web3.utils.toWei('1', 'ether');
         chai.expect(contracts.DutchAuction.bid('0xcafe', { value: payment, from: accounts[1].address })).to.be.rejectedWith(Error);
     });
 
     it('should accept bid with valid KYC', async () => {
-        const accounts = await hre.ethers.getSigners();
+        const accounts = await hardhat.ethers.getSigners();
         const payment = web3.utils.toWei('1', 'ether');
         const signature = await kyc(accounts[0].address, contracts.DutchAuction.address, accounts[0].address);
 
         await contracts.DutchAuction.bid(signature, { value: payment });
 
-        const result = await waiter({ func: contracts.DutchAuction.bids, args: [accounts[0].address], value: payment, retries: 20 });
+        const result = await waiter({ func: contracts.DutchAuction.bids, args: [accounts[0].address], value: payment, retries: retryCounter });
         chai.expect(result).equal(payment);
     });
 
     it('should accept finalize bid', async () => {
-        const accounts = await hre.ethers.getSigners();
+        const accounts = await hardhat.ethers.getSigners();
         const payment = web3.utils.toWei('2', 'ether');
         const signature = await kyc(accounts[0].address, contracts.DutchAuction.address, accounts[0].address);
 
@@ -108,29 +109,29 @@ describe('when started', () => {
             await contracts.DutchAuction.bid(signature, { value: payment });
 
         const balance = web3.utils.toWei('31', 'ether');
-        const result = await waiter({ func: contracts.DutchAuction.bids, args: [accounts[0].address], value: balance, retries: 20 });
+        const result = await waiter({ func: contracts.DutchAuction.bids, args: [accounts[0].address], value: balance, retries: retryCounter });
         chai.expect(result).equal(balance);
 
-        let resultStage = await waiter({ func: contracts.DutchAuction.stage, value: 2, retries: 20 });
+        let resultStage = await waiter({ func: contracts.DutchAuction.stage, value: 2, retries: retryCounter });
         chai.expect(resultStage).equal(2);
 
         // Finalize bid ( when value == 9912 => amount = maxWei => finalize auction)
         await contracts.DutchAuction.bid(signature, { value: 9912 });
 
-        resultStage = await waiter({ func: contracts.DutchAuction.stage, value: 3, retries: 20 });
+        resultStage = await waiter({ func: contracts.DutchAuction.stage, value: 3, retries: retryCounter });
         chai.expect(resultStage).equal(3);
     });
 });
 
-describe('when ended', () => {
+describe('DutchAuction when ended', () => {
     it('should update to trading stage', async () => {
         await contracts.DutchAuction.updateStage();
-        const result = await waiter({ func: contracts.DutchAuction.stage, value: 4, retries: 20 });
+        const result = await waiter({ func: contracts.DutchAuction.stage, value: 4, retries: retryCounter });
         chai.expect(result).equal(4);
     });
 
     it('claim tokens', async () => {
-        const accounts = await hre.ethers.getSigners();
+        const accounts = await hardhat.ethers.getSigners();
 
         const scale = new web3.utils.BN('1000000000');
         const finalPrice = await contracts.DutchAuction.finalPrice();
@@ -141,7 +142,7 @@ describe('when ended', () => {
         await contracts.DutchAuction.claimTokens();
         const finalBalance = (bid * scale / finalPrice) + initialBalance.toNumber();
 
-        let result = await waiter({ func: contracts.XRT.balanceOf, args: [accounts[0].address], value: finalBalance, retries: 20 });
+        let result = await waiter({ func: contracts.XRT.balanceOf, args: [accounts[0].address], value: finalBalance, retries: retryCounter });
         chai.expect(result).equal(finalBalance);
     });
 });

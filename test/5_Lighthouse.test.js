@@ -268,7 +268,7 @@ async function liabilityFinalization(liability, lighthouse, account, promisor) {
     console.log('total gas: ' + totalgas.toNumber());
 }
 
-describe('factory interface', () => {
+describe('Factory interface', () => {
     it('should be able to create lighthouse', async () => {
         const result = await contracts.Factory.createLighthouse(1000, 10, 'test');
         chai.expect(result.to).equal(contracts.Factory.address);
@@ -292,7 +292,7 @@ describe('factory interface', () => {
     });
 });
 
-describe('lighthouse staking', () => {
+describe('Lighthouse staking', () => {
     it('stake placement', async () => {
         await contracts.XRT.connect(accounts[0]).increaseAllowance(lighthouse.address, 2000, { from: accounts[0].address });
         let allowance = await waiter({ func: contracts.XRT.allowance, args: [accounts[0].address, lighthouse.address], value: '2000', retries: retryCounter });
@@ -316,9 +316,9 @@ describe('lighthouse staking', () => {
     });
 });
 
-describe('robot liability scenario', () => {
+describe('Robot liability scenario', () => {
     // skip due to NDEV-2056
-    it.skip('liability creation', async () => {
+    it.skip('Liability creation', async () => {
         await contracts.XRT.connect(accounts[0]).increaseAllowance(lighthouse.address, 1000, { from: accounts[0].address });
         let allowance = await waiter({ func: contracts.XRT.allowance, args: [accounts[0].address, lighthouse.address], value: '1000', retries: retryCounter });
         chai.expect(allowance).equal('1000');
@@ -332,7 +332,7 @@ describe('robot liability scenario', () => {
         liability = liability1;
     });
 
-    it.skip('liability finalization', async () => {
+    it.skip('Liability finalization', async () => {
         const originBalance = await contracts.XRT.balanceOf(accounts[0].address);
         await liabilityFinalization(liability, lighthouse, accounts[0], accounts[1]);
         const currentBalance = await contracts.XRT.balanceOf(accounts[0].address);
@@ -352,7 +352,7 @@ describe('robot liability scenario', () => {
         console.log('m: ' + marker + ' q: ' + quota + ' t: ' + timeout + ' a: ' + provider);
     }
 
-    it.skip('marker marathon', async () => {
+    it.skip('Marker marathon', async () => {
         for (let i = 0; i < 15; ++i) {
             liability = await liabilityCreation(lighthouse, accounts[0], accounts[0], accounts[1]);
             await markerLog();
@@ -435,7 +435,7 @@ describe('robot liability scenario', () => {
 
     });
 
-    it.skip('keepalive marathon', async () => {
+    it.skip('Keepalive marathon', async () => {
         async function waitTimeoutBlocks(blocks) {
             const timeoutBlock = await hardhat.network.provider.send("eth_blockNumber", []) + blocks;
             console.log('waiting for block ' + timeoutBlock + '...');

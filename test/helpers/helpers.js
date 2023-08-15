@@ -17,9 +17,13 @@ async function kyc(signer, contract, sender) {
 }
 
 async function waiter({ func, args, value, retries = 10 }) {
+    return smartWaiter({ func, args, check: (r) => r == value, retries: retries });
+}
+
+async function smartWaiter({ func, args, check, retries = 10 }) {
     let result;
     let counter = 0;
-    while (result != value && counter < retries) {
+    while (!check(result) && counter < retries) {
         await new Promise(r => setTimeout(r, 200));
         if (args != undefined)
             result = await func(...args);
@@ -35,4 +39,5 @@ module.exports = {
     ensCheck,
     kyc,
     waiter,
+    smartWaiter,
 }

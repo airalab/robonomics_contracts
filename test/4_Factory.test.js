@@ -14,7 +14,7 @@ before(async function () {
     };
 });
 
-describe('factory contract', () => {
+describe('Factory contract', () => {
     it('shoudl be resolved via ENS', async () => {
         await ensCheck('factory', contracts.ENS.address);
     });

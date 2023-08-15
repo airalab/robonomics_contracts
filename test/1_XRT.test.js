@@ -1,6 +1,5 @@
 const { ethers, deployments } = require('hardhat');
-const { ensCheck } = require('./helpers/helpers')
-const config = require('../config');
+const { ensCheck, waiter } = require('./helpers/helpers')
 const chai = require('chai');
 chai.use(require('chai-as-promised'))
 chai.should();
@@ -16,13 +15,14 @@ before(async function () {
     };
 });
 
-describe('when deployed', function () {
+describe('XRT when deployed', function () {
     it('should be resolved via ENS', async () => {
         await ensCheck('xrt', '0x0000000');
     });
 
     it('should have factory as a minter', async () => {
-        await contracts.XRT.addMinterFromAddress(contracts.Factory.address);
-        chai.expect((await contracts.XRT.isMinter(contracts.Factory.address))).equal(true);
+        await contracts.XRT.addMinter(contracts.Factory.address);
+        const result = await waiter({ func: contracts.XRT.isMinter, args: [contracts.Factory.address], value: true, retries: 50 });
+        chai.expect(result).equal(true);
     });
 });
