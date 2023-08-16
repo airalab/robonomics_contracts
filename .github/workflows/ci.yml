@@ -1,0 +1,20 @@
+name: CI
+on:
+  push:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/cache@v2
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+    # fix for forcing git to use https when pulling deps
+    - run: 'git config --global --replace-all url."https://github.com/".insteadOf ssh://git@github.com/'
+    #- run: docker-compose -p robonomics-tests-{{ github.run_id }} up -d

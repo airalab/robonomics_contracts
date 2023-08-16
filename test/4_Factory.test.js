@@ -1,24 +1,26 @@
-const Factory = artifacts.require('Factory');
-const ENS = artifacts.require('ENS');
-const XRT = artifacts.require('XRT');
-
-const { ensCheck, kyc } = require('./helpers/helpers')
-const config = require('../config');
-
+const { ensCheck } = require('./helpers/helpers')
 const chai = require('chai');
 chai.use(require('chai-as-promised'))
 chai.should();
 
-contract('Factory', () => {
+let contracts;
 
+before(async function () {
+    await deployments.fixture();
+    contracts = {
+        XRT: (await ethers.getContract('XRT')),
+        ENS: (await ethers.getContract('ENS')),
+        Factory: (await ethers.getContract('Factory')),
+    };
+});
+
+describe('Factory contract', () => {
     it('shoudl be resolved via ENS', async () => {
-        await ensCheck('factory', ENS.address);
+        await ensCheck('factory', contracts.ENS.address);
     });
 
     it('should have correct contract refs', async () => {
-        const factory = await Factory.deployed();
-        (await factory.xrt()).should.equal(XRT.address);
-        (await factory.ens()).should.equal(ENS.address);
+        chai.expect((await contracts.Factory.xrt())).equal(contracts.XRT.address);
+        chai.expect((await contracts.Factory.ens())).equal(contracts.ENS.address);
     });
-
 });

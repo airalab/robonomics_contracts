@@ -1,18 +1,19 @@
 pragma solidity ^0.5.0;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol';
+import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
 
-import '../ens/AbstractENS.sol';
-import '../ens/AbstractResolver.sol';
-import '../misc/SingletonHash.sol';
-import '../misc/DutchAuction.sol';
-import '../misc/SharedCode.sol';
+import "../ens/AbstractENS.sol";
+import "../ens/AbstractResolver.sol";
+import "../misc/SingletonHash.sol";
+import "../misc/DutchAuction.sol";
+import "../misc/SharedCode.sol";
 
-import './interface/IFactory.sol';
+import "./interface/IFactory.sol";
+import "./interface/ILighthouse.sol";
 
-import './Lighthouse.sol';
-import './Liability.sol';
-import './XRT.sol';
+import "./Lighthouse.sol";
+import "./Liability.sol";
+import "./XRT.sol";
 
 contract Factory is IFactory, SingletonHash {
     constructor(
@@ -31,6 +32,8 @@ contract Factory is IFactory, SingletonHash {
 
     address public liabilityCode;
     address public lighthouseCode;
+    address public lighthouseAddress;
+    address public liabilityAddress;
 
     using SafeERC20 for XRT;
     using SafeERC20 for ERC20;
@@ -111,11 +114,11 @@ contract Factory is IFactory, SingletonHash {
 
         // Name reservation check
         bytes32 subnode = keccak256(abi.encodePacked(LIGHTHOUSE_NODE, hname));
-        require(ens.resolver(subnode) == address(0));
+        require(ens.resolver(subnode) == address(0), "resolver subnode is not aaddress(0)");
 
         // Create lighthouse
         lighthouse = ILighthouse(lighthouseCode.proxy());
-        require(Lighthouse(address(lighthouse)).setup(xrt, _minimalStake, _timeoutInBlocks));
+        require(Lighthouse(address(lighthouse)).setup(xrt, _minimalStake, _timeoutInBlocks), "Failed to setup lighthouse");
 
         emit NewLighthouse(address(lighthouse), _name);
         isLighthouse[address(lighthouse)] = true;
@@ -127,6 +130,13 @@ contract Factory is IFactory, SingletonHash {
         AbstractResolver resolver = AbstractResolver(ens.resolver(LIGHTHOUSE_NODE));
         ens.setResolver(subnode, address(resolver));
         resolver.setAddr(subnode, address(lighthouse));
+
+        lighthouseAddress = address(lighthouse);
+    }
+
+    function getLastCreatedLighthouseAddress() external view returns (address) {
+        require(lighthouseAddress != address(0), "lighthouse is not created");
+        return lighthouseAddress;
     }
 
     function createLiability(
@@ -139,25 +149,25 @@ contract Factory is IFactory, SingletonHash {
     {
         // Create liability
         liability = ILiability(liabilityCode.proxy());
-        require(Liability(address(liability)).setup(xrt));
+        require(Liability(address(liability)).setup(xrt), "Failed to setup liability");
 
         emit NewLiability(address(liability));
 
         // Parse messages
         (bool success, bytes memory returnData)
             = address(liability).call(abi.encodePacked(bytes4(0x48a984e4), _demand)); // liability.demand(...)
-        require(success);
+        require(success, "Failed to parse demand message");
         singletonHash(liability.demandHash());
         nonceOf[liability.promisee()] += 1;
 
         (success, returnData)
             = address(liability).call(abi.encodePacked(bytes4(0x413781d2), _offer)); // liability.offer(...)
-        require(success);
+        require(success, "Failed to parse offer message");
         singletonHash(liability.offerHash());
         nonceOf[liability.promisor()] += 1;
 
         // Check lighthouse
-        require(isLighthouse[liability.lighthouse()]);
+        require(isLighthouse[liability.lighthouse()], "Lighthouse is not registered");
 
         // Transfer lighthouse fee to lighthouse worker directly
         if (liability.lighthouseFee() > 0)
@@ -174,22 +184,26 @@ contract Factory is IFactory, SingletonHash {
 
         // Transfer validator fee and hold on contract
         if (liability.validator() != address(0) && liability.validatorFee() > 0)
-            xrt.safeTransferFrom(liability.promisee(),
-                                 address(liability),
-                                 liability.validatorFee());
-     }
+            xrt.safeTransferFrom(
+                liability.promisee(),
+                address(liability),
+                liability.validatorFee()
+            );
+
+        liabilityAddress = address(liability);
+    }
+
+    function getLastCreatedLiabilityAddress() external view onlyLighthouse returns (address) {
+        require(liabilityAddress != address(0), "Liability is not created");
+        return liabilityAddress;
+    }
 
     function liabilityCreated(
         ILiability _liability,
         uint256 _gas
-    )
-        external
-        onlyLighthouse
-        gasPriceEstimate
-        returns (bool)
-    {
+    ) external onlyLighthouse gasPriceEstimate returns (bool) {
         address liability = address(_liability);
-        totalGasConsumed         += _gas;
+        totalGasConsumed += _gas;
         gasConsumedOf[liability] += _gas;
         return true;
     }
@@ -197,16 +211,11 @@ contract Factory is IFactory, SingletonHash {
     function liabilityFinalized(
         ILiability _liability,
         uint256 _gas
-    )
-        external
-        onlyLighthouse
-        gasPriceEstimate
-        returns (bool)
-    {
+    ) external onlyLighthouse gasPriceEstimate returns (bool) {
         address liability = address(_liability);
-        totalGasConsumed         += _gas;
+        totalGasConsumed += _gas;
         gasConsumedOf[liability] += _gas;
-        require(xrt.mint(tx.origin, wnFromGas(gasConsumedOf[liability])));
+        require(xrt.mint(tx.origin, wnFromGas(gasConsumedOf[liability])), "Failed to mint XRT");
         return true;
     }
 }

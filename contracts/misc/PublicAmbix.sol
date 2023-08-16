@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import './AbstractAmbix.sol';
+import "./AbstractAmbix.sol";
 
 contract PublicAmbix is AbstractAmbix {
     /**
@@ -9,5 +9,9 @@ contract PublicAmbix is AbstractAmbix {
      */
     function run(uint256 _ix) external {
         _run(_ix);
+    }
+
+    function getOutputToken() external view returns (address[] memory) {
+        return B;
     }
 }

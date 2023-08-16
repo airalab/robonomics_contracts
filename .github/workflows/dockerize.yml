@@ -1,0 +1,30 @@
+name: Upload docker image
+
+on:
+  push:
+  workflow_dispatch:
+env:
+  IMAGE_NAME: neonlabsorg/robonomics_tests
+jobs:
+  dockerize:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Define tag
+        id: define-env
+        run: |
+          if [[ "${{ github.ref_name }}" == 'master'  ]]; then
+            tag='latest'
+          else
+            tag='${{ github.sha }}'
+          fi
+          echo "tag=${tag}"
+          echo "tag=${tag}" >> $GITHUB_OUTPUT
+      - name: Build image
+        run: |
+          docker build -t $IMAGE_NAME:${{ steps.define-env.outputs.tag }} -f test.Dockerfile .
+      - name: Push image
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          echo "Push image $IMAGE_NAME:${{ steps.define-env.outputs.tag }} to Docker registry"
+          docker push --all-tags $IMAGE_NAME
