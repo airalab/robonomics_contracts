@@ -9,25 +9,18 @@ Robonomics platform contracts
 How to use
 ----------
 
-Tested on Truffle@4.1.11
 
 To build contracts run in it's directory:
 
 ```
-truffle compile
+npx hardhat compile
 ```
 
 
 To run testing framework:
 
 ```
-truffle test 
-```
-
-To deploy contracts in testnet run in it's directory:
-
-```
-truffle migrate
+npx hardhat test --network neonlabs
 ```
 
 Notice

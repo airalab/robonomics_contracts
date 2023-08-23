@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "Install dependencies"
-npm install --quiet
+npm install --silence
 
 test_directory=./test
 
