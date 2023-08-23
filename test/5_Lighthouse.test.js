@@ -124,6 +124,9 @@ before(async function () {
 });
 
 after(async function () {
+    if (!fs.existsSync("reports")){
+        fs.mkdirSync("reports");
+    }
     try {
         fs.appendFileSync("reports/Lighthouse_report.json", JSON.stringify(report));
     } catch (err) {
