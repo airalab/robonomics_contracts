@@ -11,5 +11,11 @@ for (var i in files) {
     for (var j in data){
         report['actions'].push(data[j]);
     }
-    
 }
+
+fs.writeFile("./reports/report.json", JSON.stringify(report), function(err) {
+    if(err) {
+        return console.log(err);
+    }
+    console.log("The report was saved!");
+}); 
