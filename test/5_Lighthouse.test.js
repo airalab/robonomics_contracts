@@ -2,6 +2,7 @@ const { ensCheck, waiter } = require('./helpers/helpers')
 const hardhat = require('hardhat');
 const namehash = require('eth-ens-namehash').hash;
 const Web3 = require('web3');
+const fs = require('fs');
 
 const provider = new Web3.providers.HttpProvider(
     hardhat.network.config.url
@@ -20,10 +21,13 @@ chai.should();
 let liability;
 let lighthouse;
 let accounts;
+let tx;
 const retryCounter = 100;
+let report = [];
 
 before(async function () {
     accounts = await hardhat.ethers.getSigners();
+    const gasPrice = await hardhat.ethers.provider.getGasPrice();
     await deployments.fixture();
     contracts = {
         XRT: (await ethers.getContract('XRT')),
@@ -53,7 +57,15 @@ before(async function () {
     await contracts.XRT.addMinter(contracts.Factory.address);
     await contracts.XRT.transfer(foundation, config['xrt']['genesis']['foundation']);
     await contracts.XRT.transfer(contracts.PublicAmbix.address, config['xrt']['genesis']['ambix']);
-    await contracts.XRT.transfer(contracts.DutchAuction.address, maxTokenSold);
+    tx = await contracts.XRT.transfer(contracts.DutchAuction.address, maxTokenSold);
+    const transferTx = await tx.wait(1);
+    report.push({
+        "name": "XRT transfer",
+        "usedGas": transferTx["gasUsed"].toString(),
+        "gasPrice": gasPrice.toString(),
+        "tx": transferTx["transactionHash"]
+    });
+
     result = await waiter({ func: contracts.XRT.balanceOf, args: [contracts.DutchAuction.address], value: maxTokenSold, retries: retryCounter });
     chai.expect(result).equal(config['xrt']['genesis']['auction']);
 
@@ -109,6 +121,14 @@ before(async function () {
     await contracts.ENS.setSubnodeOwner(namehash(robonomicsRoot), sha3('lighthouse'), contracts.Factory.address);
     result = await waiter({ func: contracts.ENS.owner, args: [namehash('lighthouse.' + robonomicsRoot)], value: contracts.Factory.address, retries: retryCounter });
     chai.expect(result).equal(contracts.Factory.address);
+});
+
+after(async function () {
+    try {
+        fs.appendFileSync("reports/Lighthouse_report.json", JSON.stringify(report));
+    } catch (err) {
+        console.log(err);
+    }
 });
 
 async function randomDemand(account, lighthouse, factory) {
@@ -270,9 +290,16 @@ async function liabilityFinalization(liability, lighthouse, account, promisor) {
 
 describe('Factory interface', () => {
     it('should be able to create lighthouse', async () => {
+        const gasPrice = await hardhat.ethers.provider.getGasPrice();
         const result = await contracts.Factory.createLighthouse(1000, 10, 'test');
         chai.expect(result.to).equal(contracts.Factory.address);
-
+        const receipt = await result.wait(1);
+        report.push({
+            "name": "Factory create lighthouse",
+            "usedGas": receipt["gasUsed"].toString(),
+            "gasPrice": gasPrice.toString(),
+            "tx": receipt["transactionHash"]
+        });
         let node = await waiter({
             func: contracts.ENS.owner,
             args: [namehash('test.lighthouse.5.robonomics.eth')],
@@ -294,7 +321,15 @@ describe('Factory interface', () => {
 
 describe('Lighthouse staking', () => {
     it('stake placement', async () => {
-        await contracts.XRT.connect(accounts[0]).increaseAllowance(lighthouse.address, 2000, { from: accounts[0].address });
+        const gasPrice = await hardhat.ethers.provider.getGasPrice();
+        tx = await contracts.XRT.connect(accounts[0]).increaseAllowance(lighthouse.address, 2000, { from: accounts[0].address });
+        const receipt = await tx.wait(1);
+        report.push({
+            "name": "XRT increase allowance",
+            "usedGas": receipt["gasUsed"].toString(),
+            "gasPrice": gasPrice.toString(),
+            "tx": receipt["transactionHash"]
+        });
         let allowance = await waiter({ func: contracts.XRT.allowance, args: [accounts[0].address, lighthouse.address], value: '2000', retries: retryCounter });
         chai.expect(allowance).equal('2000');
 

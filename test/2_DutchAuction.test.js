@@ -4,6 +4,7 @@ const namehash = require('eth-ens-namehash').hash;
 const web3 = require('web3');
 const { ensCheck, kyc, waiter } = require('./helpers/helpers');
 const config = require('../config');
+const fs = require('fs');
 const networkName = hardhat.network.name
 const privateKeys = hardhat.network.config.accounts;
 const chai = require('chai');
@@ -13,6 +14,8 @@ chai.should();
 
 let contracts;
 const retryCounter = 100;
+let tx;
+let report = [];
 
 before(async function () {
     const accounts = await hardhat.ethers.getSigners();
@@ -50,6 +53,14 @@ before(async function () {
     await contracts.DutchAuction.setup(contracts.XRT.address, contracts.PublicAmbix.address);
 });
 
+after(async function () {
+    try {
+        fs.appendFileSync("reports/DutchAuction_report.json", JSON.stringify(report));
+    } catch (err) {
+        console.log(err);
+    }
+});
+
 describe('DutchAuction when deployed', () => {
     it('should be resolved via ENS', async () => {
         await ensCheck('auction', contracts.DutchAuction.address);
@@ -74,9 +85,17 @@ describe('DutchAuction when deployed', () => {
     });
 
     it('should be able to start', async () => {
+        const gasPrice = await hardhat.ethers.provider.getGasPrice();
         let result = await waiter({ func: contracts.DutchAuction.stage, value: 1, retries: retryCounter });
         chai.expect(result).equal(1);
-        await contracts.DutchAuction.startAuction();
+        tx = await contracts.DutchAuction.startAuction();
+        const txStarted = await tx.wait(1);
+        report.push({
+            "name": "DutchAuction started",
+            "usedGas": txStarted["gasUsed"].toString(),
+            "gasPrice": gasPrice.toString(),
+            "tx": txStarted["transactionHash"]
+        });
         result = await waiter({ func: contracts.DutchAuction.stage, value: 2, retries: retryCounter });
         chai.expect(result).equal(2);
     });
@@ -90,11 +109,19 @@ describe('DutchAuction when started', () => {
     });
 
     it('should accept bid with valid KYC', async () => {
+        const gasPrice = await hardhat.ethers.provider.getGasPrice();
         const accounts = await hardhat.ethers.getSigners();
         const payment = web3.utils.toWei('1', 'ether');
 
         const signature = await kyc(privateKeys[0], contracts.DutchAuction.address, accounts[0].address);
-        await contracts.DutchAuction.bid(signature, { value: payment });
+        tx = await contracts.DutchAuction.bid(signature, { value: payment });
+        const txBid = await tx.wait(1);
+        report.push({
+            "name": "DutchAuction bid",
+            "usedGas": txBid["gasUsed"].toString(),
+            "gasPrice": gasPrice.toString(),
+            "tx": txBid["transactionHash"]
+        });
 
         const result = await waiter({ func: contracts.DutchAuction.bids, args: [accounts[0].address], value: payment, retries: retryCounter });
         chai.expect(result).equal(payment);
@@ -103,7 +130,7 @@ describe('DutchAuction when started', () => {
     it('should accept finalize bid', async () => {
         const accounts = await hardhat.ethers.getSigners();
         const payment = web3.utils.toWei('2', 'ether');
-        
+
         const signature = await kyc(privateKeys[0], contracts.DutchAuction.address, accounts[0].address);
         for (let i = 0; i < 15; i += 1)
             await contracts.DutchAuction.bid(signature, { value: payment });
@@ -125,12 +152,21 @@ describe('DutchAuction when started', () => {
 
 describe('DutchAuction when ended', () => {
     it('should update to trading stage', async () => {
-        await contracts.DutchAuction.updateStage();
+        const gasPrice = await hardhat.ethers.provider.getGasPrice();
+        tx = await contracts.DutchAuction.updateStage();
+        const txStage = await tx.wait(1);
+        report.push({
+            "name": "DutchAuction update stage",
+            "usedGas": txStage["gasUsed"].toString(),
+            "gasPrice": gasPrice.toString(),
+            "tx": txStage["transactionHash"]
+        });
         const result = await waiter({ func: contracts.DutchAuction.stage, value: 4, retries: retryCounter });
         chai.expect(result).equal(4);
     });
 
     it('claim tokens', async () => {
+        const gasPrice = await hardhat.ethers.provider.getGasPrice();
         const accounts = await hardhat.ethers.getSigners();
 
         const scale = new web3.utils.BN('1000000000');
@@ -139,7 +175,14 @@ describe('DutchAuction when ended', () => {
         const bid = await contracts.DutchAuction.bids(accounts[0].address);
         const initialBalance = await contracts.XRT.balanceOf(accounts[0].address);
 
-        await contracts.DutchAuction.claimTokens();
+        tx = await contracts.DutchAuction.claimTokens();
+        const txToken = await tx.wait(1);
+        report.push({
+            "name": "DutchAuction claim tokens",
+            "usedGas": txToken["gasUsed"].toString(),
+            "gasPrice": gasPrice.toString(),
+            "tx": txToken["transactionHash"]
+        });
         const finalBalance = (bid * scale / finalPrice) + initialBalance.toNumber();
 
         let result = await waiter({ func: contracts.XRT.balanceOf, args: [accounts[0].address], value: finalBalance, retries: retryCounter });
